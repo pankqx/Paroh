@@ -11,48 +11,109 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Detect Node application foundation
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f package.json ]] && [[ -f package-lock.json ]]; then
+            echo "has_app_foundation=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app_foundation=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Skip Node/Electron checks for documentation-only phase
+        if: steps.detect.outputs.has_app_foundation != 'true'
+        run: echo "Documentation-only repository detected; skipping Node/Electron checks until package.json and package-lock.json exist."
       - uses: actions/setup-node@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.detect.outputs.has_app_foundation == 'true'
       - run: npm run lint
+        if: steps.detect.outputs.has_app_foundation == 'true'
       - run: npm run typecheck
+        if: steps.detect.outputs.has_app_foundation == 'true'
 
   test:
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - name: Detect Node application foundation
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f package.json ]] && [[ -f package-lock.json ]]; then
+            echo "has_app_foundation=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app_foundation=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Skip Node/Electron checks for documentation-only phase
+        if: steps.detect.outputs.has_app_foundation != 'true'
+        run: echo "Documentation-only repository detected; skipping Node/Electron checks until package.json and package-lock.json exist."
       - uses: actions/setup-node@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.detect.outputs.has_app_foundation == 'true'
       # Domain, Application, and Infrastructure layer tests are blocking per docs/testing.md.
       # Data Integrity suite (atomic write, crash-mid-write, corrupted YAML/SQLite) runs here too.
       - run: npm run test
+        if: steps.detect.outputs.has_app_foundation == 'true'
 
   accessibility:
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
     steps:
       - uses: actions/checkout@v4
+      - name: Detect Node application foundation
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f package.json ]] && [[ -f package-lock.json ]]; then
+            echo "has_app_foundation=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app_foundation=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Skip Node/Electron checks for documentation-only phase
+        if: steps.detect.outputs.has_app_foundation != 'true'
+        run: echo "Documentation-only repository detected; skipping Node/Electron checks until package.json and package-lock.json exist."
       - uses: actions/setup-node@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.detect.outputs.has_app_foundation == 'true'
       # axe-core pass on changed screens, per docs/accessibility.md's Non-Negotiables.
       - run: npm run test:a11y
+        if: steps.detect.outputs.has_app_foundation == 'true'
 
   audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Detect Node application foundation
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f package.json ]] && [[ -f package-lock.json ]]; then
+            echo "has_app_foundation=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app_foundation=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Skip Node/Electron checks for documentation-only phase
+        if: steps.detect.outputs.has_app_foundation != 'true'
+        run: echo "Documentation-only repository detected; skipping Node/Electron checks until package.json and package-lock.json exist."
       - uses: actions/setup-node@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.detect.outputs.has_app_foundation == 'true'
       - run: npm audit --audit-level=high
+        if: steps.detect.outputs.has_app_foundation == 'true'

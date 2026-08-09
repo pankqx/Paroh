@@ -11,15 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Detect Node application foundation
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f package.json ]] && [[ -f package-lock.json ]]; then
+            echo "has_app_foundation=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_app_foundation=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Skip Node/Electron checks for documentation-only phase
+        if: steps.detect.outputs.has_app_foundation != 'true'
+        run: echo "Documentation-only repository detected; skipping Node/Electron checks until package.json and package-lock.json exist."
       - uses: actions/setup-node@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.detect.outputs.has_app_foundation == 'true'
       # electron-builder targets from docs/architecture.md's Platform Strategy:
       # native .deb and .AppImage, built on real Ubuntu, no compatibility layer involved.
       - run: npm run build:ubuntu
+        if: steps.detect.outputs.has_app_foundation == 'true'
       - uses: actions/upload-artifact@v4
+        if: steps.detect.outputs.has_app_foundation == 'true'
         with:
           name: paroh-ubuntu
           path: |

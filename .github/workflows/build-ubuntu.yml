@@ -1,0 +1,27 @@
+name: Build Ubuntu
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # electron-builder targets from docs/architecture.md's Platform Strategy:
+      # native .deb and .AppImage, built on real Ubuntu, no compatibility layer involved.
+      - run: npm run build:ubuntu
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paroh-ubuntu
+          path: |
+            dist/*.deb
+            dist/*.AppImage

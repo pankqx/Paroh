@@ -1,0 +1,29 @@
+name: Build Windows
+
+# Added from Roadmap Phase 7 onward. Runs on a real Windows GitHub Actions runner —
+# this is the CI-based Windows build referenced in docs/architecture.md's Platform
+# Strategy, which explicitly avoids Wine on the Ubuntu dev machine entirely.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build:windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paroh-windows
+          path: |
+            dist/*.exe
+            dist/*.msi

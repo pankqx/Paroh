@@ -169,31 +169,9 @@ Important guardrails include:
 
 The repository currently contains the product documentation and planning materials, but not the Phase 1 application implementation. This document remains the authoritative product definition while implementation work remains pending.
 
-title: "A moment of peace today"
-date: 2026-07-28T09:42:00
-mood: ok
-tags: [anxiety, healing, reflection]
-visibility: private
-habits_snapshot: [morning-pages, meditation, gratitude-list]
-audio: []
-prompt_id: social-anxiety-002
-prompt_skipped: false
----
-
-# A moment of peace today
-
-I woke up this morning and the light was different...
-```
-
-This YAML frontmatter + Markdown body is what both the SQLite index and the calendar dot-indicators are built from. **The `.md` file is always correct even if the index is deleted.**
-
----
-
-## 6. The Healing Prompt Engine — CBT Program (6 Months)
-
 This is the therapeutic engine of the whole app, and it deserves real structure, not a random quote generator.
 
-### 6.1 Structure
+### 7.1 Structure
 The program runs in **4-week blocks across 24 weeks (~6 months)**, each block focused on one CBT skill area, escalating in depth. Prompts rotate daily within the active block; the user can also browse/pick manually from the full library at any time (§4.16).
 
 | Weeks | Focus | Core CBT skill |
@@ -205,7 +183,7 @@ The program runs in **4-week blocks across 24 weeks (~6 months)**, each block fo
 | 17–20 | Self-compassion & core beliefs | Softening the inner critic, values clarification |
 | 21–24 | Relapse-proofing | Consolidating skills, building a personal "toolkit" entry, planning for setbacks |
 
-### 6.2 Sample prompts by category (representative, not exhaustive — the full library lives in `docs/feature-specifications.md` once we build it out)
+### 7.2 Sample prompts by category (representative, not exhaustive — the full library lives in `docs/feature-specifications.md` once we build it out)
 
 **Noticing (Weeks 1–4)**
 - "What's one moment today when your mood shifted? What happened right before it?"

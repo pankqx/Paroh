@@ -27,6 +27,11 @@ Horizons' Life Story data model deliberately excludes a `progress_percent` field
 ### 2026-08-09 — Chapters' AI narrative summary deferred, local stats shipped first
 Chapters' mood landscape, entry count, streak, and word-frequency stats are fully local and computed from existing data — no AI required, shippable in Phase 5. The "Editor's Note" AI-generated narrative summary is explicitly deferred to Phase 8, gated behind the same opt-in `CloudAIProvider` consent model as every other AI feature.
 
+### 2026-08-10 — Paroh product direction consolidated before implementation
+Paroh is being developed as an offline-first Personal Operating System whose journal is the heart of the experience. The confirmed direction includes a customizable dashboard, a visual Canvas, built-in and custom templates, daily/weekly/monthly/yearly reflection rhythms, Life Operating System evolution, deferred handwriting/drawing, a short calm opening experience on first launch, Ubuntu-first implementation focus, and future cross-platform support that does not force premature implementation.
+
+This consolidation was made before any implementation began so future AI coding sessions have one coherent product direction and do not interpret conflicting documentation as separate product requirements.
+
 ### 2026-08-09 — Deep zoom (Year→Quarter→Month→Week→Today) deferred for Horizons v1
 The original brainstorm's Google-Maps-style continuous zoom is a genuinely good long-term goal but a significant engineering lift. v1 ships Year and Quarter zoom only; deeper zoom levels are tracked in `future-ideas.md` for a later phase once the core timeline interaction is proven with real users.
 

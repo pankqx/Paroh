@@ -259,7 +259,7 @@ The eventual mobile app is Capacitor wrapping the same React codebase, with `Vau
 
 ## Themes
 
-Two built-in visual modes exist as first-class, not skins: **Canvas** (dark, structured, dashboard) and **Editor** (warm, cream, editorial) — exact tokens in `design-system.md`. Both are driven by one CSS custom-property system, so a future user-adjustable accent color or light/dark bias is a token override, not a parallel stylesheet — this is what keeps the two modes feeling like one app.
+Two built-in visual modes exist as first-class, not skins: **Canvas** is a light, warm, structured surface with dotted texture and white cards, and **Editor** is warm, cream, editorial — exact tokens in `design-system.md`. Only the Healing Prompt card is deliberately dark for contrast. Both modes are driven by one CSS custom-property system, so a future user-adjustable accent color or light/dark bias is a token override, not a parallel stylesheet — this is what keeps the two modes feeling like one app.
 
 ---
 

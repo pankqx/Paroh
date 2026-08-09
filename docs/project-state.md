@@ -25,16 +25,23 @@ Align the repository documentation with the current Paroh product direction and 
 - Added a task/project-state summary reflecting the actual repository state.
 
 ## Current task
-Complete the documentation consistency pass and preserve the current implementation/documentation boundary.
+Preserve the reconciled documentation and prepare for Phase 1 implementation.
 
 ## Next task
-Begin implementation only if the team explicitly chooses to move from documentation into Phase 1 scaffolding.
+Begin Phase 1 foundation implementation only after the documentation baseline is approved.
 
 ## Known blockers
-- The expected dashboard/editor reference images are not present in references/.
 - No implementation scaffolding exists yet for Phase 1.
 
 ## Deferred work
 - Phase 1 application implementation.
 - UI implementation and visual polish.
-- Any feature implementation beyond the current documentation cleanup.
+- Any feature implementation beyond the approved Phase 1 scope.
+
+## Reference assets
+
+The repository now contains the current visual references for:
+- Dashboard
+- Editor
+- Monthly planning
+- Yearly planning

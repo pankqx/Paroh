@@ -1,8 +1,22 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 out/
+
+# Environment / secrets
 .env
 .env.local
-vault/.paroh/index.db
+.env.*
+
+# Logs
 *.log
+*.log.*
+
+# OS files
 .DS_Store
+
+# Paroh personal vault
+vault/*
+!vault/.gitkeep

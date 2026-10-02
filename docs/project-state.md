@@ -4,16 +4,16 @@
 Paroh
 
 ## Product version
-0.1.0 (documentation / product draft)
+0.1.0 (Phase 1 skeleton)
 
 ## Current phase
-Documentation cleanup / pre-implementation
+Phase 1 — Skeleton (implemented 2026-10-02, in review)
 
 ## Documentation status
 The repository currently contains the product constitution, vision, architecture, design system, feature specifications, roadmap, tasks, contribution, security, testing, accessibility, performance, release plan, decisions log, and future ideas documents.
 
 ## Application implementation status
-No Phase 1 application implementation is present yet under src/ or tests/.
+Phase 1 is implemented under src/ and tests/: Electron shell, VaultAdapter with atomic saves, Canvas and Editor wired to real Markdown files. See docs/tasks.md.
 
 ## Current objective
 Align the repository documentation with the current Paroh product direction and preserve an accurate record of the repository's current state for future sessions.
@@ -28,10 +28,10 @@ Align the repository documentation with the current Paroh product direction and 
 Preserve the reconciled documentation and prepare for Phase 1 implementation.
 
 ## Next task
-Begin Phase 1 foundation implementation only after the documentation baseline is approved.
+Phase 2 — Core Loop: SQLite FTS5 index, search, Calendar and All Entries pages.
 
 ## Known blockers
-- No implementation scaffolding exists yet for Phase 1.
+- None.
 
 ## Deferred work
 - Phase 1 application implementation.

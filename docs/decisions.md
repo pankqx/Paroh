@@ -50,6 +50,14 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Own saves vs outside edits** are told apart by mtime: after every save the index holds the file's mtime, so the watcher ignores the echo.
 - **Mood tints calendar dots now** (design-system.md listed this for Phase 3) because the Calendar page needed it anyway.
 
+### 2026-10-02 — Phase 3 implementation choices
+- **Answers PRODUCT.md open question 1 the way feature-specifications.md already did:** habit completions live in each day's frontmatter (`habits_snapshot`), habit definitions and tasks in `.paroh/*.json`. The index gained a `habits` column (index version 2, rebuilt automatically) so streaks and heatmaps don't re-read every file.
+- **Habit ids are readable slugs** (`walk-outside`) because they appear in entry files people may open in other editors.
+- **A streak doesn't break on an unfinished today**; it counts back from yesterday until today is ticked.
+- **Audio is streamed to disk in one-second chunks** over IPC rather than saved on stop, so a crash keeps the recording. Playback reads the file over IPC into a blob URL instead of opening a custom protocol or `file://` access.
+- **A reflection from the nudge also moves the task to today**, so a nudged task never shows the nudge twice in a row.
+- **JSON stores refuse to overwrite a file they can't parse**, and writes are serialized per store so quick clicks can't lose an update.
+
 ---
 
 ## Template for New Entries

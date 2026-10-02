@@ -1,15 +1,6 @@
-/** Local calendar date as YYYY-MM-DD. Entries are keyed by the user's own day, not UTC. */
-export function toEntryDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
+import { fromEntryDate, toEntryDate } from '../../shared/localDate';
 
-export function fromEntryDate(date: string): Date {
-  const [y, m, d] = date.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
+export { addDays, fromEntryDate, toEntryDate, weekday } from '../../shared/localDate';
 
 export interface CalendarCell {
   date: string;

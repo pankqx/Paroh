@@ -128,3 +128,8 @@ All channels are invoked from the renderer as `window.paroh.<namespace>.<method>
 ## Versioning This Contract
 
 Any change to a method's signature is a breaking change to this file and must be called out explicitly in `CHANGELOG.md` and, if it affects the renderer/main boundary in a way that could break a mid-flight operation, considered against `release-plan.md`'s "extra scrutiny" list.
+
+
+## Phase 3 notes
+
+`habits`, `tasks` and `audio` are implemented as typed in `src/shared/ipc-contract.ts` (that file wins if this one disagrees). Differences from the sketches above: `habits.setArchived(id, archived)` replaces `archive`, `habits.history()` returns completed habit ids per day (streaks are computed in `renderer/domain/streak.ts`), and recording is `audio.begin()` → `audio.append(id, chunk)` every second → `audio.finish(id, seconds)`, with `audio.read(id)` for playback and `audio.rename(id, title)`.

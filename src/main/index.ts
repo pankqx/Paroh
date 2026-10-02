@@ -1,13 +1,18 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, session, shell } from 'electron';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { IPC, type VaultChange } from '../shared/ipc-contract';
 import { EntryService } from './EntryService';
+import { registerDailyIpc, type DailyStores } from './ipc/daily.ipc';
 import { registerEntriesIpc } from './ipc/entries.ipc';
 import { registerVaultIpc } from './ipc/vault.ipc';
 import { resolveVaultPath } from './settings';
+import { AudioStore } from './stores/AudioStore';
+import { HabitStore } from './stores/HabitStore';
+import { TaskStore } from './stores/TaskStore';
 
 let service: EntryService;
+let stores: DailyStores;
 
 function broadcast(change: VaultChange): void {
   for (const win of BrowserWindow.getAllWindows()) win.webContents.send(IPC.vaultChanged, change);
@@ -19,6 +24,7 @@ async function openVault(path: string): Promise<void> {
   next.watch((dates) => broadcast({ dates }));
   const previous = service;
   service = next;
+  stores = { habits: new HabitStore(next), tasks: new TaskStore(path), audio: new AudioStore(next) };
   previous?.close();
 }
 
@@ -53,9 +59,17 @@ function createWindow(): void {
 }
 
 app.whenReady().then(async () => {
+  // The microphone (for Audio Logs) is the only permission the app ever grants, and only to its own page.
+  session.defaultSession.setPermissionRequestHandler((wc, permission, callback, details) => {
+    const own = wc.getURL().startsWith('file://') || (process.env.ELECTRON_RENDERER_URL && wc.getURL().startsWith(process.env.ELECTRON_RENDERER_URL));
+    callback(Boolean(own) && permission === 'media' && (details as { mediaTypes?: string[] }).mediaTypes?.every((t) => t === 'audio') !== false);
+  });
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === 'media');
+
   await openVault(await resolveVaultPath());
 
   registerEntriesIpc(() => service);
+  registerDailyIpc(() => stores);
   registerVaultIpc(
     () => service.root,
     async (path) => {

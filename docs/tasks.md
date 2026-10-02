@@ -2,42 +2,31 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Documentation cleanup / pre-implementation
-**Current status:** Phase 1 implementation remains TODO; the repository currently contains documentation and planning materials, but no application scaffolding or feature code yet.
-**Last updated:** 2026-08-09
+**Active phase:** Phase 1 — Skeleton (implemented, in review)
+**Last updated:** 2026-10-02
 
 ---
 
-## DONE
+## DONE (Phase 1)
 
-- [x] Reviewed the repository structure and confirmed that the current implementation state is documentation-first.
-- [x] Renamed the master product specification to `PRODUCT.md`.
-- [x] Updated the product identity to Paroh and documented the Personal Operating System direction.
-- [x] Updated the core product documentation set to point to `PRODUCT.md` as the authoritative product document.
-- [x] Added a project-state summary for future agent sessions.
+- [x] Electron + React + TypeScript project (electron-vite), strict TS, ESLint with the renderer layer-boundary rule.
+- [x] `VaultAdapter` with the atomic save pipeline (temp file, read-back validation, fsync, rename).
+- [x] Frontmatter parse/serialize with `schema_version`; unknown keys are preserved on save.
+- [x] Typed IPC contract (`src/shared/ipc-contract.ts`) exposed only through the preload bridge; `contextIsolation`, `sandbox`, no `nodeIntegration`.
+- [x] Design tokens from `docs/design-system.md` as `src/renderer/styles/tokens.css`; Inter and Fraunces bundled locally.
+- [x] Canvas: daily opener quote, mood check-in (writes today's frontmatter), mini calendar with entry dots, recent entries, placeholders for later cards.
+- [x] Editor: title, Tiptap rich text with Markdown round-trip, formatting toolbar, mood, tags, word count and read time, 2s autosave, Ctrl/Cmd+S, Esc back to Canvas, delete with confirmation.
+- [x] Vault folder picker (stored in app settings, not the vault).
+- [x] Tests: frontmatter round-trip, vault save/load/list/delete, atomic write failure leaves the original untouched, calendar/date/word-count domain logic, axe-core accessibility pass.
 
-## IN PROGRESS
+## TODO (Phase 2 — Core Loop)
 
-- [ ] Finish the remaining documentation consistency pass across the repo, including current references to the renamed master product file.
+- [ ] SQLite FTS5 index (disposable, rebuildable) and full-text search.
+- [ ] Calendar full page and All Entries page.
+- [ ] File watcher for entries changed outside the app.
+- [ ] Slash-command menu and wikilinks in the editor.
 
-## TODO
+## Known gaps
 
-- [ ] Start Phase 1 implementation if and when the team decides to move from documentation into application scaffolding.
-- [ ] Create the initial Electron/React/TypeScript project structure described in `docs/folder-structure.md`.
-- [ ] Implement the vault and save pipeline described in `docs/architecture.md`.
-- [ ] Add the initial UI shells for the Canvas and Editor once implementation begins.
-
-## BLOCKED
-
-- [ ] The original dashboard and editor reference images are not present in `references/`. The documentation notes have been updated, but the asset files still need to be supplied if they are available.
-
-## DEFERRED
-
-- [ ] Any Phase 1 implementation work is deferred until the documentation cleanup is complete and the next implementation decision is made.
-- [ ] UI implementation and visual polish remain deferred until the repository has a real app scaffold to build on.
-
----
-
-## Notes
-
-The current repository is still in a documentation/planning state. The roadmap still lists Phase 1 as the next implementation milestone, but no implementation files currently exist under `src/` or `tests/`.
+- `npm run build:ubuntu` (used by the release workflow) is not defined yet; packaging lands in the Polish & Packaging phase.
+- Opener images in `assets/openers/quotes.json` are placeholders; the opener card uses a gradient until real images exist.

@@ -35,6 +35,14 @@ This consolidation was made before any implementation began so future AI coding 
 ### 2026-08-09 — Deep zoom (Year→Quarter→Month→Week→Today) deferred for Horizons v1
 The original brainstorm's Google-Maps-style continuous zoom is a genuinely good long-term goal but a significant engineering lift. v1 ships Year and Quarter zoom only; deeper zoom levels are tracked in `future-ideas.md` for a later phase once the core timeline interaction is proven with real users.
 
+### 2026-10-02 — Phase 1 implementation choices
+- **electron-vite** builds main, preload and renderer from one config; simpler than wiring three Vite builds by hand.
+- **tiptap-markdown** serializes the editor to Markdown, with raw HTML disabled so pasted rich text is reduced to Markdown.
+- **Unknown frontmatter keys are preserved** on save (`Entry.extra`), so files from a newer version or edited by hand never lose data.
+- **No SQLite yet.** Phase 1 lists entries by walking the month folders; the FTS5 index arrives with search in Phase 2.
+- **`renderer/application/` and the event bus are not created yet.** Phase 1 has no cross-feature events to publish; they are added when the first one is needed, per "don't pre-abstract" in coding-standards.md.
+- **Fonts come from `@fontsource`** packages, bundled into the app at build time, so nothing loads from a CDN.
+
 ---
 
 ## Template for New Entries

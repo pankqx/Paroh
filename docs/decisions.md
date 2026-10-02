@@ -43,6 +43,13 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **`renderer/application/` and the event bus are not created yet.** Phase 1 has no cross-feature events to publish; they are added when the first one is needed, per "don't pre-abstract" in coding-standards.md.
 - **Fonts come from `@fontsource`** packages, bundled into the app at build time, so nothing loads from a CDN.
 
+### 2026-10-02 — Phase 2 implementation choices
+- **`node:sqlite` instead of better-sqlite3.** Electron 44 ships Node 24, whose built-in SQLite includes FTS5. No native module means no `electron-rebuild` and nothing to compile per platform.
+- **The index stores plain text**, not Markdown, so search snippets never show `**` or `[[`.
+- **Wikilinks stay plain text in the document** and are only decorated in the editor, so Markdown round-trips untouched. The serializer is told not to escape them, keeping files Obsidian-compatible. Targets resolve to a date first, then to the newest entry with that title.
+- **Own saves vs outside edits** are told apart by mtime: after every save the index holds the file's mtime, so the watcher ignores the echo.
+- **Mood tints calendar dots now** (design-system.md listed this for Phase 3) because the Calendar page needed it anyway.
+
 ---
 
 ## Template for New Entries

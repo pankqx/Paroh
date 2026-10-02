@@ -14,7 +14,7 @@ export function MiniCalendarCard({ today, entries, onOpenEntry }: Props) {
   const t = fromEntryDate(today);
   const [cursor, setCursor] = useState({ year: t.getFullYear(), month: t.getMonth() });
   const weeks = useMemo(() => monthGrid(cursor.year, cursor.month), [cursor]);
-  const written = useMemo(() => new Set(entries.map((e) => e.date)), [entries]);
+  const byDate = useMemo(() => new Map(entries.map((e) => [e.date, e])), [entries]);
   const label = new Date(cursor.year, cursor.month, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
   const shift = (delta: number) =>
@@ -50,7 +50,7 @@ export function MiniCalendarCard({ today, entries, onOpenEntry }: Props) {
           {weeks.map((week) => (
             <tr key={week[0].date}>
               {week.map((cell) => {
-                const hasEntry = written.has(cell.date);
+                const hasEntry = byDate.has(cell.date);
                 const isFuture = cell.date > today;
                 return (
                   <td key={cell.date}>
@@ -62,7 +62,7 @@ export function MiniCalendarCard({ today, entries, onOpenEntry }: Props) {
                         onClick={() => onOpenEntry(cell.date)}
                       >
                         {cell.day}
-                        <span className={`dot ${hasEntry ? 'visible' : ''}`} />
+                        <span className={dotClass(byDate.get(cell.date))} />
                       </button>
                     )}
                   </td>
@@ -74,4 +74,9 @@ export function MiniCalendarCard({ today, entries, onOpenEntry }: Props) {
       </table>
     </section>
   );
+}
+
+function dotClass(entry?: EntrySummary): string {
+  if (!entry) return 'dot';
+  return entry.mood ? `dot visible mood-${entry.mood}` : 'dot visible';
 }

@@ -9,7 +9,7 @@ const DEBOUNCE_MS = 2000;
  * Saves ~2s after the last change (feature-specifications.md §4), and immediately on flush().
  * Nothing is written until the user actually changes something, so opening a day never creates an empty file.
  */
-export function useAutosave(onSaved: () => void) {
+export function useAutosave(onSaved: (entry: Entry) => void) {
   const latest = useRef<Entry | null>(null);
   const dirty = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -23,7 +23,7 @@ export function useAutosave(onSaved: () => void) {
     const result = await window.paroh.entries.save(latest.current);
     if (result.ok) {
       setStatus({ kind: 'saved', at: new Date() });
-      onSaved();
+      onSaved(result.value);
       return true;
     }
     // Keep it dirty so the next change or Ctrl+S retries.
@@ -52,5 +52,7 @@ export function useAutosave(onSaved: () => void) {
     };
   }, [flush]);
 
-  return { status, change, flush };
+  const isDirty = useCallback(() => dirty.current, []);
+
+  return { status, change, flush, isDirty };
 }

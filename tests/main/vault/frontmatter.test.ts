@@ -48,3 +48,11 @@ describe('entry frontmatter', () => {
     expect(parsed.ok && parsed.value.mood).toBeUndefined();
   });
 });
+
+import { markdownToPlainText } from '../../../src/shared/plainText';
+
+describe('markdownToPlainText', () => {
+  it('keeps the words and drops the Markdown', () => {
+    expect(markdownToPlainText('## Title\n\n- **bold** and _it_\n> quote [[A morning|that day]] [site](https://x.y)\n```\ncode\n```')).toBe('Title bold and it quote that day site');
+  });
+});

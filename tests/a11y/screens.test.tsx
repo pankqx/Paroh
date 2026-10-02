@@ -6,12 +6,22 @@ import type { ParohApi } from '../../src/shared/ipc-contract';
 import { CanvasPage } from '../../src/renderer/features/canvas/CanvasPage';
 import { MetadataRail } from '../../src/renderer/features/editor/MetadataRail';
 import { Sidebar } from '../../src/renderer/app/Sidebar';
+import { AllEntriesPage } from '../../src/renderer/features/all-entries/AllEntriesPage';
+import { CalendarPage } from '../../src/renderer/features/calendar/CalendarPage';
 import type { EntrySummary } from '../../src/shared/types/Entry';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 window.paroh = {
-  entries: { save: async (e) => ({ ok: true, value: e }), load: async () => ({ ok: true, value: null }), delete: async () => ({ ok: true, value: undefined }), list: async () => ({ ok: true, value: [] }) },
-  vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null },
+  entries: {
+    save: async (e) => ({ ok: true, value: e }),
+    load: async () => ({ ok: true, value: null }),
+    delete: async () => ({ ok: true, value: undefined }),
+    list: async () => ({ ok: true, value: [] }),
+    backlinks: async () => ({ ok: true, value: [] }),
+    resolveLink: async () => ({ ok: true, value: null }),
+  },
+  search: { query: async () => ({ ok: true, value: [] }), tags: async () => ({ ok: true, value: [] }), rebuildIndex: async () => ({ ok: true, value: undefined }) },
+  vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null, onChanged: () => () => {} },
 } satisfies ParohApi;
 
 const entries: EntrySummary[] = [
@@ -44,11 +54,17 @@ describe('accessibility (axe-core)', () => {
 
   it('Sidebar has no violations', async () => {
     const noop = () => {};
-    expect(await violations(<Sidebar view={{ name: 'canvas' }} today="2026-10-02" vaultPath="/home/me/Paroh" onCanvas={noop} onToday={noop} onChooseVault={noop} />)).toEqual([]);
+    expect(await violations(<Sidebar view={{ name: 'canvas' }} today="2026-10-02" vaultPath="/home/me/Paroh" onNavigate={noop} onChooseVault={noop} />)).toEqual([]);
+  });
+
+  it('Calendar and All Entries pages have no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<CalendarPage today="2026-10-02" entries={entries} onOpenEntry={noop} />)).toEqual([]);
+    expect(await violations(<AllEntriesPage query="morning" onQuery={noop} onOpenEntry={noop} />)).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {
     const noop = () => {};
-    expect(await violations(<MetadataRail mood="sad" tags={['family']} words={12} minutes={1} onMood={noop} onTags={noop} onDelete={noop} />)).toEqual([]);
+    expect(await violations(<MetadataRail mood="sad" tags={['family']} words={12} minutes={1} backlinks={[{ date: '2026-09-29', title: 'Linked' }]} onOpenEntry={noop} onMood={noop} onTags={noop} onDelete={noop} />)).toEqual([]);
   });
 });

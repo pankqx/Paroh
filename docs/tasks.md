@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 1 — Skeleton (implemented, in review)
+**Active phase:** Phase 2 — Core Loop (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -19,12 +19,21 @@
 - [x] Vault folder picker (stored in app settings, not the vault).
 - [x] Tests: frontmatter round-trip, vault save/load/list/delete, atomic write failure leaves the original untouched, calendar/date/word-count domain logic, axe-core accessibility pass.
 
-## TODO (Phase 2 — Core Loop)
+## DONE (Phase 2)
 
-- [ ] SQLite FTS5 index (disposable, rebuildable) and full-text search.
-- [ ] Calendar full page and All Entries page.
-- [ ] File watcher for entries changed outside the app.
-- [ ] Slash-command menu and wikilinks in the editor.
+- [x] SQLite FTS5 index at `<vault>/.paroh/index.db`, using Electron's built-in `node:sqlite` (no native module). Disposable: a corrupt or outdated index is deleted and rebuilt; launches only re-index files whose mtime changed.
+- [x] Full-text search (stemming, prefix-as-you-type) with mood, tag and date-range filters and highlighted snippets; search box in the top bar.
+- [x] Calendar full page (mood-coloured days, entry titles) and All Entries page; mini calendar dots tinted by mood.
+- [x] File watcher: entries added, edited or deleted outside Paroh appear immediately; an open entry reloads quietly, or asks if you have unsaved changes.
+- [x] Editor: `/` block menu, `[[wikilinks]]` with autocomplete (by title or date), click to open, "Linked from" backlinks in the side rail. Links are stored literally, Obsidian-style.
+- [x] Tests: index search/filters/links/corruption, vault-index sync and external changes, plain-text extraction, axe-core for the new pages.
+
+## TODO (Phase 3 — Habits, To-Do, Audio)
+
+- [ ] Habit CRUD, streaks, Canvas card + full page with heatmap.
+- [ ] To-Do CRUD, "did you finish this?" next-day nudge, recurring tasks.
+- [ ] Audio recording, playback, linking to entries.
+- [ ] Mood trend chart on the Calendar page.
 
 ## Known gaps
 

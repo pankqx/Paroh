@@ -7,13 +7,13 @@ Paroh
 0.1.0 (Phase 1 skeleton)
 
 ## Current phase
-Phase 1 — Skeleton (implemented 2026-10-02, in review)
+Phase 2 — Core Loop (implemented 2026-10-02, in review); Phase 1 merged
 
 ## Documentation status
 The repository currently contains the product constitution, vision, architecture, design system, feature specifications, roadmap, tasks, contribution, security, testing, accessibility, performance, release plan, decisions log, and future ideas documents.
 
 ## Application implementation status
-Phase 1 is implemented under src/ and tests/: Electron shell, VaultAdapter with atomic saves, Canvas and Editor wired to real Markdown files. See docs/tasks.md.
+Phase 1 is implemented under src/ and tests/: Electron shell, VaultAdapter with atomic saves, Canvas and Editor wired to real Markdown files. Phase 2 adds the SQLite search index, Calendar and All Entries pages, wikilinks and a file watcher. See docs/tasks.md.
 
 ## Current objective
 Align the repository documentation with the current Paroh product direction and preserve an accurate record of the repository's current state for future sessions.
@@ -28,7 +28,7 @@ Align the repository documentation with the current Paroh product direction and 
 Preserve the reconciled documentation and prepare for Phase 1 implementation.
 
 ## Next task
-Phase 2 — Core Loop: SQLite FTS5 index, search, Calendar and All Entries pages.
+Phase 3 — Habits, To-Do, Audio, mood trend chart.
 
 ## Known blockers
 - None.

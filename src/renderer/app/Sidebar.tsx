@@ -1,32 +1,33 @@
-import type { View } from './App';
+import type { Navigate, View } from './App';
 
 interface Props {
   view: View;
   today: string;
   vaultPath: string;
-  onCanvas: () => void;
-  onToday: () => void;
+  onNavigate: Navigate;
   onChooseVault: () => void;
 }
 
 // Later-phase pages are listed so the shape of the app is visible, but stay disabled until they are real.
-const LATER = ['Calendar', 'All Entries', 'Audio Logs', 'Habits', 'To-Do', 'Healing Prompts'];
+const LATER = ['Audio Logs', 'Habits', 'To-Do', 'Healing Prompts'];
 
-export function Sidebar({ view, today, vaultPath, onCanvas, onToday, onChooseVault }: Props) {
-  const editingToday = view.name === 'editor' && view.date === today;
+export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: Props) {
+  const items: { label: string; active: boolean; go: View }[] = [
+    { label: 'Canvas', active: view.name === 'canvas', go: { name: 'canvas' } },
+    { label: 'Today’s entry', active: view.name === 'editor' && view.date === today, go: { name: 'editor', date: today } },
+    { label: 'Calendar', active: view.name === 'calendar', go: { name: 'calendar' } },
+    { label: 'All Entries', active: view.name === 'entries', go: { name: 'entries', query: '' } },
+  ];
   return (
     <nav className="sidebar" aria-label="Main">
       <ul className="nav">
-        <li>
-          <button className={`nav-item ${view.name === 'canvas' ? 'active' : ''}`} onClick={onCanvas}>
-            Canvas
-          </button>
-        </li>
-        <li>
-          <button className={`nav-item ${editingToday ? 'active' : ''}`} onClick={onToday}>
-            Today's entry
-          </button>
-        </li>
+        {items.map((item) => (
+          <li key={item.label}>
+            <button className={`nav-item ${item.active ? 'active' : ''}`} aria-current={item.active ? 'page' : undefined} onClick={() => onNavigate(item.go)}>
+              {item.label}
+            </button>
+          </li>
+        ))}
         {LATER.map((label) => (
           <li key={label}>
             <button className="nav-item" disabled title="Coming in a later phase">

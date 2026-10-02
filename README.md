@@ -4,7 +4,7 @@ Paroh is an offline-first, privacy-first, open-source Personal Operating System 
 
 ## Current status
 
-Phases 1 to 4 are implemented: an Electron desktop app with a Canvas dashboard, an Editor, search, a calendar, habits, to-dos, audio logs and a 24-week healing prompt programme. Entries are saved as plain Markdown files with YAML frontmatter in a folder you own, through the atomic save pipeline in `docs/architecture.md`. See `docs/tasks.md` for what is done and what comes next.
+Phases 1 to 5 are implemented: an Electron desktop app with a Canvas dashboard, an Editor, search, a calendar, habits, to-dos, audio logs, a 24-week healing prompt programme, monthly Chapters and a Horizons life timeline. Entries are saved as plain Markdown files with YAML frontmatter in a folder you own, through the atomic save pipeline in `docs/architecture.md`. See `docs/tasks.md` for what is done and what comes next.
 
 ## Run it
 

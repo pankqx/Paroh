@@ -1,6 +1,7 @@
 import type { AudioLog } from './types/AudioLog';
 import type { DateRange, Entry, EntrySummary } from './types/Entry';
 import type { Habit, HabitDay, HabitFrequency } from './types/Habit';
+import type { HorizonsData, LifeStory, LifeStoryInput } from './types/LifeStory';
 import type { PromptLog } from './types/Prompt';
 import type { Result } from './types/Result';
 import type { Backlink, SearchFilters, SearchResult } from './types/Search';
@@ -36,6 +37,11 @@ export const IPC = {
   audioRead: 'audio:read',
   audioRename: 'audio:rename',
   promptsHistory: 'prompts:history',
+  chaptersMonth: 'chapters:month',
+  horizonsList: 'horizons:list',
+  horizonsSave: 'horizons:save',
+  horizonsRemove: 'horizons:remove',
+  horizonsAddArea: 'horizons:addArea',
   vaultInfo: 'vault:info',
   vaultChoose: 'vault:choose',
   /** main → renderer: entry files changed outside the app (or the vault itself was switched). */
@@ -107,6 +113,18 @@ export interface ParohApi {
   prompts: {
     /** Answered and skipped healing prompts, newest first, read from entry frontmatter. */
     history(): Promise<Result<PromptLog[]>>;
+  };
+  chapters: {
+    /** That month's entries with full bodies, read from the files (Chapters is computed in the renderer). */
+    month(month: string): Promise<Result<Entry[]>>;
+  };
+  horizons: {
+    list(): Promise<Result<HorizonsData>>;
+    /** Creates a story, or updates the one with `id`. */
+    save(input: LifeStoryInput, id?: string): Promise<Result<LifeStory>>;
+    remove(id: string): Promise<Result<void>>;
+    /** Returns the new area's folder name. */
+    addArea(name: string): Promise<Result<string>>;
   };
   vault: {
     info(): Promise<VaultInfo>;

@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 4 — Healing Prompt Engine (implemented, in review)
+**Active phase:** Phase 5 — Horizons & Chapters (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -46,11 +46,19 @@
 - [x] A standing note that Paroh is a journal, not therapy, with a signpost to crisis lines and professionals.
 - [x] Tests: library shape, fallback, rotation and looping, skip-is-not-shuffle, manual override, seeding, frontmatter round-trip, prompt history from the index, axe-core for the page.
 
-## TODO (Phase 5 — Horizons & Chapters)
+## DONE (Phase 5)
 
-- [ ] Chapters: computed monthly view (mood landscape, stats, top word).
-- [ ] Horizons: Life Areas and Life Stories on a Year/Quarter timeline, status states, no percentages.
-- [ ] Sidebar reorganized into Today / Reflect groups.
+- [x] Chapters: one page per month, computed from that month's files. Mood landscape (draws in once, respects reduced motion, with a text summary for screen readers), entries written, days logged, longest streak, most-used words (stopwords and blockquotes left out), week-by-week moods with the hardest week marked, and the month's entries. `←` / `→` change month; a week opens All Entries filtered to those dates. An empty month says "No entries this month."
+- [x] Horizons: Life Stories as Markdown files at `<vault>/horizons/<area>/<slug>.md` in the documented format, with no progress field. Seven default life areas plus any you add (an area is a folder). Timeline with Year and Quarter zoom, a Today marker, ongoing stories stretching to today, `←` / `→` to move and `+` / `-` to zoom. A List view as the keyboard and screen-reader equivalent. Story editor with title, area, status (Dreaming / In motion / Living it / Let go), start date, an optional "when", why, and linked entries.
+- [x] Sidebar grouped into Today and Reflect.
+- [x] Tests: word counts, chapter stats and week grouping, landscape summary, timeline spans, columns and lanes, life story file format and round-trip, the Horizons store (unique slugs, moving between areas, unknown keys kept, path escapes rejected), month loading, axe-core for Chapters, the timeline, the list and the editor.
+
+## TODO (Phase 6 — Polish & Packaging)
+
+- [ ] Settings page (vault, export/import, reminders, privacy and crisis-resources line).
+- [ ] `.deb` / `.AppImage` builds via electron-builder, including `npm run build:ubuntu`.
+- [ ] Onboarding, and a design and accessibility pass across every screen.
+- [ ] Horizons: drag stories between periods, and rename or hide life areas.
 
 ## Known gaps
 

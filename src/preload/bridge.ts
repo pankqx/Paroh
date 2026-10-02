@@ -43,6 +43,15 @@ const api: ParohApi = {
   prompts: {
     history: () => ipcRenderer.invoke(IPC.promptsHistory),
   },
+  chapters: {
+    month: (month) => ipcRenderer.invoke(IPC.chaptersMonth, month),
+  },
+  horizons: {
+    list: () => ipcRenderer.invoke(IPC.horizonsList),
+    save: (input, id) => ipcRenderer.invoke(IPC.horizonsSave, input, id),
+    remove: (id) => ipcRenderer.invoke(IPC.horizonsRemove, id),
+    addArea: (name) => ipcRenderer.invoke(IPC.horizonsAddArea, name),
+  },
   vault: {
     info: () => ipcRenderer.invoke(IPC.vaultInfo),
     choose: () => ipcRenderer.invoke(IPC.vaultChoose),

@@ -64,6 +64,13 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Days of use = days with an entry before today.** Counting only earlier days keeps today's prompt stable even after today's entry is created. A skip creates today's entry, so it counts as a day of use.
 - **"Write about it" on a day that already has writing** puts the prompt above it rather than starting a second entry, since there is one file per day.
 
+### 2026-10-02 — Phase 5 implementation choices
+- **Chapters reads that month's files directly** (`chapters.month`) instead of the index, because the most-used word needs full bodies. This also covers the spec's "fall back to a filesystem scan" case. Everything else is computed in `renderer/domain/chapters.ts`.
+- **Blockquotes are left out of word counts**, so a seeded healing prompt doesn't become the month's "most-used word."
+- **Life Stories gained one optional key, `when`** (`2027` or `2027-Q2`), because the spec's timeline needs somewhere to place a story but the file shape only had `created`. A story spans `created` to the end of `when`, or to today when there is no `when`. There is still no progress field.
+- **Horizons is not watched for outside edits** in v1; it reloads each time the page opens. Entries remain the only watched files.
+- **Dragging cards between periods is deferred.** The editor's "when" field does the same job and works by keyboard; drag can come in the polish phase.
+
 ---
 
 ## Template for New Entries

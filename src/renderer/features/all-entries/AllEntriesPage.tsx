@@ -6,15 +6,18 @@ import { formatLongDate } from '../../domain/dates';
 
 interface Props {
   query: string;
+  /** Opens with a date range already applied, e.g. a week picked in Chapters. */
+  initialFrom?: string;
+  initialTo?: string;
   onQuery: (query: string) => void;
   onOpenEntry: (date: string) => void;
 }
 
-export function AllEntriesPage({ query, onQuery, onOpenEntry }: Props) {
+export function AllEntriesPage({ query, initialFrom = '', initialTo = '', onQuery, onOpenEntry }: Props) {
   const [mood, setMood] = useState<Mood | ''>('');
   const [tag, setTag] = useState('');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [from, setFrom] = useState(initialFrom);
+  const [to, setTo] = useState(initialTo);
   const [tags, setTags] = useState<{ tag: string; count: number }[]>([]);
   const [state, setState] = useState<{ results: SearchResult[]; error: string | null; forQuery: string } | null>(null);
   const [version, setVersion] = useState(0);

@@ -77,6 +77,26 @@ export class VaultAdapter {
     return files;
   }
 
+  /** Every readable entry in one month folder, oldest first, read straight from disk (Chapters needs full bodies). */
+  async loadMonth(month: string): Promise<Result<Entry[]>> {
+    if (!MONTH_DIR_RE.test(month)) return err(`Invalid month: ${month}`);
+    let files: string[];
+    try {
+      files = await readdir(join(this.root, month));
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return ok([]);
+      return err(`Could not read ${month}: ${(e as Error).message}`);
+    }
+    const entries: Entry[] = [];
+    for (const file of files.sort()) {
+      const date = file.replace(/\.md$/, '');
+      if (!file.endsWith('.md') || !isEntryDate(date) || date.slice(0, 7) !== month) continue;
+      const loaded = await this.load(date);
+      if (loaded.ok && loaded.value) entries.push(loaded.value);
+    }
+    return ok(entries);
+  }
+
   /** Modification time of an entry's file, or null if it does not exist. */
   async mtime(date: string): Promise<number | null> {
     try {

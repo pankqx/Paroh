@@ -46,6 +46,10 @@ export class EntryService {
     return saved;
   }
 
+  monthEntries(month: string): Promise<Result<Entry[]>> {
+    return this.vault.loadMonth(String(month));
+  }
+
   load(date: string): Promise<Result<Entry | null>> {
     return this.vault.load(date);
   }

@@ -1,6 +1,7 @@
 import type { EntrySummary } from '../../../shared/types/Entry';
 import type { Navigate } from '../../app/App';
 import { AudioLogsCard } from './AudioLogsCard';
+import { HealingPromptCard } from '../healing/HealingPromptCard';
 import { HabitsCard } from './HabitsCard';
 import { HeroOpenerCard } from './HeroOpenerCard';
 import { MiniCalendarCard } from './MiniCalendarCard';
@@ -24,7 +25,16 @@ export function CanvasPage({ today, entries, loadError, onOpenEntry, onEntriesCh
       {loadError && <div className="banner-error">Some entries could not be read: {loadError}</div>}
       <div className="canvas-grid">
         <HeroOpenerCard today={today} onWrite={() => onOpenEntry(today)} />
-        <MoodCheckInCard today={today} mood={todayEntry?.mood} onSaved={onEntriesChanged} />
+        <div className="canvas-stack">
+          <MoodCheckInCard today={today} mood={todayEntry?.mood} onSaved={onEntriesChanged} />
+          <HealingPromptCard
+            today={today}
+            entryDates={entries.map((e) => e.date)}
+            onOpenEntry={onOpenEntry}
+            onChanged={onEntriesChanged}
+            onOpenPage={() => onNavigate({ name: 'prompts' })}
+          />
+        </div>
         <MiniCalendarCard today={today} entries={entries} onOpenEntry={onOpenEntry} />
       </div>
       <RecentEntriesRow entries={entries} onOpenEntry={onOpenEntry} onWrite={() => onOpenEntry(today)} />

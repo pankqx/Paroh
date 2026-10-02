@@ -6,6 +6,7 @@ import { CalendarPage } from '../features/calendar/CalendarPage';
 import { CanvasPage } from '../features/canvas/CanvasPage';
 import { EditorPage } from '../features/editor/EditorPage';
 import { HabitsPage } from '../features/habits/HabitsPage';
+import { HealingPromptsPage } from '../features/healing/HealingPromptsPage';
 import { TodoPage } from '../features/todo/TodoPage';
 import { useEntries } from '../hooks/useEntries';
 import { useVault } from '../hooks/useVault';
@@ -20,7 +21,8 @@ export type View =
   | { name: 'editor'; date: string }
   | { name: 'habits' }
   | { name: 'todo' }
-  | { name: 'audio' };
+  | { name: 'audio' }
+  | { name: 'prompts' };
 export type Navigate = (view: View) => void;
 
 export function App() {
@@ -47,6 +49,7 @@ export function App() {
         <Sidebar view={view} today={today} vaultPath={vault.path} onNavigate={navigate} onChooseVault={vault.choose} />
         <main className="app-main">
           {view.name === 'canvas' && <CanvasPage today={today} entries={entries} loadError={error} onOpenEntry={openEntry} onEntriesChanged={refreshList} onNavigate={navigate} />}
+          {view.name === 'prompts' && <HealingPromptsPage today={today} entryDates={entries.map((e) => e.date)} onOpenEntry={openEntry} onChanged={refreshList} />}
           {view.name === 'habits' && <HabitsPage today={today} />}
           {view.name === 'todo' && <TodoPage today={today} />}
           {view.name === 'audio' && <AudioLogsPage onOpenEntry={openEntry} />}

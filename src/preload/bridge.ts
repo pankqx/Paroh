@@ -40,6 +40,9 @@ const api: ParohApi = {
     read: (id) => ipcRenderer.invoke(IPC.audioRead, id),
     rename: (id, title) => ipcRenderer.invoke(IPC.audioRename, id, title),
   },
+  prompts: {
+    history: () => ipcRenderer.invoke(IPC.promptsHistory),
+  },
   vault: {
     info: () => ipcRenderer.invoke(IPC.vaultInfo),
     choose: () => ipcRenderer.invoke(IPC.vaultChoose),

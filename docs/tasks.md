@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 3 — Habits, To-Do, Audio (implemented, in review)
+**Active phase:** Phase 4 — Healing Prompt Engine (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -36,10 +36,21 @@
 - [x] Mood trend chart (last 30 days) on the Calendar page.
 - [x] Tests: habit/task/audio stores (including concurrent toggles, unreadable JSON never overwritten, interrupted recordings), streaks, schedules, task grouping, recurrence, mood trend, axe-core for the new pages.
 
-## TODO (Phase 4 — Healing Prompt Engine)
+## DONE (Phase 4)
 
-- [ ] Full CBT prompt library (`assets/prompts.json`), 24-week rotation, prompt history page, manual override.
-- [ ] "Write about it" seeds the prompt into today's entry.
+- [x] Prompt library in `assets/prompts.json`: 120 prompts, five for each of the 24 weeks, across the six CBT blocks in PRODUCT.md §7.1. Validated on load; malformed prompts are dropped and an unusable file falls back to five built-in prompts.
+- [x] Rotation: one week-block per 7 days with an entry (days of use, not calendar days), looping back to week 1 with a note after week 24. Within a week, the first prompt not seen before.
+- [x] Dark prompt card on the Canvas: "Write about it" puts the prompt at the top of today's entry as a blockquote; "Skip" keeps the same prompt for the rest of the day. `W` / `S` while the card has focus.
+- [x] Healing Prompts page: today's prompt, the programme overview, the full library with "Write about this today" (manual override, any week), and history (written about vs skipped, by date).
+- [x] `prompt_id` / `prompt_skipped` in entry frontmatter are the only log; the index gained columns for them (index version 3).
+- [x] A standing note that Paroh is a journal, not therapy, with a signpost to crisis lines and professionals.
+- [x] Tests: library shape, fallback, rotation and looping, skip-is-not-shuffle, manual override, seeding, frontmatter round-trip, prompt history from the index, axe-core for the page.
+
+## TODO (Phase 5 — Horizons & Chapters)
+
+- [ ] Chapters: computed monthly view (mood landscape, stats, top word).
+- [ ] Horizons: Life Areas and Life Stories on a Year/Quarter timeline, status states, no percentages.
+- [ ] Sidebar reorganized into Today / Reflect groups.
 
 ## Known gaps
 

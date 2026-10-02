@@ -15,6 +15,7 @@ import { RecorderProvider } from '../../src/renderer/app/RecorderContext';
 import { HabitsPage } from '../../src/renderer/features/habits/HabitsPage';
 import { TodoPage } from '../../src/renderer/features/todo/TodoPage';
 import { AudioLogsPage } from '../../src/renderer/features/audio-logs/AudioLogsPage';
+import { HealingPromptsPage } from '../../src/renderer/features/healing/HealingPromptsPage';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 const habits: Habit[] = [{ id: 'walk', name: 'Walk outside', frequency: 'daily', createdAt: '2026-09-01', archived: false }];
@@ -56,6 +57,7 @@ window.paroh = {
     read: async () => ({ ok: true, value: new Uint8Array() }),
     rename: async () => ({ ok: true, value: undefined }),
   },
+  prompts: { history: async () => ({ ok: true, value: [{ prompt_id: 'noticing-001', date: '2026-10-01', outcome: 'answered' }] }) },
   vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null, onChanged: () => () => {} },
 } satisfies ParohApi;
 
@@ -104,6 +106,11 @@ describe('accessibility (axe-core)', () => {
     expect(await violations(<HabitsPage today="2026-10-02" />)).toEqual([]);
     expect(await violations(<TodoPage today="2026-10-02" />)).toEqual([]);
     expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('Healing Prompts page has no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<HealingPromptsPage today="2026-10-02" entryDates={entries.map((e) => e.date)} onOpenEntry={noop} onChanged={noop} />)).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {

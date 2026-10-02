@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Phase 4 healing prompts: a 24-week, 120-prompt CBT programme with a daily
+  prompt card on the Canvas, skip without reroll, a prompt library you can pick
+  from, and prompt history.
+
 - Phase 3 daily practice: habits with streaks and heatmap, to-dos with
   repeats and the "did you finish this?" nudge, audio logs that save as you
   record, and a 30-day mood chart.

@@ -2,7 +2,7 @@
  * The index is disposable (architecture.md §Search & Indexing): bump INDEX_VERSION whenever this
  * schema changes and every vault's index.db is thrown away and rebuilt from the Markdown files.
  */
-export const INDEX_VERSION = 2;
+export const INDEX_VERSION = 3;
 
 export const SCHEMA = `
 CREATE TABLE entries (
@@ -13,6 +13,8 @@ CREATE TABLE entries (
   tags TEXT NOT NULL,
   excerpt TEXT NOT NULL,
   habits TEXT NOT NULL DEFAULT '[]',
+  prompt_id TEXT,
+  prompt_skipped INTEGER NOT NULL DEFAULT 0,
   mtime REAL NOT NULL
 );
 CREATE INDEX entries_title_key ON entries(title_key);

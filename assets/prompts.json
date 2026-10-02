@@ -1,0 +1,749 @@
+{
+  "version": 1,
+  "prompts": [
+    {
+      "id": "noticing-001",
+      "week_block": 1,
+      "category": "noticing",
+      "text": "What's one moment today when your mood shifted? What happened right before it?",
+      "followups": [
+        "Where did you feel it in your body?"
+      ]
+    },
+    {
+      "id": "noticing-002",
+      "week_block": 1,
+      "category": "noticing",
+      "text": "Describe a thought that visited you today without you inviting it. Where do you think it came from?"
+    },
+    {
+      "id": "noticing-003",
+      "week_block": 1,
+      "category": "noticing",
+      "text": "Pick three words for how you feel right now. Which one is strongest?"
+    },
+    {
+      "id": "noticing-004",
+      "week_block": 1,
+      "category": "noticing",
+      "text": "What did you do today that you're glad you did, however small?"
+    },
+    {
+      "id": "noticing-005",
+      "week_block": 1,
+      "category": "noticing",
+      "text": "When did you feel most like yourself today? What was going on around you?"
+    },
+    {
+      "id": "noticing-006",
+      "week_block": 2,
+      "category": "noticing",
+      "text": "Think of a feeling you had today. What thought was sitting underneath it?",
+      "followups": [
+        "What did you do next?"
+      ]
+    },
+    {
+      "id": "noticing-007",
+      "week_block": 2,
+      "category": "noticing",
+      "text": "Was there a moment today when you wanted to avoid something? What were you hoping to avoid feeling?"
+    },
+    {
+      "id": "noticing-008",
+      "week_block": 2,
+      "category": "noticing",
+      "text": "Write down one thought from today exactly as it sounded in your head. Does it sound like your own voice, or someone else's?"
+    },
+    {
+      "id": "noticing-009",
+      "week_block": 2,
+      "category": "noticing",
+      "text": "Rate your energy today from 1 to 10. What do you think nudged it up or down?"
+    },
+    {
+      "id": "noticing-010",
+      "week_block": 2,
+      "category": "noticing",
+      "text": "What did your body tell you today that your mind didn't notice at first?"
+    },
+    {
+      "id": "noticing-011",
+      "week_block": 3,
+      "category": "noticing",
+      "text": "Is there a thought that keeps coming back this week? When does it tend to show up?",
+      "followups": [
+        "Is there a time, place or person it often comes with?"
+      ]
+    },
+    {
+      "id": "noticing-012",
+      "week_block": 3,
+      "category": "noticing",
+      "text": "Describe a situation today using only facts, the way a camera would see it. Then add what you told yourself about it."
+    },
+    {
+      "id": "noticing-013",
+      "week_block": 3,
+      "category": "noticing",
+      "text": "What's one thing you did today because of how you felt, rather than what you wanted?"
+    },
+    {
+      "id": "noticing-014",
+      "week_block": 3,
+      "category": "noticing",
+      "text": "Notice a small pleasure from today: a taste, a sound, a bit of light. Stay with it for a few lines."
+    },
+    {
+      "id": "noticing-015",
+      "week_block": 3,
+      "category": "noticing",
+      "text": "When you felt stressed today, what was the very first sign?"
+    },
+    {
+      "id": "noticing-016",
+      "week_block": 4,
+      "category": "noticing",
+      "text": "Looking back at the last few weeks, what patterns are you starting to notice in your moods?"
+    },
+    {
+      "id": "noticing-017",
+      "week_block": 4,
+      "category": "noticing",
+      "text": "Which situations tend to lift you, and which tend to drain you?"
+    },
+    {
+      "id": "noticing-018",
+      "week_block": 4,
+      "category": "noticing",
+      "text": "Write about a moment this week as a chain: what happened, what you thought, what you felt, what you did."
+    },
+    {
+      "id": "noticing-019",
+      "week_block": 4,
+      "category": "noticing",
+      "text": "What's one thing about your thinking you understand better now than a month ago?"
+    },
+    {
+      "id": "noticing-020",
+      "week_block": 4,
+      "category": "noticing",
+      "text": "If your week had a weather report, what would it say?"
+    },
+    {
+      "id": "restructuring-001",
+      "week_block": 5,
+      "category": "restructuring",
+      "text": "What's a thought you had today that felt 100% true in the moment? What's the evidence for it, and against it?"
+    },
+    {
+      "id": "restructuring-002",
+      "week_block": 5,
+      "category": "restructuring",
+      "text": "If a friend told you they were thinking this about themselves, what would you say back to them?"
+    },
+    {
+      "id": "restructuring-003",
+      "week_block": 5,
+      "category": "restructuring",
+      "text": "Did you catch yourself predicting the future today? What did you expect would happen, and what actually did?"
+    },
+    {
+      "id": "restructuring-004",
+      "week_block": 5,
+      "category": "restructuring",
+      "text": "Think of something that went wrong recently. How much of it was truly in your control?"
+    },
+    {
+      "id": "restructuring-005",
+      "week_block": 5,
+      "category": "restructuring",
+      "text": "Write down a 'should' you told yourself today. What happens if you change it to 'I'd like to'?"
+    },
+    {
+      "id": "restructuring-006",
+      "week_block": 6,
+      "category": "restructuring",
+      "text": "Did you notice any all-or-nothing thinking today, where something was either perfect or a failure? What's in between?"
+    },
+    {
+      "id": "restructuring-007",
+      "week_block": 6,
+      "category": "restructuring",
+      "text": "Was there a moment you assumed you knew what someone else was thinking? What else could they have been thinking?"
+    },
+    {
+      "id": "restructuring-008",
+      "week_block": 6,
+      "category": "restructuring",
+      "text": "Pick a worry from today. What's the worst case, the best case, and the most likely case?"
+    },
+    {
+      "id": "restructuring-009",
+      "week_block": 6,
+      "category": "restructuring",
+      "text": "When did you discount something good today, telling yourself it 'didn't count'? Let it count here."
+    },
+    {
+      "id": "restructuring-010",
+      "week_block": 6,
+      "category": "restructuring",
+      "text": "What label did you put on yourself today? Is it the whole story?"
+    },
+    {
+      "id": "restructuring-011",
+      "week_block": 7,
+      "category": "restructuring",
+      "text": "Take a thought that has been bothering you. Write a more balanced version that still feels honest.",
+      "followups": [
+        "How much do you believe each version, from 0 to 100?"
+      ]
+    },
+    {
+      "id": "restructuring-012",
+      "week_block": 7,
+      "category": "restructuring",
+      "text": "Imagine you're a kind, fair judge looking at today's hardest thought. What would they rule?"
+    },
+    {
+      "id": "restructuring-013",
+      "week_block": 7,
+      "category": "restructuring",
+      "text": "What would you think about this situation a year from now?"
+    },
+    {
+      "id": "restructuring-014",
+      "week_block": 7,
+      "category": "restructuring",
+      "text": "Which thinking trap do you fall into most often? What does it usually sound like?"
+    },
+    {
+      "id": "restructuring-015",
+      "week_block": 7,
+      "category": "restructuring",
+      "text": "Think of a time a feared outcome didn't happen. What did you learn from that?"
+    },
+    {
+      "id": "restructuring-016",
+      "week_block": 8,
+      "category": "restructuring",
+      "text": "Which tool from the past few weeks has been most useful for questioning a hard thought?"
+    },
+    {
+      "id": "restructuring-017",
+      "week_block": 8,
+      "category": "restructuring",
+      "text": "Write down a belief about yourself you'd like to test. What small experiment could test it this week?"
+    },
+    {
+      "id": "restructuring-018",
+      "week_block": 8,
+      "category": "restructuring",
+      "text": "How has your inner voice changed, even slightly, over the last month?"
+    },
+    {
+      "id": "restructuring-019",
+      "week_block": 8,
+      "category": "restructuring",
+      "text": "Walk through a hard moment from this week and rewrite how you'd like to respond to the thought next time."
+    },
+    {
+      "id": "restructuring-020",
+      "week_block": 8,
+      "category": "restructuring",
+      "text": "What's one thought you used to believe completely that now feels a little less certain?"
+    },
+    {
+      "id": "social-anxiety-001",
+      "week_block": 9,
+      "category": "social-anxiety",
+      "text": "What is one social situation that made you anxious this week? What was the fear underneath it?"
+    },
+    {
+      "id": "social-anxiety-002",
+      "week_block": 9,
+      "category": "social-anxiety",
+      "text": "When you feel anxious around people, what do you imagine they're noticing about you?"
+    },
+    {
+      "id": "social-anxiety-003",
+      "week_block": 9,
+      "category": "social-anxiety",
+      "text": "Describe a social moment that went better than you expected. What did you do that helped?"
+    },
+    {
+      "id": "social-anxiety-004",
+      "week_block": 9,
+      "category": "social-anxiety",
+      "text": "Which kinds of social situations feel easiest, and which feel hardest? What makes the difference?"
+    },
+    {
+      "id": "social-anxiety-005",
+      "week_block": 9,
+      "category": "social-anxiety",
+      "text": "Where did your attention go during your last conversation: on the other person, or on yourself?"
+    },
+    {
+      "id": "social-anxiety-006",
+      "week_block": 10,
+      "category": "social-anxiety",
+      "text": "Think of a conversation you replayed in your head afterward. What did you assume people noticed? How likely is that, really?"
+    },
+    {
+      "id": "social-anxiety-007",
+      "week_block": 10,
+      "category": "social-anxiety",
+      "text": "List a few social situations you avoid, from easiest to hardest. Which one feels just slightly possible?",
+      "followups": [
+        "What would a very small first step look like?"
+      ]
+    },
+    {
+      "id": "social-anxiety-008",
+      "week_block": 10,
+      "category": "social-anxiety",
+      "text": "Name one 'safety behavior' you used today (avoiding eye contact, over-preparing what to say, leaving early). What might happen if you dropped it by 10%?"
+    },
+    {
+      "id": "social-anxiety-009",
+      "week_block": 10,
+      "category": "social-anxiety",
+      "text": "If someone else had said the thing you're embarrassed about, how much would you think about it tomorrow?"
+    },
+    {
+      "id": "social-anxiety-010",
+      "week_block": 10,
+      "category": "social-anxiety",
+      "text": "What's a social fear you've carried for a long time? Where do you think it started?"
+    },
+    {
+      "id": "social-anxiety-011",
+      "week_block": 11,
+      "category": "social-anxiety",
+      "text": "Plan one small social step for this week. What do you predict will happen?",
+      "followups": [
+        "Afterward: what actually happened?"
+      ]
+    },
+    {
+      "id": "social-anxiety-012",
+      "week_block": 11,
+      "category": "social-anxiety",
+      "text": "Write about a moment you stayed in a situation even though you wanted to leave. How did the feeling change over time?"
+    },
+    {
+      "id": "social-anxiety-013",
+      "week_block": 11,
+      "category": "social-anxiety",
+      "text": "What would you do differently in social situations if you weren't afraid of being judged?"
+    },
+    {
+      "id": "social-anxiety-014",
+      "week_block": 11,
+      "category": "social-anxiety",
+      "text": "Think of someone who seems comfortable socially. Do you think they never feel awkward, or that they've learned to let it pass?"
+    },
+    {
+      "id": "social-anxiety-015",
+      "week_block": 11,
+      "category": "social-anxiety",
+      "text": "After your last social moment, did you look for evidence that it went badly? What evidence was there that it went fine?"
+    },
+    {
+      "id": "social-anxiety-016",
+      "week_block": 12,
+      "category": "social-anxiety",
+      "text": "Looking back over these four weeks, which social step are you proudest of?"
+    },
+    {
+      "id": "social-anxiety-017",
+      "week_block": 12,
+      "category": "social-anxiety",
+      "text": "How has the replay after social events changed, if at all?"
+    },
+    {
+      "id": "social-anxiety-018",
+      "week_block": 12,
+      "category": "social-anxiety",
+      "text": "Which safety behavior are you ready to keep loosening? Which one still feels too big?"
+    },
+    {
+      "id": "social-anxiety-019",
+      "week_block": 12,
+      "category": "social-anxiety",
+      "text": "Write a short note to yourself for before your next nerve-wracking event."
+    },
+    {
+      "id": "social-anxiety-020",
+      "week_block": 12,
+      "category": "social-anxiety",
+      "text": "What does connection with other people give you that makes the discomfort worth it?"
+    },
+    {
+      "id": "behavioral-activation-001",
+      "week_block": 13,
+      "category": "behavioral-activation",
+      "text": "What's one small thing you used to enjoy that you haven't done in a while? Could you do 10 minutes of it this week?"
+    },
+    {
+      "id": "behavioral-activation-002",
+      "week_block": 13,
+      "category": "behavioral-activation",
+      "text": "Describe a task you've been avoiding. What's the smallest possible first step?"
+    },
+    {
+      "id": "behavioral-activation-003",
+      "week_block": 13,
+      "category": "behavioral-activation",
+      "text": "Look at yesterday hour by hour. Which moments gave you a sense of pleasure, and which a sense of achievement?"
+    },
+    {
+      "id": "behavioral-activation-004",
+      "week_block": 13,
+      "category": "behavioral-activation",
+      "text": "When your mood is low, what do you tend to stop doing first?"
+    },
+    {
+      "id": "behavioral-activation-005",
+      "week_block": 13,
+      "category": "behavioral-activation",
+      "text": "What would a gently good day look like for you right now, not a perfect one?"
+    },
+    {
+      "id": "behavioral-activation-006",
+      "week_block": 14,
+      "category": "behavioral-activation",
+      "text": "Schedule one small enjoyable activity for tomorrow. What time, where, and what exactly will you do?",
+      "followups": [
+        "Afterward: how did your mood compare before and after?"
+      ]
+    },
+    {
+      "id": "behavioral-activation-007",
+      "week_block": 14,
+      "category": "behavioral-activation",
+      "text": "Did you wait to 'feel like it' before doing something today? What happens when action comes first?"
+    },
+    {
+      "id": "behavioral-activation-008",
+      "week_block": 14,
+      "category": "behavioral-activation",
+      "text": "Write about something you did today even though you didn't want to. How did you feel after?"
+    },
+    {
+      "id": "behavioral-activation-009",
+      "week_block": 14,
+      "category": "behavioral-activation",
+      "text": "Which activities leave you feeling more drained after, even if they're easy in the moment?"
+    },
+    {
+      "id": "behavioral-activation-010",
+      "week_block": 14,
+      "category": "behavioral-activation",
+      "text": "Who is someone you could reach out to this week, even with a short message?"
+    },
+    {
+      "id": "behavioral-activation-011",
+      "week_block": 15,
+      "category": "behavioral-activation",
+      "text": "Break one bigger goal into three tiny steps. Which can you do today?"
+    },
+    {
+      "id": "behavioral-activation-012",
+      "week_block": 15,
+      "category": "behavioral-activation",
+      "text": "What got in the way of a planned activity this week? How could you make it easier next time?"
+    },
+    {
+      "id": "behavioral-activation-013",
+      "week_block": 15,
+      "category": "behavioral-activation",
+      "text": "Notice one moment of mastery this week: something you did well or learned. Describe it."
+    },
+    {
+      "id": "behavioral-activation-014",
+      "week_block": 15,
+      "category": "behavioral-activation",
+      "text": "Which small routine helps your days feel steadier?"
+    },
+    {
+      "id": "behavioral-activation-015",
+      "week_block": 15,
+      "category": "behavioral-activation",
+      "text": "Write about time spent outside or moving your body recently. What did you notice?"
+    },
+    {
+      "id": "behavioral-activation-016",
+      "week_block": 16,
+      "category": "behavioral-activation",
+      "text": "Looking back over these four weeks, which small actions made the biggest difference to your mood?"
+    },
+    {
+      "id": "behavioral-activation-017",
+      "week_block": 16,
+      "category": "behavioral-activation",
+      "text": "What's your personal list of 'quick lifts', things that help when your mood starts to dip?"
+    },
+    {
+      "id": "behavioral-activation-018",
+      "week_block": 16,
+      "category": "behavioral-activation",
+      "text": "How has your relationship with avoidance changed this month?"
+    },
+    {
+      "id": "behavioral-activation-019",
+      "week_block": 16,
+      "category": "behavioral-activation",
+      "text": "What's one activity you'd like to keep doing every week from now on?"
+    },
+    {
+      "id": "behavioral-activation-020",
+      "week_block": 16,
+      "category": "behavioral-activation",
+      "text": "Write a plan for a low-energy day: three things you can still do that help a little."
+    },
+    {
+      "id": "self-compassion-001",
+      "week_block": 17,
+      "category": "self-compassion",
+      "text": "Write a short letter to yourself from a year in the future, looking back on this season with kindness."
+    },
+    {
+      "id": "self-compassion-002",
+      "week_block": 17,
+      "category": "self-compassion",
+      "text": "What's a rule you hold yourself to that you wouldn't hold a friend to?"
+    },
+    {
+      "id": "self-compassion-003",
+      "week_block": 17,
+      "category": "self-compassion",
+      "text": "When you made a mistake recently, what did your inner voice say? How would a kind friend have said it?"
+    },
+    {
+      "id": "self-compassion-004",
+      "week_block": 17,
+      "category": "self-compassion",
+      "text": "Name three things you did this week that took effort, even if no one saw them."
+    },
+    {
+      "id": "self-compassion-005",
+      "week_block": 17,
+      "category": "self-compassion",
+      "text": "What does your inner critic think it's protecting you from?"
+    },
+    {
+      "id": "self-compassion-006",
+      "week_block": 18,
+      "category": "self-compassion",
+      "text": "Think of a hard moment today. Write to yourself the way you'd comfort someone you love."
+    },
+    {
+      "id": "self-compassion-007",
+      "week_block": 18,
+      "category": "self-compassion",
+      "text": "Which parts of being human are you hardest on yourself about? How many other people struggle with the same thing?"
+    },
+    {
+      "id": "self-compassion-008",
+      "week_block": 18,
+      "category": "self-compassion",
+      "text": "What do you need to hear right now? Write it down for yourself."
+    },
+    {
+      "id": "self-compassion-009",
+      "week_block": 18,
+      "category": "self-compassion",
+      "text": "Describe a moment when someone was kind to you. How might you offer yourself that same kindness?"
+    },
+    {
+      "id": "self-compassion-010",
+      "week_block": 18,
+      "category": "self-compassion",
+      "text": "Where in your life are you asking too much of yourself right now?"
+    },
+    {
+      "id": "self-compassion-011",
+      "week_block": 19,
+      "category": "self-compassion",
+      "text": "What matters most to you in life? List a few values in your own words.",
+      "followups": [
+        "Which value got the least attention this week?"
+      ]
+    },
+    {
+      "id": "self-compassion-012",
+      "week_block": 19,
+      "category": "self-compassion",
+      "text": "Think of a recent choice that felt right. Which of your values did it honour?"
+    },
+    {
+      "id": "self-compassion-013",
+      "week_block": 19,
+      "category": "self-compassion",
+      "text": "Is there a belief about yourself you've carried since you were young? Is it still true for who you are now?"
+    },
+    {
+      "id": "self-compassion-014",
+      "week_block": 19,
+      "category": "self-compassion",
+      "text": "Who do you want to be in your relationships, regardless of how others act?"
+    },
+    {
+      "id": "self-compassion-015",
+      "week_block": 19,
+      "category": "self-compassion",
+      "text": "What's one small way you could live closer to one of your values this week?"
+    },
+    {
+      "id": "self-compassion-016",
+      "week_block": 20,
+      "category": "self-compassion",
+      "text": "Looking back over these four weeks, how has the way you talk to yourself changed?"
+    },
+    {
+      "id": "self-compassion-017",
+      "week_block": 20,
+      "category": "self-compassion",
+      "text": "Write a list of things you appreciate about yourself, including the small ones."
+    },
+    {
+      "id": "self-compassion-018",
+      "week_block": 20,
+      "category": "self-compassion",
+      "text": "What does self-compassion look like for you on a bad day, in practical terms?"
+    },
+    {
+      "id": "self-compassion-019",
+      "week_block": 20,
+      "category": "self-compassion",
+      "text": "Which value do you want to guide the next few months? Why that one?"
+    },
+    {
+      "id": "self-compassion-020",
+      "week_block": 20,
+      "category": "self-compassion",
+      "text": "Write a short compassionate phrase you can return to when things get hard."
+    },
+    {
+      "id": "relapse-proofing-001",
+      "week_block": 21,
+      "category": "relapse-proofing",
+      "text": "Looking back over your entries, what's one coping tool that's worked more than once? Write it down as if instructing a future version of yourself."
+    },
+    {
+      "id": "relapse-proofing-002",
+      "week_block": 21,
+      "category": "relapse-proofing",
+      "text": "Which skills from this programme do you use without thinking now?"
+    },
+    {
+      "id": "relapse-proofing-003",
+      "week_block": 21,
+      "category": "relapse-proofing",
+      "text": "What has surprised you most about yourself over these months?"
+    },
+    {
+      "id": "relapse-proofing-004",
+      "week_block": 21,
+      "category": "relapse-proofing",
+      "text": "Read an entry from early in the programme. What would you say to the person who wrote it?"
+    },
+    {
+      "id": "relapse-proofing-005",
+      "week_block": 21,
+      "category": "relapse-proofing",
+      "text": "What helps you most when a hard thought shows up out of nowhere?"
+    },
+    {
+      "id": "relapse-proofing-006",
+      "week_block": 22,
+      "category": "relapse-proofing",
+      "text": "What would the early warning signs of a hard week look like for you? What's your first move when you notice them?"
+    },
+    {
+      "id": "relapse-proofing-007",
+      "week_block": 22,
+      "category": "relapse-proofing",
+      "text": "Which situations are most likely to knock you off balance in the coming months?"
+    },
+    {
+      "id": "relapse-proofing-008",
+      "week_block": 22,
+      "category": "relapse-proofing",
+      "text": "Who are the people you can lean on when things get hard? How can you let them know?"
+    },
+    {
+      "id": "relapse-proofing-009",
+      "week_block": 22,
+      "category": "relapse-proofing",
+      "text": "Write about a setback you've already recovered from. What got you through?"
+    },
+    {
+      "id": "relapse-proofing-010",
+      "week_block": 22,
+      "category": "relapse-proofing",
+      "text": "What's the difference between a bad day and slipping back? How will you tell them apart?"
+    },
+    {
+      "id": "relapse-proofing-011",
+      "week_block": 23,
+      "category": "relapse-proofing",
+      "text": "Write your personal toolkit: the thoughts, actions and people that help you most."
+    },
+    {
+      "id": "relapse-proofing-012",
+      "week_block": 23,
+      "category": "relapse-proofing",
+      "text": "What would you like to tell yourself on the day you feel like nothing has changed?"
+    },
+    {
+      "id": "relapse-proofing-013",
+      "week_block": 23,
+      "category": "relapse-proofing",
+      "text": "Which habits from this programme do you want to protect, even when life gets busy?"
+    },
+    {
+      "id": "relapse-proofing-014",
+      "week_block": 23,
+      "category": "relapse-proofing",
+      "text": "Plan a gentle check-in with yourself once a month. What questions would you ask?"
+    },
+    {
+      "id": "relapse-proofing-015",
+      "week_block": 23,
+      "category": "relapse-proofing",
+      "text": "If a hard season returns, what's one thing you'll do differently this time?"
+    },
+    {
+      "id": "relapse-proofing-016",
+      "week_block": 24,
+      "category": "relapse-proofing",
+      "text": "Looking back over six months, what's changed, in your days, your thoughts, or how you treat yourself?"
+    },
+    {
+      "id": "relapse-proofing-017",
+      "week_block": 24,
+      "category": "relapse-proofing",
+      "text": "What are you proudest of from this whole programme?"
+    },
+    {
+      "id": "relapse-proofing-018",
+      "week_block": 24,
+      "category": "relapse-proofing",
+      "text": "Which prompt or entry from these months would you want to reread on a hard day?"
+    },
+    {
+      "id": "relapse-proofing-019",
+      "week_block": 24,
+      "category": "relapse-proofing",
+      "text": "What would you like the next six months to hold?"
+    },
+    {
+      "id": "relapse-proofing-020",
+      "week_block": 24,
+      "category": "relapse-proofing",
+      "text": "Write a thank-you note to yourself for showing up, on the good days and the hard ones."
+    }
+  ]
+}

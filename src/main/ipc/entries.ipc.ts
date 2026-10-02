@@ -15,4 +15,5 @@ export function registerEntriesIpc(service: () => EntryService): void {
   ipcMain.handle(IPC.searchTags, () => service().tags());
   ipcMain.handle(IPC.searchRebuildIndex, () => service().rebuildIndex());
   ipcMain.handle(IPC.habitsHistory, () => service().habitHistory());
+  ipcMain.handle(IPC.promptsHistory, () => service().promptHistory());
 }

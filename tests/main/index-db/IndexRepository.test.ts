@@ -16,6 +16,17 @@ beforeEach(() => {
 });
 afterEach(() => index.close());
 
+describe('prompt history', () => {
+  it('derives answered and skipped prompts from entry frontmatter, newest first', () => {
+    index.upsert(entry('2026-06-12', { prompt_id: 'noticing-001', prompt_skipped: false }), 1);
+    index.upsert(entry('2026-06-13', { prompt_id: 'noticing-002', prompt_skipped: true }), 1);
+    expect(index.promptHistory()).toEqual([
+      { prompt_id: 'noticing-002', date: '2026-06-13', outcome: 'skipped' },
+      { prompt_id: 'noticing-001', date: '2026-06-12', outcome: 'answered' },
+    ]);
+  });
+});
+
 describe('search', () => {
   it('finds entries by words in the body, with the match marked in the snippet', () => {
     const results = index.search('pigeons');

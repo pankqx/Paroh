@@ -58,6 +58,12 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **A reflection from the nudge also moves the task to today**, so a nudged task never shows the nudge twice in a row.
 - **JSON stores refuse to overwrite a file they can't parse**, and writes are serialized per store so quick clicks can't lose an update.
 
+### 2026-10-02 — Phase 4 implementation choices
+- **Five prompts per week-block, 120 in total,** written in the style of PRODUCT.md §7.2. Every prompt is an open question; none asks about diagnoses, symptoms or self-harm, and the page carries a permanent "journal, not therapy" note with a signpost to crisis lines and professionals.
+- **Today's prompt is computed in the renderer** from the bundled library, entry dates and prompt history, instead of the `prompts.today/skip/selectManually` IPC sketched in api.md. Skipping and picking are ordinary entry saves of `prompt_id` / `prompt_skipped`, so there is one write path and no prompt state outside the Markdown files.
+- **Days of use = days with an entry before today.** Counting only earlier days keeps today's prompt stable even after today's entry is created. A skip creates today's entry, so it counts as a day of use.
+- **"Write about it" on a day that already has writing** puts the prompt above it rather than starting a second entry, since there is one file per day.
+
 ---
 
 ## Template for New Entries

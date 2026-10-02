@@ -1,6 +1,7 @@
 import type { AudioLog } from './types/AudioLog';
 import type { DateRange, Entry, EntrySummary } from './types/Entry';
 import type { Habit, HabitDay, HabitFrequency } from './types/Habit';
+import type { PromptLog } from './types/Prompt';
 import type { Result } from './types/Result';
 import type { Backlink, SearchFilters, SearchResult } from './types/Search';
 import type { NudgeAction, Recurrence, Task } from './types/Task';
@@ -34,6 +35,7 @@ export const IPC = {
   audioList: 'audio:list',
   audioRead: 'audio:read',
   audioRename: 'audio:rename',
+  promptsHistory: 'prompts:history',
   vaultInfo: 'vault:info',
   vaultChoose: 'vault:choose',
   /** main → renderer: entry files changed outside the app (or the vault itself was switched). */
@@ -101,6 +103,10 @@ export interface ParohApi {
     list(): Promise<Result<AudioLog[]>>;
     read(id: string): Promise<Result<Uint8Array>>;
     rename(id: string, title: string): Promise<Result<void>>;
+  };
+  prompts: {
+    /** Answered and skipped healing prompts, newest first, read from entry frontmatter. */
+    history(): Promise<Result<PromptLog[]>>;
   };
   vault: {
     info(): Promise<VaultInfo>;

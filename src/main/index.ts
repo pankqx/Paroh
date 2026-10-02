@@ -9,6 +9,7 @@ import { registerVaultIpc } from './ipc/vault.ipc';
 import { resolveVaultPath } from './settings';
 import { AudioStore } from './stores/AudioStore';
 import { HabitStore } from './stores/HabitStore';
+import { HorizonStore } from './stores/HorizonStore';
 import { TaskStore } from './stores/TaskStore';
 
 let service: EntryService;
@@ -24,7 +25,7 @@ async function openVault(path: string): Promise<void> {
   next.watch((dates) => broadcast({ dates }));
   const previous = service;
   service = next;
-  stores = { habits: new HabitStore(next), tasks: new TaskStore(path), audio: new AudioStore(next) };
+  stores = { habits: new HabitStore(next), tasks: new TaskStore(path), audio: new AudioStore(next), horizons: new HorizonStore(path) };
   previous?.close();
 }
 

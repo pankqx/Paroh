@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Phase 5 reflection: Chapters (a monthly view with a mood landscape, stats
+  and most-used words) and Horizons (life stories on a year or quarter
+  timeline, with a list view). The sidebar is now grouped into Today and
+  Reflect.
+
+- Phase 4 healing prompts: a 24-week, 120-prompt CBT programme with a daily
+  prompt card on the Canvas, skip without reroll, a prompt library you can pick
+  from, and prompt history.
+
 - Phase 3 daily practice: habits with streaks and heatmap, to-dos with
   repeats and the "did you finish this?" nudge, audio logs that save as you
   record, and a 30-day mood chart.

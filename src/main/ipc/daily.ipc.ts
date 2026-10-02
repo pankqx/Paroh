@@ -1,23 +1,31 @@
 import { ipcMain } from 'electron';
 import { IPC, type HabitInput, type TaskInput } from '../../shared/ipc-contract';
+import type { LifeStoryInput } from '../../shared/types/LifeStory';
 import type { NudgeAction } from '../../shared/types/Task';
 import type { AudioStore } from '../stores/AudioStore';
 import type { HabitStore } from '../stores/HabitStore';
+import type { HorizonStore } from '../stores/HorizonStore';
 import type { TaskStore } from '../stores/TaskStore';
 
 export interface DailyStores {
   habits: HabitStore;
   tasks: TaskStore;
   audio: AudioStore;
+  horizons: HorizonStore;
 }
 
-/** Habits, tasks and audio: the daily-practice stores (feature-specifications.md §6–8). */
+/** Habits, tasks, audio (feature-specifications.md §6–8) and Horizons (§10): the stores beside the entries. */
 export function registerDailyIpc(stores: () => DailyStores): void {
   ipcMain.handle(IPC.habitsList, () => stores().habits.list());
   ipcMain.handle(IPC.habitsCreate, (_e, input: HabitInput) => stores().habits.create(input));
   ipcMain.handle(IPC.habitsUpdate, (_e, id: string, input: HabitInput) => stores().habits.update(id, input));
   ipcMain.handle(IPC.habitsSetArchived, (_e, id: string, archived: boolean) => stores().habits.setArchived(id, Boolean(archived)));
   ipcMain.handle(IPC.habitsToggleToday, (_e, id: string) => stores().habits.toggleToday(id));
+
+  ipcMain.handle(IPC.horizonsList, () => stores().horizons.list());
+  ipcMain.handle(IPC.horizonsSave, (_e, input: LifeStoryInput, id?: string) => stores().horizons.save(input, id ?? undefined));
+  ipcMain.handle(IPC.horizonsRemove, (_e, id: string) => stores().horizons.remove(id));
+  ipcMain.handle(IPC.horizonsAddArea, (_e, name: string) => stores().horizons.addArea(name));
 
   ipcMain.handle(IPC.tasksList, () => stores().tasks.list());
   ipcMain.handle(IPC.tasksCreate, (_e, input: TaskInput) => stores().tasks.create(input));

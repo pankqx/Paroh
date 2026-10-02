@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 3 — Habits, To-Do, Audio (implemented, in review)
+**Active phase:** Phase 5 — Horizons & Chapters (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -36,10 +36,29 @@
 - [x] Mood trend chart (last 30 days) on the Calendar page.
 - [x] Tests: habit/task/audio stores (including concurrent toggles, unreadable JSON never overwritten, interrupted recordings), streaks, schedules, task grouping, recurrence, mood trend, axe-core for the new pages.
 
-## TODO (Phase 4 — Healing Prompt Engine)
+## DONE (Phase 4)
 
-- [ ] Full CBT prompt library (`assets/prompts.json`), 24-week rotation, prompt history page, manual override.
-- [ ] "Write about it" seeds the prompt into today's entry.
+- [x] Prompt library in `assets/prompts.json`: 120 prompts, five for each of the 24 weeks, across the six CBT blocks in PRODUCT.md §7.1. Validated on load; malformed prompts are dropped and an unusable file falls back to five built-in prompts.
+- [x] Rotation: one week-block per 7 days with an entry (days of use, not calendar days), looping back to week 1 with a note after week 24. Within a week, the first prompt not seen before.
+- [x] Dark prompt card on the Canvas: "Write about it" puts the prompt at the top of today's entry as a blockquote; "Skip" keeps the same prompt for the rest of the day. `W` / `S` while the card has focus.
+- [x] Healing Prompts page: today's prompt, the programme overview, the full library with "Write about this today" (manual override, any week), and history (written about vs skipped, by date).
+- [x] `prompt_id` / `prompt_skipped` in entry frontmatter are the only log; the index gained columns for them (index version 3).
+- [x] A standing note that Paroh is a journal, not therapy, with a signpost to crisis lines and professionals.
+- [x] Tests: library shape, fallback, rotation and looping, skip-is-not-shuffle, manual override, seeding, frontmatter round-trip, prompt history from the index, axe-core for the page.
+
+## DONE (Phase 5)
+
+- [x] Chapters: one page per month, computed from that month's files. Mood landscape (draws in once, respects reduced motion, with a text summary for screen readers), entries written, days logged, longest streak, most-used words (stopwords and blockquotes left out), week-by-week moods with the hardest week marked, and the month's entries. `←` / `→` change month; a week opens All Entries filtered to those dates. An empty month says "No entries this month."
+- [x] Horizons: Life Stories as Markdown files at `<vault>/horizons/<area>/<slug>.md` in the documented format, with no progress field. Seven default life areas plus any you add (an area is a folder). Timeline with Year and Quarter zoom, a Today marker, ongoing stories stretching to today, `←` / `→` to move and `+` / `-` to zoom. A List view as the keyboard and screen-reader equivalent. Story editor with title, area, status (Dreaming / In motion / Living it / Let go), start date, an optional "when", why, and linked entries.
+- [x] Sidebar grouped into Today and Reflect.
+- [x] Tests: word counts, chapter stats and week grouping, landscape summary, timeline spans, columns and lanes, life story file format and round-trip, the Horizons store (unique slugs, moving between areas, unknown keys kept, path escapes rejected), month loading, axe-core for Chapters, the timeline, the list and the editor.
+
+## TODO (Phase 6 — Polish & Packaging)
+
+- [ ] Settings page (vault, export/import, reminders, privacy and crisis-resources line).
+- [ ] `.deb` / `.AppImage` builds via electron-builder, including `npm run build:ubuntu`.
+- [ ] Onboarding, and a design and accessibility pass across every screen.
+- [ ] Horizons: drag stories between periods, and rename or hide life areas.
 
 ## Known gaps
 

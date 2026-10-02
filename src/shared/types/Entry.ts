@@ -4,8 +4,7 @@ export const CURRENT_SCHEMA_VERSION = 1;
 
 /**
  * One journal entry, one file per day: `<vault>/YYYY-MM/YYYY-MM-DD.md`.
- * Fields beyond Phase 3 (prompt_id, prompt_skipped) are added when those features land,
- * per feature-specifications.md §4. Unknown frontmatter keys are preserved on save via `extra`.
+ * Fields follow feature-specifications.md §4 and §5. Unknown frontmatter keys are preserved on save via `extra`.
  */
 export interface Entry {
   schema_version: number;
@@ -16,6 +15,8 @@ export interface Entry {
   visibility: 'private' | 'public';
   habits_snapshot?: string[]; // habit ids completed that day
   audio?: string[]; // vault-relative paths into audio/
+  prompt_id?: string; // the healing prompt shown that day
+  prompt_skipped?: boolean; // true when that prompt was skipped
   body: string; // Markdown
   extra?: Record<string, unknown>;
 }

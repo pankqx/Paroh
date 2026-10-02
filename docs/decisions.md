@@ -58,6 +58,19 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **A reflection from the nudge also moves the task to today**, so a nudged task never shows the nudge twice in a row.
 - **JSON stores refuse to overwrite a file they can't parse**, and writes are serialized per store so quick clicks can't lose an update.
 
+### 2026-10-02 — Phase 4 implementation choices
+- **Five prompts per week-block, 120 in total,** written in the style of PRODUCT.md §7.2. Every prompt is an open question; none asks about diagnoses, symptoms or self-harm, and the page carries a permanent "journal, not therapy" note with a signpost to crisis lines and professionals.
+- **Today's prompt is computed in the renderer** from the bundled library, entry dates and prompt history, instead of the `prompts.today/skip/selectManually` IPC sketched in api.md. Skipping and picking are ordinary entry saves of `prompt_id` / `prompt_skipped`, so there is one write path and no prompt state outside the Markdown files.
+- **Days of use = days with an entry before today.** Counting only earlier days keeps today's prompt stable even after today's entry is created. A skip creates today's entry, so it counts as a day of use.
+- **"Write about it" on a day that already has writing** puts the prompt above it rather than starting a second entry, since there is one file per day.
+
+### 2026-10-02 — Phase 5 implementation choices
+- **Chapters reads that month's files directly** (`chapters.month`) instead of the index, because the most-used word needs full bodies. This also covers the spec's "fall back to a filesystem scan" case. Everything else is computed in `renderer/domain/chapters.ts`.
+- **Blockquotes are left out of word counts**, so a seeded healing prompt doesn't become the month's "most-used word."
+- **Life Stories gained one optional key, `when`** (`2027` or `2027-Q2`), because the spec's timeline needs somewhere to place a story but the file shape only had `created`. A story spans `created` to the end of `when`, or to today when there is no `when`. There is still no progress field.
+- **Horizons is not watched for outside edits** in v1; it reloads each time the page opens. Entries remain the only watched files.
+- **Dragging cards between periods is deferred.** The editor's "when" field does the same job and works by keyboard; drag can come in the polish phase.
+
 ---
 
 ## Template for New Entries

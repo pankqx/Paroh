@@ -1,6 +1,7 @@
 import { watch, type FSWatcher } from 'node:fs';
 import { join, sep } from 'node:path';
 import { isEntryDate, type DateRange, type Entry, type EntrySummary } from '../shared/types/Entry';
+import type { PromptLog } from '../shared/types/Prompt';
 import type { HabitDay } from '../shared/types/Habit';
 import { err, ok, type Result } from '../shared/types/Result';
 import type { Backlink, SearchFilters, SearchResult } from '../shared/types/Search';
@@ -45,6 +46,10 @@ export class EntryService {
     return saved;
   }
 
+  monthEntries(month: string): Promise<Result<Entry[]>> {
+    return this.vault.loadMonth(String(month));
+  }
+
   load(date: string): Promise<Result<Entry | null>> {
     return this.vault.load(date);
   }
@@ -69,6 +74,10 @@ export class EntryService {
 
   habitHistory(): Result<HabitDay[]> {
     return this.guard(() => this.index.habitHistory());
+  }
+
+  promptHistory(): Result<PromptLog[]> {
+    return this.guard(() => this.index.promptHistory());
   }
 
   backlinks(date: string): Result<Backlink[]> {

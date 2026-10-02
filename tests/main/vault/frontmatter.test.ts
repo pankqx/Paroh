@@ -32,6 +32,13 @@ describe('entry frontmatter', () => {
     expect(serializeEntry(parsed.value)).toContain('weather: rain');
   });
 
+  it('round-trips the healing prompt fields', () => {
+    const withPrompt: Entry = { ...entry, prompt_id: 'social-anxiety-002', prompt_skipped: true };
+    const text = serializeEntry(withPrompt);
+    expect(text).toContain('prompt_id: social-anxiety-002\nprompt_skipped: true');
+    expect(parseEntry(text, entry.date)).toEqual({ ok: true, value: withPrompt });
+  });
+
   it('reads a plain Markdown file with no frontmatter as a valid entry', () => {
     const parsed = parseEntry('Just some words.\n', '2026-06-12');
     expect(parsed.ok && parsed.value.body).toBe('Just some words.\n');

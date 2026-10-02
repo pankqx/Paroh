@@ -15,6 +15,11 @@ import { RecorderProvider } from '../../src/renderer/app/RecorderContext';
 import { HabitsPage } from '../../src/renderer/features/habits/HabitsPage';
 import { TodoPage } from '../../src/renderer/features/todo/TodoPage';
 import { AudioLogsPage } from '../../src/renderer/features/audio-logs/AudioLogsPage';
+import { ChaptersPage } from '../../src/renderer/features/chapters/ChaptersPage';
+import { HorizonsPage } from '../../src/renderer/features/horizons/HorizonsPage';
+import { LifeStoryEditor } from '../../src/renderer/features/horizons/LifeStoryEditor';
+import type { LifeStory } from '../../src/shared/types/LifeStory';
+import { HealingPromptsPage } from '../../src/renderer/features/healing/HealingPromptsPage';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 const habits: Habit[] = [{ id: 'walk', name: 'Walk outside', frequency: 'daily', createdAt: '2026-09-01', archived: false }];
@@ -22,6 +27,7 @@ const tasks: Task[] = [
   { id: 't1', text: 'Call mom', createdDate: '2026-09-30', dueDate: '2026-09-30', done: false },
   { id: 't2', text: 'Finish chapter 3', createdDate: '2026-10-02', dueDate: '2026-10-02', done: false, recurring: 'daily' },
 ];
+const story: LifeStory = { id: 'health/run-a-5k', schema_version: 1, title: 'Run a 5k', life_area: 'health', status: 'in-motion', created: '2026-06-01', when: '2027-Q2', linked_entries: ['2026-10-01'], why: 'To feel strong.' };
 window.paroh = {
   entries: {
     save: async (e) => ({ ok: true, value: e }),
@@ -55,6 +61,22 @@ window.paroh = {
     list: async () => ({ ok: true, value: [{ id: '2026-10-01-090000', filePath: 'audio/2026-10-01-090000.webm', title: 'Morning', createdAt: '2026-10-01T09:00:00Z', durationSeconds: 65, linkedEntryDate: '2026-10-01' }] }),
     read: async () => ({ ok: true, value: new Uint8Array() }),
     rename: async () => ({ ok: true, value: undefined }),
+  },
+  prompts: { history: async () => ({ ok: true, value: [{ prompt_id: 'noticing-001', date: '2026-10-01', outcome: 'answered' }] }) },
+  chapters: {
+    month: async () => ({
+      ok: true,
+      value: [
+        { schema_version: 1, date: '2026-10-01', title: 'A quiet morning', mood: 'ok', tags: [], visibility: 'private', body: 'Coffee and pigeons. Coffee again.' },
+        { schema_version: 1, date: '2026-10-02', title: '', mood: 'good', tags: [], visibility: 'private', body: '' },
+      ],
+    }),
+  },
+  horizons: {
+    list: async () => ({ ok: true, value: { areas: ['career', 'health'], stories: [story] } }),
+    save: async () => ({ ok: true, value: story }),
+    remove: async () => ({ ok: true, value: undefined }),
+    addArea: async () => ({ ok: true, value: 'x' }),
   },
   vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null, onChanged: () => () => {} },
 } satisfies ParohApi;
@@ -104,6 +126,24 @@ describe('accessibility (axe-core)', () => {
     expect(await violations(<HabitsPage today="2026-10-02" />)).toEqual([]);
     expect(await violations(<TodoPage today="2026-10-02" />)).toEqual([]);
     expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('Healing Prompts page has no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<HealingPromptsPage today="2026-10-02" entryDates={entries.map((e) => e.date)} onOpenEntry={noop} onChanged={noop} />)).toEqual([]);
+  });
+
+  it('Chapters page has no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<ChaptersPage today="2026-10-02" onOpenEntry={noop} onOpenRange={noop} />)).toEqual([]);
+  });
+
+  it('Horizons timeline, list and story editor have no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<HorizonsPage today="2026-10-02" entries={entries} onOpenEntry={noop} />)).toEqual([]);
+    expect(await violations(<HorizonsPage today="2026-10-02" entries={entries} onOpenEntry={noop} initialView="list" />)).toEqual([]);
+    const save = async () => ({ ok: true as const, value: undefined });
+    expect(await violations(<LifeStoryEditor story={story} initialArea="health" areas={['career', 'health']} entries={entries} today="2026-10-02" onSave={save} onDelete={save} onClose={noop} onOpenEntry={noop} />)).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {

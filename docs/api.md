@@ -130,6 +130,14 @@ All channels are invoked from the renderer as `window.paroh.<namespace>.<method>
 Any change to a method's signature is a breaking change to this file and must be called out explicitly in `CHANGELOG.md` and, if it affects the renderer/main boundary in a way that could break a mid-flight operation, considered against `release-plan.md`'s "extra scrutiny" list.
 
 
+## Phase 5 notes
+
+`chapters.month(month)` returns that month's full entries from disk; `ChapterSummary` is computed in the renderer. `horizons.list()` returns `{ areas, stories }`, `horizons.save(input, id?)` creates or updates (and moves the file if the area changed), `horizons.remove(id)` deletes, and `horizons.addArea(name)` creates an area folder. A story's `id` is `<area>/<slug>`.
+
+## Phase 4 notes
+
+Only `prompts.history()` exists over IPC; it returns `PromptLog[]` read from the index. Today's prompt, skipping and manual selection are computed in `renderer/domain/healingProgram.ts` and saved as `prompt_id` / `prompt_skipped` on today's entry through `entries.save`, so there is no separate prompt store.
+
 ## Phase 3 notes
 
 `habits`, `tasks` and `audio` are implemented as typed in `src/shared/ipc-contract.ts` (that file wins if this one disagrees). Differences from the sketches above: `habits.setArchived(id, archived)` replaces `archive`, `habits.history()` returns completed habit ids per day (streaks are computed in `renderer/domain/streak.ts`), and recording is `audio.begin()` → `audio.append(id, chunk)` every second → `audio.finish(id, seconds)`, with `audio.read(id)` for playback and `audio.rename(id, title)`.

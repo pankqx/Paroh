@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Phase 2 core loop: full-text search with filters, Calendar and All Entries
+  pages, wikilinks with backlinks, slash menu, and live pickup of files edited
+  outside the app.
+
 - Phase 1 skeleton: Electron + React + TypeScript app, Markdown vault with atomic
   saves, Canvas dashboard (opener, mood check-in, calendar, recent entries) and
   Editor (Tiptap, autosave, mood, tags), tests and an axe-core accessibility pass.

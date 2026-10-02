@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { Mood } from '../../../shared/types/Mood';
+import type { Backlink } from '../../../shared/types/Search';
+import { formatShortDate } from '../../domain/dates';
 import { MoodSelector } from '../../components/MoodSelector';
 
 interface Props {
@@ -7,12 +9,14 @@ interface Props {
   tags: string[];
   words: number;
   minutes: number;
+  backlinks?: Backlink[];
+  onOpenEntry?: (date: string) => void;
   onMood: (mood: Mood) => void;
   onTags: (tags: string[]) => void;
   onDelete?: () => void;
 }
 
-export function MetadataRail({ mood, tags, words, minutes, onMood, onTags, onDelete }: Props) {
+export function MetadataRail({ mood, tags, words, minutes, backlinks = [], onOpenEntry, onMood, onTags, onDelete }: Props) {
   const [draft, setDraft] = useState('');
 
   function addTag() {
@@ -63,6 +67,21 @@ export function MetadataRail({ mood, tags, words, minutes, onMood, onTags, onDel
           <div>{minutes} min</div>
         </div>
       </section>
+      {backlinks.length > 0 && (
+        <section>
+          <h4 className="rail-label">Linked from</h4>
+          <ul className="backlinks">
+            {backlinks.map((b) => (
+              <li key={b.date}>
+                <button className="link-btn" onClick={() => onOpenEntry?.(b.date)}>
+                  {b.title || 'Untitled'}
+                </button>{' '}
+                <span className="micro muted">{formatShortDate(b.date)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section>
         <span className="micro muted">Private journal entry, stored as Markdown in your vault.</span>
       </section>

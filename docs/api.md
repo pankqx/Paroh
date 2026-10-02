@@ -13,7 +13,9 @@ All channels are invoked from the renderer as `window.paroh.<namespace>.<method>
 | `save` | `(entry: Entry) => Promise<Result<Entry, SaveError>>` | Runs the full atomic save pipeline (`architecture.md`) |
 | `load` | `(date: string) => Promise<Entry \| null>` | Loads a single entry by date; `null` if none exists |
 | `delete` | `(date: string) => Promise<Result<void, DeleteError>>` | Requires prior UI confirmation per `ui-rules.md` Rule 7 |
-| `list` | `(range: DateRange) => Promise<EntrySummary[]>` | Lightweight list for Calendar/All Entries, not full bodies |
+| `list` | `(range?: DateRange) => Promise<Result<EntrySummary[]>>` | Lightweight list for Calendar/All Entries, served from the index |
+| `backlinks` | `(date: string) => Promise<Result<Backlink[]>>` | Entries whose `[[links]]` point here, by date or title |
+| `resolveLink` | `(target: string) => Promise<Result<string \| null>>` | Wikilink target to entry date |
 
 ## `search`
 
@@ -21,6 +23,15 @@ All channels are invoked from the renderer as `window.paroh.<namespace>.<method>
 |---|---|---|
 | `query` | `(text: string, filters?: SearchFilters) => Promise<SearchResult[]>` | FTS5-backed, per `architecture.md` §Search & Indexing |
 | `rebuildIndex` | `() => Promise<Result<void, IndexError>>` | Manual trigger, also called automatically on detected corruption |
+| `tags` | `() => Promise<Result<{ tag: string; count: number }[]>>` | Tag list with counts, for filters |
+
+## `vault`
+
+| Method | Signature | Description |
+|---|---|---|
+| `info` | `() => Promise<VaultInfo>` | Current vault folder |
+| `choose` | `() => Promise<VaultInfo \| null>` | Folder picker; reopens the index for the new vault |
+| `onChanged` | `(listener: (change: VaultChange) => void) => () => void` | Entry files changed outside the app, or the vault was switched |
 
 ## `habits`
 

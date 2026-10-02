@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { isEntryDate, type DateRange, type Entry, type EntrySummary } from '../../shared/types/Entry';
 import { err, ok, type Result } from '../../shared/types/Result';
+import { markdownToPlainText } from '../../shared/plainText';
 import { atomicWrite } from './atomicWrite';
 import { parseEntry, serializeEntry } from './frontmatter';
 
@@ -54,7 +55,39 @@ export class VaultAdapter {
     }
   }
 
-  /** Newest first. Phase 2 replaces the directory walk with the SQLite index. */
+  /** Every entry file in the vault with its modification time, for keeping the index in sync. */
+  async listFiles(): Promise<{ date: string; mtimeMs: number }[]> {
+    const files: { date: string; mtimeMs: number }[] = [];
+    let months: string[];
+    try {
+      months = (await readdir(this.root)).filter((m) => MONTH_DIR_RE.test(m));
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw e;
+    }
+    for (const month of months) {
+      const dir = join(this.root, month);
+      if (!(await stat(dir)).isDirectory()) continue;
+      for (const file of await readdir(dir)) {
+        const date = file.replace(/\.md$/, '');
+        if (!file.endsWith('.md') || !isEntryDate(date) || date.slice(0, 7) !== month) continue;
+        files.push({ date, mtimeMs: (await stat(join(dir, file))).mtimeMs });
+      }
+    }
+    return files;
+  }
+
+  /** Modification time of an entry's file, or null if it does not exist. */
+  async mtime(date: string): Promise<number | null> {
+    try {
+      return (await stat(this.entryPath(date))).mtimeMs;
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null;
+      throw e;
+    }
+  }
+
+  /** Newest first, by walking the folders. The app lists through the SQLite index; this is the fallback and the test oracle. */
   async list(range?: DateRange): Promise<Result<EntrySummary[]>> {
     const summaries: EntrySummary[] = [];
     let months: string[];
@@ -88,10 +121,6 @@ function normalizeBody(body: string): string {
 }
 
 export function toSummary(entry: Entry): EntrySummary {
-  const plain = entry.body
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/[#>*_`~[\]()!-]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const plain = markdownToPlainText(entry.body);
   return { date: entry.date, title: entry.title, mood: entry.mood, tags: entry.tags, excerpt: plain.slice(0, 180) };
 }

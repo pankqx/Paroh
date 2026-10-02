@@ -1,12 +1,26 @@
 import { app, BrowserWindow, shell } from 'electron';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import { IPC, type VaultChange } from '../shared/ipc-contract';
+import { EntryService } from './EntryService';
 import { registerEntriesIpc } from './ipc/entries.ipc';
 import { registerVaultIpc } from './ipc/vault.ipc';
 import { resolveVaultPath } from './settings';
-import { VaultAdapter } from './vault/VaultAdapter';
 
-let vault: VaultAdapter;
+let service: EntryService;
+
+function broadcast(change: VaultChange): void {
+  for (const win of BrowserWindow.getAllWindows()) win.webContents.send(IPC.vaultChanged, change);
+}
+
+async function openVault(path: string): Promise<void> {
+  await mkdir(path, { recursive: true });
+  const next = await EntryService.open(path);
+  next.watch((dates) => broadcast({ dates }));
+  const previous = service;
+  service = next;
+  previous?.close();
+}
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -39,14 +53,15 @@ function createWindow(): void {
 }
 
 app.whenReady().then(async () => {
-  const path = await resolveVaultPath();
-  await mkdir(path, { recursive: true });
-  vault = new VaultAdapter(path);
+  await openVault(await resolveVaultPath());
 
-  registerEntriesIpc(() => vault);
+  registerEntriesIpc(() => service);
   registerVaultIpc(
-    () => vault.root,
-    (p) => (vault = new VaultAdapter(p)),
+    () => service.root,
+    async (path) => {
+      await openVault(path);
+      broadcast({ dates: [], reset: true });
+    },
   );
 
   createWindow();
@@ -58,3 +73,5 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
+app.on('will-quit', () => service?.close());

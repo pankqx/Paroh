@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Phase 3 daily practice: habits with streaks and heatmap, to-dos with
+  repeats and the "did you finish this?" nudge, audio logs that save as you
+  record, and a 30-day mood chart.
+
 - Phase 2 core loop: full-text search with filters, Calendar and All Entries
   pages, wikilinks with backlinks, slash menu, and live pickup of files edited
   outside the app.

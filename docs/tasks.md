@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 2 — Core Loop (implemented, in review)
+**Active phase:** Phase 3 — Habits, To-Do, Audio (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -28,12 +28,18 @@
 - [x] Editor: `/` block menu, `[[wikilinks]]` with autocomplete (by title or date), click to open, "Linked from" backlinks in the side rail. Links are stored literally, Obsidian-style.
 - [x] Tests: index search/filters/links/corruption, vault-index sync and external changes, plain-text extraction, axe-core for the new pages.
 
-## TODO (Phase 3 — Habits, To-Do, Audio)
+## DONE (Phase 3)
 
-- [ ] Habit CRUD, streaks, Canvas card + full page with heatmap.
-- [ ] To-Do CRUD, "did you finish this?" next-day nudge, recurring tasks.
-- [ ] Audio recording, playback, linking to entries.
-- [ ] Mood trend chart on the Calendar page.
+- [x] Habits: definitions in `.paroh/habits.json`, today's completions in the entry's `habits_snapshot`. Daily / weekdays / custom days, edit, archive (never delete), streaks that don't punish an unfinished today, 20-week heatmap, seeded suggestions on first run. Only today can be ticked.
+- [x] To-Do: `.paroh/tasks.json`. Today / Upcoming / Someday / Done, repeat daily / weekdays / weekly (next instance created on completion, month-safe), "Did you finish this?" nudge with done / move to today / note why. `N` focuses the new-task box.
+- [x] Audio Logs: record from the Canvas card, the Audio Logs page or `Ctrl/Cmd+Shift+R` anywhere. Audio streams to `<vault>/audio/*.webm` every second, so an interrupted recording is kept. Linked into that day's entry `audio:` frontmatter, inline playback, rename. The app grants the microphone permission only to its own page.
+- [x] Mood trend chart (last 30 days) on the Calendar page.
+- [x] Tests: habit/task/audio stores (including concurrent toggles, unreadable JSON never overwritten, interrupted recordings), streaks, schedules, task grouping, recurrence, mood trend, axe-core for the new pages.
+
+## TODO (Phase 4 — Healing Prompt Engine)
+
+- [ ] Full CBT prompt library (`assets/prompts.json`), 24-week rotation, prompt history page, manual override.
+- [ ] "Write about it" seeds the prompt into today's entry.
 
 ## Known gaps
 

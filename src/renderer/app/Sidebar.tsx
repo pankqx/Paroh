@@ -9,7 +9,7 @@ interface Props {
 }
 
 // Later-phase pages are listed so the shape of the app is visible, but stay disabled until they are real.
-const LATER = ['Audio Logs', 'Habits', 'To-Do', 'Healing Prompts'];
+const LATER = ['Healing Prompts'];
 
 export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: Props) {
   const items: { label: string; active: boolean; go: View }[] = [
@@ -17,6 +17,9 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
     { label: 'Today’s entry', active: view.name === 'editor' && view.date === today, go: { name: 'editor', date: today } },
     { label: 'Calendar', active: view.name === 'calendar', go: { name: 'calendar' } },
     { label: 'All Entries', active: view.name === 'entries', go: { name: 'entries', query: '' } },
+    { label: 'Audio Logs', active: view.name === 'audio', go: { name: 'audio' } },
+    { label: 'Habits', active: view.name === 'habits', go: { name: 'habits' } },
+    { label: 'To-Do', active: view.name === 'todo', go: { name: 'todo' } },
   ];
   return (
     <nav className="sidebar" aria-label="Main">

@@ -1,8 +1,12 @@
 import type { EntrySummary } from '../../../shared/types/Entry';
+import type { Navigate } from '../../app/App';
+import { AudioLogsCard } from './AudioLogsCard';
+import { HabitsCard } from './HabitsCard';
 import { HeroOpenerCard } from './HeroOpenerCard';
 import { MiniCalendarCard } from './MiniCalendarCard';
 import { MoodCheckInCard } from './MoodCheckInCard';
 import { RecentEntriesRow } from './RecentEntriesRow';
+import { TasksCard } from './TasksCard';
 
 interface Props {
   today: string;
@@ -10,9 +14,10 @@ interface Props {
   loadError: string | null;
   onOpenEntry: (date: string) => void;
   onEntriesChanged: () => void;
+  onNavigate: Navigate;
 }
 
-export function CanvasPage({ today, entries, loadError, onOpenEntry, onEntriesChanged }: Props) {
+export function CanvasPage({ today, entries, loadError, onOpenEntry, onEntriesChanged, onNavigate }: Props) {
   const todayEntry = entries.find((e) => e.date === today);
   return (
     <div className="canvas">
@@ -24,12 +29,9 @@ export function CanvasPage({ today, entries, loadError, onOpenEntry, onEntriesCh
       </div>
       <RecentEntriesRow entries={entries} onOpenEntry={onOpenEntry} onWrite={() => onOpenEntry(today)} />
       <div className="canvas-row">
-        {['Today’s Habits', 'Today’s Tasks', 'Audio Logs'].map((title) => (
-          <section key={title} className="card card-placeholder" aria-label={title}>
-            <h3 className="card-title">{title}</h3>
-            <p className="muted">Coming in a later phase.</p>
-          </section>
-        ))}
+        <HabitsCard today={today} onOpenPage={() => onNavigate({ name: 'habits' })} />
+        <TasksCard today={today} onOpenPage={() => onNavigate({ name: 'todo' })} />
+        <AudioLogsCard onOpenPage={() => onNavigate({ name: 'audio' })} />
       </div>
     </div>
   );

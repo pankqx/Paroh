@@ -4,7 +4,7 @@ export const CURRENT_SCHEMA_VERSION = 1;
 
 /**
  * One journal entry, one file per day: `<vault>/YYYY-MM/YYYY-MM-DD.md`.
- * Fields beyond Phase 1 (habits_snapshot, audio, prompt_id) are added when those features land,
+ * Fields beyond Phase 3 (prompt_id, prompt_skipped) are added when those features land,
  * per feature-specifications.md §4. Unknown frontmatter keys are preserved on save via `extra`.
  */
 export interface Entry {
@@ -14,6 +14,8 @@ export interface Entry {
   mood?: Mood;
   tags: string[];
   visibility: 'private' | 'public';
+  habits_snapshot?: string[]; // habit ids completed that day
+  audio?: string[]; // vault-relative paths into audio/
   body: string; // Markdown
   extra?: Record<string, unknown>;
 }

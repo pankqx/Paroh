@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { EntrySummary } from '../../../shared/types/Entry';
 import { MOOD_EMOJI } from '../../components/MoodSelector';
 import { fromEntryDate, monthGrid } from '../../domain/dates';
+import { MoodTrendChart } from './MoodTrendChart';
 
 interface Props {
   today: string;
@@ -44,6 +45,7 @@ export function CalendarPage({ today, entries, onOpenEntry }: Props) {
           </button>
         </div>
       </div>
+      <MoodTrendChart entries={entries} today={today} />
       <div className="big-calendar" role="grid" aria-label={label}>
         <div className="big-calendar-row" role="row">
           {WEEKDAYS.map((d) => (

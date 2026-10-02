@@ -2,6 +2,7 @@ import { mkdirSync, rmSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import type { DateRange, Entry, EntrySummary } from '../../shared/types/Entry';
+import type { HabitDay } from '../../shared/types/Habit';
 import { isMood } from '../../shared/types/Mood';
 import { MATCH_END, MATCH_START, type Backlink, type SearchFilters, type SearchResult } from '../../shared/types/Search';
 import { markdownToPlainText } from '../../shared/plainText';
@@ -61,8 +62,8 @@ export class IndexRepository {
     this.transaction(() => {
       this.removeRows(entry.date);
       this.db
-        .prepare('INSERT INTO entries (date, title, title_key, mood, tags, excerpt, mtime) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .run(entry.date, entry.title, normalizeLinkTarget(entry.title), entry.mood ?? null, JSON.stringify(entry.tags), summary.excerpt, mtime);
+        .prepare('INSERT INTO entries (date, title, title_key, mood, tags, excerpt, habits, mtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+        .run(entry.date, entry.title, normalizeLinkTarget(entry.title), entry.mood ?? null, JSON.stringify(entry.tags), summary.excerpt, JSON.stringify(entry.habits_snapshot ?? []), mtime);
       const tag = this.db.prepare('INSERT OR IGNORE INTO entry_tags (date, tag) VALUES (?, ?)');
       for (const t of entry.tags) tag.run(entry.date, t.toLowerCase());
       const link = this.db.prepare('INSERT OR IGNORE INTO links (source, target) VALUES (?, ?)');
@@ -80,6 +81,12 @@ export class IndexRepository {
       ? (this.db.prepare('SELECT * FROM entries WHERE date BETWEEN ? AND ? ORDER BY date DESC').all(range.from, range.to) as unknown as EntryRow[])
       : (this.db.prepare('SELECT * FROM entries ORDER BY date DESC').all() as unknown as EntryRow[]);
     return rows.map(rowToSummary);
+  }
+
+  /** Days on which at least one habit was completed, oldest first. */
+  habitHistory(): HabitDay[] {
+    const rows = this.db.prepare("SELECT date, habits FROM entries WHERE habits != '[]' ORDER BY date").all() as { date: string; habits: string }[];
+    return rows.map((r) => ({ date: r.date, habits: JSON.parse(r.habits) as string[] }));
   }
 
   tags(): { tag: string; count: number }[] {

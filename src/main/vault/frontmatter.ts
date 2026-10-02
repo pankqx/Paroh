@@ -4,7 +4,7 @@ import { isMood } from '../../shared/types/Mood';
 import { err, ok, type Result } from '../../shared/types/Result';
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
-const KNOWN_KEYS = new Set(['schema_version', 'date', 'title', 'mood', 'tags', 'visibility']);
+const KNOWN_KEYS = new Set(['schema_version', 'date', 'title', 'mood', 'tags', 'visibility', 'habits_snapshot', 'audio']);
 
 export function serializeEntry(entry: Entry): string {
   const data: Record<string, unknown> = {
@@ -15,13 +15,17 @@ export function serializeEntry(entry: Entry): string {
   if (entry.mood) data.mood = entry.mood;
   data.tags = entry.tags;
   data.visibility = entry.visibility;
+  if (entry.habits_snapshot?.length) data.habits_snapshot = entry.habits_snapshot;
+  if (entry.audio?.length) data.audio = entry.audio;
   // Keys written by a newer app version or by hand are carried through untouched.
   for (const [k, v] of Object.entries(entry.extra ?? {})) if (!KNOWN_KEYS.has(k)) data[k] = v;
 
   const doc = new Document(data);
   // `tags: [a, b]` on one line, matching the documented format and staying readable in other editors.
-  const tags = doc.get('tags', true);
-  if (isSeq(tags)) tags.flow = true;
+  for (const key of ['tags', 'habits_snapshot', 'audio']) {
+    const seq = doc.get(key, true);
+    if (isSeq(seq)) seq.flow = true;
+  }
   const yaml = doc.toString({ flowCollectionPadding: false }).trimEnd();
   const body = entry.body.endsWith('\n') || entry.body === '' ? entry.body : `${entry.body}\n`;
   return `---\n${yaml}\n---\n\n${body}`;
@@ -53,7 +57,15 @@ export function parseEntry(text: string, fallbackDate: string): Result<Entry> {
     mood: isMood(d.mood) ? d.mood : undefined,
     tags: Array.isArray(d.tags) ? d.tags.filter((t): t is string => typeof t === 'string') : [],
     visibility: d.visibility === 'public' ? 'public' : 'private',
+    ...(stringList(d.habits_snapshot) ? { habits_snapshot: stringList(d.habits_snapshot) } : {}),
+    ...(stringList(d.audio) ? { audio: stringList(d.audio) } : {}),
     body: match[2].replace(/^\r?\n/, ''),
     ...(Object.keys(extra).length ? { extra } : {}),
   });
+}
+
+function stringList(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const list = value.filter((v): v is string => typeof v === 'string');
+  return list.length ? list : undefined;
 }

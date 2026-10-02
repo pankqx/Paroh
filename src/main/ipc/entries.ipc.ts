@@ -14,4 +14,5 @@ export function registerEntriesIpc(service: () => EntryService): void {
   ipcMain.handle(IPC.searchQuery, (_e, text: string, filters?: SearchFilters) => service().search(String(text ?? ''), filters));
   ipcMain.handle(IPC.searchTags, () => service().tags());
   ipcMain.handle(IPC.searchRebuildIndex, () => service().rebuildIndex());
+  ipcMain.handle(IPC.habitsHistory, () => service().habitHistory());
 }

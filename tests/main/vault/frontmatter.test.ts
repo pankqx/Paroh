@@ -56,3 +56,13 @@ describe('markdownToPlainText', () => {
     expect(markdownToPlainText('## Title\n\n- **bold** and _it_\n> quote [[A morning|that day]] [site](https://x.y)\n```\ncode\n```')).toBe('Title bold and it quote that day site');
   });
 });
+
+describe('daily-practice fields', () => {
+  it('round-trips habits_snapshot and audio, and omits them when empty', () => {
+    const withFields = { ...entry, habits_snapshot: ['walk', 'read'], audio: ['audio/2026-06-11-090000.webm'] };
+    const text = serializeEntry(withFields);
+    expect(text).toContain('habits_snapshot: [walk, read]');
+    expect(parseEntry(text, entry.date)).toEqual({ ok: true, value: withFields });
+    expect(serializeEntry({ ...entry, habits_snapshot: [] })).not.toContain('habits_snapshot');
+  });
+});

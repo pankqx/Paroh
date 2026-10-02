@@ -1,6 +1,7 @@
 import { watch, type FSWatcher } from 'node:fs';
 import { join, sep } from 'node:path';
 import { isEntryDate, type DateRange, type Entry, type EntrySummary } from '../shared/types/Entry';
+import type { HabitDay } from '../shared/types/Habit';
 import { err, ok, type Result } from '../shared/types/Result';
 import type { Backlink, SearchFilters, SearchResult } from '../shared/types/Search';
 import { IndexRepository } from './index-db/IndexRepository';
@@ -64,6 +65,10 @@ export class EntryService {
 
   tags(): Result<{ tag: string; count: number }[]> {
     return this.guard(() => this.index.tags());
+  }
+
+  habitHistory(): Result<HabitDay[]> {
+    return this.guard(() => this.index.habitHistory());
   }
 
   backlinks(date: string): Result<Backlink[]> {

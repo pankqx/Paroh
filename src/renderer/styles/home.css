@@ -126,3 +126,8 @@
   .hero-card { padding: var(--space-6); min-height: 0; }
   .hero-quote { font-size: 30px; }
 }
+
+/* An entry with a cover shows it across the top of its card. */
+.entry-card.has-cover::after { display: none; }
+.entry-card-cover { margin: calc(-1 * var(--space-6)) calc(-1 * var(--space-6)) var(--space-3); height: 112px; background: var(--surface-3) center / cover no-repeat; transition: transform var(--dur-slow) var(--ease-out); }
+.entry-card:hover .entry-card-cover { transform: scale(1.03); }

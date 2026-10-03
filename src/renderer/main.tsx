@@ -7,6 +7,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/shell.css';
 import './styles/home.css';
+import './styles/editor.css';
 import './styles/app.css';
 import { App } from './app/App';
 import { applyTheme } from './app/theme';

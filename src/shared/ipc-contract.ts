@@ -39,6 +39,8 @@ export const IPC = {
   audioRead: 'audio:read',
   audioRename: 'audio:rename',
   audioSetTranscript: 'audio:setTranscript',
+  mediaSave: 'media:save',
+  mediaRead: 'media:read',
   promptsHistory: 'prompts:history',
   chaptersMonth: 'chapters:month',
   horizonsList: 'horizons:list',
@@ -162,6 +164,11 @@ export interface ParohApi {
     rename(id: string, title: string): Promise<Result<void>>;
     /** Stores text the renderer transcribed on-device; an empty string removes it. */
     setTranscript(id: string, text: string): Promise<Result<AudioLog>>;
+  };
+  media: {
+    /** Copies a photo, video or sound file into `media/YYYY-MM/` and returns its vault-relative path. */
+    save(fileName: string, bytes: Uint8Array): Promise<Result<{ path: string }>>;
+    read(path: string): Promise<Result<Uint8Array>>;
   };
   prompts: {
     /** Answered and skipped healing prompts, newest first, read from entry frontmatter. */

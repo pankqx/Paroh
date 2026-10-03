@@ -17,6 +17,8 @@ export interface Entry {
   audio?: string[]; // vault-relative paths into audio/
   prompt_id?: string; // the healing prompt shown that day
   prompt_skipped?: boolean; // true when that prompt was skipped
+  cover?: string; // a photo in media/, or a built-in `gradient:<name>`, shown behind the title
+  cover_y?: number; // which part of a cover photo stays in view, 0 (top) to 100 (bottom)
   body: string; // Markdown
   extra?: Record<string, unknown>;
 }
@@ -27,6 +29,7 @@ export interface EntrySummary {
   mood?: Mood;
   tags: string[];
   excerpt: string;
+  cover?: string;
 }
 
 export interface DateRange {

@@ -73,6 +73,7 @@ window.paroh = {
     rename: async () => ({ ok: true, value: undefined }),
     setTranscript: async () => ({ ok: false, error: 'unused' }),
   },
+  media: { save: async () => ({ ok: true, value: { path: 'media/2026-10/x.jpg' } }), read: async () => ({ ok: true, value: new Uint8Array() }) },
   prompts: { history: async () => ({ ok: true, value: [{ prompt_id: 'noticing-001', date: '2026-10-01', outcome: 'answered' }] }) },
   chapters: {
     month: async () => ({

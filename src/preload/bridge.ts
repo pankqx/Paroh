@@ -43,6 +43,10 @@ const api: ParohApi = {
     rename: (id, title) => ipcRenderer.invoke(IPC.audioRename, id, title),
     setTranscript: (id, text) => ipcRenderer.invoke(IPC.audioSetTranscript, id, text),
   },
+  media: {
+    save: (fileName, bytes) => ipcRenderer.invoke(IPC.mediaSave, fileName, bytes),
+    read: (path) => ipcRenderer.invoke(IPC.mediaRead, path),
+  },
   prompts: {
     history: () => ipcRenderer.invoke(IPC.promptsHistory),
   },

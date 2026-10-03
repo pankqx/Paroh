@@ -4,7 +4,7 @@ import { isMood } from '../../shared/types/Mood';
 import { err, ok, type Result } from '../../shared/types/Result';
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
-const KNOWN_KEYS = new Set(['schema_version', 'date', 'title', 'mood', 'tags', 'visibility', 'habits_snapshot', 'audio', 'prompt_id', 'prompt_skipped']);
+const KNOWN_KEYS = new Set(['schema_version', 'date', 'title', 'mood', 'tags', 'visibility', 'habits_snapshot', 'audio', 'prompt_id', 'prompt_skipped', 'cover', 'cover_y']);
 
 export function serializeEntry(entry: Entry): string {
   const data: Record<string, unknown> = {
@@ -20,6 +20,10 @@ export function serializeEntry(entry: Entry): string {
   if (entry.prompt_id) {
     data.prompt_id = entry.prompt_id;
     data.prompt_skipped = entry.prompt_skipped === true;
+  }
+  if (entry.cover) {
+    data.cover = entry.cover;
+    if (typeof entry.cover_y === 'number' && entry.cover_y !== 50) data.cover_y = Math.round(entry.cover_y);
   }
   // Keys written by a newer app version or by hand are carried through untouched.
   for (const [k, v] of Object.entries(entry.extra ?? {})) if (!KNOWN_KEYS.has(k)) data[k] = v;
@@ -64,6 +68,8 @@ export function parseEntry(text: string, fallbackDate: string): Result<Entry> {
     ...(stringList(d.habits_snapshot) ? { habits_snapshot: stringList(d.habits_snapshot) } : {}),
     ...(stringList(d.audio) ? { audio: stringList(d.audio) } : {}),
     ...(typeof d.prompt_id === 'string' && d.prompt_id ? { prompt_id: d.prompt_id, prompt_skipped: d.prompt_skipped === true } : {}),
+    ...(typeof d.cover === 'string' && d.cover.trim() ? { cover: d.cover.trim() } : {}),
+    ...(typeof d.cover_y === 'number' && d.cover_y >= 0 && d.cover_y <= 100 ? { cover_y: d.cover_y } : {}),
     body: match[2].replace(/^\r?\n/, ''),
     ...(Object.keys(extra).length ? { extra } : {}),
   });

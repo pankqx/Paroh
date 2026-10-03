@@ -18,6 +18,7 @@ interface EntryRow {
   mood: string | null;
   tags: string;
   excerpt: string;
+  cover: string | null;
 }
 
 /** SQLite FTS5 index over the vault. Never the source of truth: everything here can be rebuilt from the .md files. */
@@ -70,7 +71,7 @@ export class IndexRepository implements SearchIndex {
     this.transaction(() => {
       this.removeRows(entry.date);
       this.db
-        .prepare('INSERT INTO entries (date, title, title_key, mood, tags, excerpt, habits, prompt_id, prompt_skipped, mtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .prepare('INSERT INTO entries (date, title, title_key, mood, tags, excerpt, habits, prompt_id, prompt_skipped, cover, mtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         .run(
           entry.date,
           entry.title,
@@ -81,6 +82,7 @@ export class IndexRepository implements SearchIndex {
           JSON.stringify(entry.habits_snapshot ?? []),
           entry.prompt_id ?? null,
           entry.prompt_skipped ? 1 : 0,
+          entry.cover ?? null,
           mtime,
         );
       const tag = this.db.prepare('INSERT OR IGNORE INTO entry_tags (date, tag) VALUES (?, ?)');
@@ -222,7 +224,7 @@ export class IndexRepository implements SearchIndex {
 }
 
 function rowToSummary(r: EntryRow): EntrySummary {
-  return { date: r.date, title: r.title, mood: isMood(r.mood) ? r.mood : undefined, tags: JSON.parse(r.tags) as string[], excerpt: r.excerpt };
+  return { date: r.date, title: r.title, mood: isMood(r.mood) ? r.mood : undefined, tags: JSON.parse(r.tags) as string[], excerpt: r.excerpt, ...(r.cover ? { cover: r.cover } : {}) };
 }
 
 /**

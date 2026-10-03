@@ -2,6 +2,7 @@
 export function markdownToPlainText(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<\/?[a-z][^>]*>/gi, '')
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_m, target: string, label?: string) => label ?? target)
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')

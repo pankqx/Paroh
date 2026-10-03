@@ -142,5 +142,5 @@ function normalizeBody(body: string): string {
 
 export function toSummary(entry: Entry): EntrySummary {
   const plain = markdownToPlainText(entry.body);
-  return { date: entry.date, title: entry.title, mood: entry.mood, tags: entry.tags, excerpt: plain.slice(0, 180) };
+  return { date: entry.date, title: entry.title, mood: entry.mood, tags: entry.tags, excerpt: plain.slice(0, 180), ...(entry.cover ? { cover: entry.cover } : {}) };
 }

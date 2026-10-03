@@ -117,8 +117,12 @@ export interface TaskInput {
   recurring?: Recurrence;
 }
 
+/** Which shell is running the renderer. The phone app has no folder picker, export, reminders or AI yet. */
+export type Platform = 'desktop' | 'mobile';
+
 /** The typed surface the renderer sees as `window.paroh` (docs/api.md). */
 export interface ParohApi {
+  platform: Platform;
   entries: {
     save(entry: Entry): Promise<Result<Entry>>;
     load(date: string): Promise<Result<Entry | null>>;

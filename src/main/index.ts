@@ -38,7 +38,7 @@ async function openVault(path: string): Promise<void> {
   next.watch((dates) => broadcast({ dates }));
   const previous = service;
   service = next;
-  stores = { habits: new HabitStore(next), tasks: new TaskStore(path), audio: new AudioStore(next), horizons: new HorizonStore(path) };
+  stores = { habits: new HabitStore(next), tasks: new TaskStore(next.fs), audio: new AudioStore(next), horizons: new HorizonStore(next.fs) };
   await stores.audio.syncTranscriptIndex();
   previous?.close();
 }

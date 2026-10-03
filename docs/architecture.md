@@ -255,6 +255,8 @@ SQLite's FTS5 extension powers ranked full-text search without hand-rolling a se
 
 The eventual mobile app is Capacitor wrapping the same React codebase, with `VaultAdapter`'s internals swapped to Capacitor's Filesystem API instead of Node's `fs`, reading and writing the identical `.md` + YAML format. Because the UI, the Domain layer, and the file format are already platform-agnostic (see Layers, above), the mobile port is primarily an Infrastructure-layer adapter swap plus a touch-optimized Presentation-layer pass — not a second codebase. Desktop-specific layouts (the multi-column Canvas grid) will need real mobile-specific layout work, planned honestly, not hand-waved.
 
+**As built (Phase 9):** the adapter seam is `VaultFs` (`src/shared/fs/VaultFs.ts`), with `NodeVaultFs` and `CapacitorVaultFs`; the index seam is `SearchIndex`, with SQLite on the desktop and `MemoryIndex` on phones. See `docs/mobile.md`.
+
 ---
 
 ## Themes

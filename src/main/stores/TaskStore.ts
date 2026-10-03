@@ -1,5 +1,4 @@
-import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
+import type { VaultFs } from '../../shared/fs/VaultFs';
 import type { TaskInput } from '../../shared/ipc-contract';
 import { toEntryDate } from '../../shared/localDate';
 import { nextOccurrence } from '../../shared/recurrence';
@@ -18,10 +17,10 @@ export class TaskStore {
   private readonly path: string;
 
   constructor(
-    root: string,
+    private fs: VaultFs,
     private today: () => string = () => toEntryDate(new Date()),
   ) {
-    this.path = join(root, '.paroh', 'tasks.json');
+    this.path = '.paroh/tasks.json';
   }
 
   list(): Promise<Result<Task[]>> {
@@ -32,7 +31,7 @@ export class TaskStore {
     const problem = validate(input);
     if (problem) return err(problem);
     return this.write((tasks) => {
-      const task: Task = { id: randomUUID(), text: input.text.trim(), createdDate: this.today(), done: false, ...optional(input) };
+      const task: Task = { id: crypto.randomUUID(), text: input.text.trim(), createdDate: this.today(), done: false, ...optional(input) };
       tasks.push(task);
       return task;
     });
@@ -67,7 +66,7 @@ export class TaskStore {
         const from = task.dueDate && task.dueDate > this.today() ? task.dueDate : this.today();
         const due = nextOccurrence(task.recurring, from);
         const exists = tasks.some((t) => !t.done && t.text === task.text && t.recurring === task.recurring && t.dueDate === due);
-        if (!exists) tasks.push({ id: randomUUID(), text: task.text, createdDate: this.today(), dueDate: due, done: false, recurring: task.recurring });
+        if (!exists) tasks.push({ id: crypto.randomUUID(), text: task.text, createdDate: this.today(), dueDate: due, done: false, recurring: task.recurring });
       }
       return task;
     });
@@ -104,7 +103,7 @@ export class TaskStore {
       attempt(async () => {
       const file = await this.read();
         const result = change(file.tasks);
-        await writeJsonFile(this.path, file);
+        await writeJsonFile(this.fs, this.path, file);
         return result;
       }),
     );
@@ -113,7 +112,7 @@ export class TaskStore {
   }
 
   private async read(): Promise<TasksFile> {
-    const file = await readJsonFile<TasksFile>(this.path, { schema_version: 1, tasks: [] });
+    const file = await readJsonFile<TasksFile>(this.fs, this.path, { schema_version: 1, tasks: [] });
     return { schema_version: 1, tasks: Array.isArray(file.tasks) ? file.tasks : [] };
   }
 }

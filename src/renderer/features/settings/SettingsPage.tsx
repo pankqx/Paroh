@@ -16,6 +16,7 @@ export function SettingsPage({ onVaultChanged }: Props) {
   const [settings, setSettings] = useState<SettingsView | null>(null);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [reminder, setReminder] = useState('');
+  const mobile = window.paroh.platform === 'mobile';
 
   const load = () =>
     window.paroh.settings.get().then((s) => {
@@ -86,78 +87,97 @@ export function SettingsPage({ onVaultChanged }: Props) {
         <h2 className="card-title" id="set-vault">
           Vault
         </h2>
-        <p className="small muted">Your journal is a folder of plain Markdown files. You can open it in any editor, back it up, or sync it with tools you already trust.</p>
+        {mobile ? (
+          <p className="small muted">Your journal is a folder of plain Markdown files in this phone’s Documents/Paroh folder. To keep it in step with your computer, point a sync app such as Syncthing at that folder.</p>
+        ) : (
+          <p className="small muted">Your journal is a folder of plain Markdown files. You can open it in any editor, back it up, or sync it with tools you already trust.</p>
+        )}
         <code className="vault-path-full">{settings?.vaultPath ?? '…'}</code>
-        <div className="settings-actions">
-          <button className="btn" onClick={() => void window.paroh.vault.reveal()}>
-            Show folder
-          </button>
-          <button className="btn" onClick={() => void changeVault()}>
-            Change folder
-          </button>
-        </div>
-      </section>
-
-      <section className="card settings-section" aria-labelledby="set-export">
-        <h2 className="card-title" id="set-export">
-          Export and import
-        </h2>
-        <p className="small muted">Export makes one .zip of every entry, recording, story and setting in your vault. Import unpacks an export into an empty folder and switches to it.</p>
-        <div className="settings-actions">
-          <button className="btn btn-primary" onClick={() => void exportVault()} disabled={status.kind === 'busy'}>
-            Export vault as .zip
-          </button>
-          <button className="btn" onClick={() => void importVault()} disabled={status.kind === 'busy'}>
-            Import an export…
-          </button>
-        </div>
-      </section>
-
-      <section className="card settings-section" aria-labelledby="set-reminder">
-        <h2 className="card-title" id="set-reminder">
-          Daily reminder
-        </h2>
-        <p className="small muted">One quiet notification a day. It never mentions missed days.</p>
-        <div className="settings-actions">
-          <label className="field inline-field">
-            <span>Time</span>
-            <input className="filter-input" type="time" value={reminder} onChange={(e) => setReminder(e.target.value)} />
-          </label>
-          <button className="btn" onClick={() => void saveReminder(reminder || null)} disabled={reminder === (settings?.reminderTime ?? '')}>
-            Save
-          </button>
-          {settings?.reminderTime && (
-            <button className="btn" onClick={() => void saveReminder(null)}>
-              Turn off
+        {!mobile && (
+          <div className="settings-actions">
+            <button className="btn" onClick={() => void window.paroh.vault.reveal()}>
+              Show folder
             </button>
-          )}
-        </div>
+            <button className="btn" onClick={() => void changeVault()}>
+              Change folder
+            </button>
+          </div>
+        )}
       </section>
 
-      <section className="card settings-section" aria-labelledby="set-ai">
-        <h2 className="card-title" id="set-ai">
-          AI features
-        </h2>
-        <p className="small muted">Every AI feature is off until you switch it on, one at a time. Paroh works fully without any of them.</p>
-        <ul className="ai-list">
-          {AI_FEATURES.map((f) => {
-            const on = settings?.aiFeatures[f.id] === true;
-            return (
-              <li key={f.id} className="ai-row">
-                <label className="switch-label">
-                  <input type="checkbox" role="switch" checked={on} onChange={(e) => void toggleAi(f.id, e.target.checked)} aria-describedby={`ai-${f.id}-desc`} />
-                  <span className="ai-name">{f.label}</span>
-                </label>
-                <p className="small muted" id={`ai-${f.id}-desc`}>
-                  {f.leavesDevice}
-                </p>
-                {on && settings && f.id === 'editors-note' && <ApiKeyField settings={settings} onChanged={() => void load()} />}
-                {on && f.id === 'transcription' && <SpeechModelPanel />}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      {mobile && (
+        <section className="card settings-section" aria-labelledby="set-desktop">
+          <h2 className="card-title" id="set-desktop">
+            In the desktop app
+          </h2>
+          <p className="small muted">Export and import, the daily reminder and the AI features live in the desktop app for now. Everything you write here shows up there once the folder syncs.</p>
+        </section>
+      )}
+
+      {!mobile && (
+        <>
+          <section className="card settings-section" aria-labelledby="set-export">
+            <h2 className="card-title" id="set-export">
+              Export and import
+            </h2>
+            <p className="small muted">Export makes one .zip of every entry, recording, story and setting in your vault. Import unpacks an export into an empty folder and switches to it.</p>
+            <div className="settings-actions">
+              <button className="btn btn-primary" onClick={() => void exportVault()} disabled={status.kind === 'busy'}>
+                Export vault as .zip
+              </button>
+              <button className="btn" onClick={() => void importVault()} disabled={status.kind === 'busy'}>
+                Import an export…
+              </button>
+            </div>
+          </section>
+
+          <section className="card settings-section" aria-labelledby="set-reminder">
+            <h2 className="card-title" id="set-reminder">
+              Daily reminder
+            </h2>
+            <p className="small muted">One quiet notification a day. It never mentions missed days.</p>
+            <div className="settings-actions">
+              <label className="field inline-field">
+                <span>Time</span>
+                <input className="filter-input" type="time" value={reminder} onChange={(e) => setReminder(e.target.value)} />
+              </label>
+              <button className="btn" onClick={() => void saveReminder(reminder || null)} disabled={reminder === (settings?.reminderTime ?? '')}>
+                Save
+              </button>
+              {settings?.reminderTime && (
+                <button className="btn" onClick={() => void saveReminder(null)}>
+                  Turn off
+                </button>
+              )}
+            </div>
+          </section>
+
+          <section className="card settings-section" aria-labelledby="set-ai">
+            <h2 className="card-title" id="set-ai">
+              AI features
+            </h2>
+            <p className="small muted">Every AI feature is off until you switch it on, one at a time. Paroh works fully without any of them.</p>
+            <ul className="ai-list">
+              {AI_FEATURES.map((f) => {
+                const on = settings?.aiFeatures[f.id] === true;
+                return (
+                  <li key={f.id} className="ai-row">
+                    <label className="switch-label">
+                      <input type="checkbox" role="switch" checked={on} onChange={(e) => void toggleAi(f.id, e.target.checked)} aria-describedby={`ai-${f.id}-desc`} />
+                      <span className="ai-name">{f.label}</span>
+                    </label>
+                    <p className="small muted" id={`ai-${f.id}-desc`}>
+                      {f.leavesDevice}
+                    </p>
+                    {on && settings && f.id === 'editors-note' && <ApiKeyField settings={settings} onChanged={() => void load()} />}
+                    {on && f.id === 'transcription' && <SpeechModelPanel />}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        </>
+      )}
 
       <section className="settings-section" aria-labelledby="set-privacy">
         <h2 className="section-title" id="set-privacy">

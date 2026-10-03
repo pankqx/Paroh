@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { HorizonStore } from '../../../src/main/stores/HorizonStore';
+import { NodeVaultFs } from '../../../src/main/vault/NodeVaultFs';
 import { VaultAdapter } from '../../../src/main/vault/VaultAdapter';
 import { parseLifeStory, serializeLifeStory } from '../../../src/main/vault/lifeStoryFile';
 import type { LifeStory, LifeStoryInput } from '../../../src/shared/types/LifeStory';
@@ -17,7 +18,7 @@ let root: string;
 let store: HorizonStore;
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), 'paroh-horizons-'));
-  store = new HorizonStore(root);
+  store = new HorizonStore(new NodeVaultFs(root));
 });
 afterEach(() => rm(root, { recursive: true, force: true }));
 
@@ -86,7 +87,7 @@ describe('HorizonStore', () => {
 
 describe('VaultAdapter.loadMonth', () => {
   it('reads every entry in one month with full bodies, oldest first', async () => {
-    const vault = new VaultAdapter(root);
+    const vault = new VaultAdapter(new NodeVaultFs(root));
     await vault.save({ schema_version: 1, date: '2026-10-02', title: 'b', tags: [], visibility: 'private', body: 'Second\n' });
     await vault.save({ schema_version: 1, date: '2026-10-01', title: 'a', tags: [], visibility: 'private', body: 'First\n' });
     await vault.save({ schema_version: 1, date: '2026-09-30', title: 'x', tags: [], visibility: 'private', body: 'Other\n' });

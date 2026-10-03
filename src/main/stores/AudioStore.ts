@@ -1,10 +1,9 @@
-import { appendFile, mkdir, readdir, readFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { isNotFound } from '../../shared/fs/VaultFs';
 import { toEntryDate } from '../../shared/localDate';
 import type { AudioLog } from '../../shared/types/AudioLog';
 import { emptyEntry } from '../../shared/types/Entry';
 import { err, ok, type Result } from '../../shared/types/Result';
-import type { EntryService } from '../EntryService';
+import type { VaultService } from '../VaultService';
 import { readJsonFile, writeJsonFile } from '../vault/jsonFile';
 
 interface AudioFile {
@@ -25,22 +24,22 @@ export class AudioStore {
   private active = new Set<string>();
 
   constructor(
-    private entries: EntryService,
+    private entries: VaultService,
     private now: () => Date = () => new Date(),
   ) {
-    this.dir = join(entries.root, 'audio');
-    this.metaPath = join(entries.root, '.paroh', 'audio.json');
+    this.dir = 'audio';
+    this.metaPath = '.paroh/audio.json';
   }
 
   async begin(): Promise<Result<{ id: string }>> {
     try {
-      await mkdir(this.dir, { recursive: true });
+      await this.entries.fs.mkdir(this.dir);
       const d = this.now();
       const base = `${toEntryDate(d)}-${[d.getHours(), d.getMinutes(), d.getSeconds()].map((n) => String(n).padStart(2, '0')).join('')}`;
-      const existing = new Set(await readdir(this.dir));
+      const existing = new Set(await this.entries.fs.list(this.dir));
       let id = base;
       for (let n = 2; existing.has(`${id}.webm`) || this.active.has(id); n++) id = `${base}-${n}`;
-      await appendFile(this.file(id), new Uint8Array());
+      await this.entries.fs.appendBytes(this.file(id), new Uint8Array());
       this.active.add(id);
       return ok({ id });
     } catch (e) {
@@ -51,7 +50,7 @@ export class AudioStore {
   async append(id: string, chunk: Uint8Array): Promise<Result<void>> {
     if (!this.active.has(id)) return err('That recording is not in progress');
     try {
-      await appendFile(this.file(id), chunk);
+      await this.entries.fs.appendBytes(this.file(id), chunk);
       return ok(undefined);
     } catch (e) {
       return err(`Could not save audio: ${(e as Error).message}`);
@@ -73,7 +72,7 @@ export class AudioStore {
     try {
       const meta = await this.readMeta();
       meta.logs.push(log);
-      await writeJsonFile(this.metaPath, meta);
+      await writeJsonFile(this.entries.fs, this.metaPath, meta);
     } catch (e) {
       return err(`Recording saved, but its details could not be stored: ${(e as Error).message}`);
     }
@@ -93,9 +92,9 @@ export class AudioStore {
       const byId = new Map(meta.logs.map((l) => [l.id, l]));
       let files: string[] = [];
       try {
-        files = await readdir(this.dir);
+        files = await this.entries.fs.list(this.dir);
       } catch (e) {
-        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e;
+        if (!isNotFound(e)) throw e;
       }
       const logs: AudioLog[] = [];
       for (const f of files) {
@@ -104,8 +103,8 @@ export class AudioStore {
         const known = byId.get(id);
         if (known) logs.push({ ...known, filePath: `audio/${f}` });
         else {
-          const s = await stat(join(this.dir, f));
-          if (s.size > 0) logs.push({ id, filePath: `audio/${f}`, title: 'Interrupted recording', createdAt: s.mtime.toISOString(), linkedEntryDate: id.slice(0, 10) });
+          const s = await this.entries.fs.stat(`${this.dir}/${f}`);
+          if (s.size > 0) logs.push({ id, filePath: `audio/${f}`, title: 'Interrupted recording', createdAt: new Date(s.mtimeMs).toISOString(), linkedEntryDate: id.slice(0, 10) });
         }
       }
       logs.sort((a, b) => (a.id < b.id ? 1 : -1));
@@ -118,7 +117,7 @@ export class AudioStore {
   async read(id: string): Promise<Result<Uint8Array>> {
     if (!ID_RE.test(id)) return err('Unknown recording');
     try {
-      return ok(new Uint8Array(await readFile(this.file(id))));
+      return ok(await this.entries.fs.readBytes(this.file(id)));
     } catch (e) {
       return err(`Could not open recording: ${(e as Error).message}`);
     }
@@ -132,7 +131,7 @@ export class AudioStore {
       const log = meta.logs.find((l) => l.id === id);
       if (log) log.title = clean;
       else meta.logs.push({ id, title: clean, createdAt: new Date().toISOString(), linkedEntryDate: id.slice(0, 10) });
-      await writeJsonFile(this.metaPath, meta);
+      await writeJsonFile(this.entries.fs, this.metaPath, meta);
       return ok(undefined);
     } catch (e) {
       return err(`Could not rename: ${(e as Error).message}`);
@@ -147,7 +146,7 @@ export class AudioStore {
       const meta = await this.readMeta();
       let log = meta.logs.find((l) => l.id === id);
       if (!log) {
-        await stat(this.file(id));
+        await this.entries.fs.stat(this.file(id));
         log = { id, title: 'Interrupted recording', createdAt: this.now().toISOString(), linkedEntryDate: id.slice(0, 10) };
         meta.logs.push(log);
       }
@@ -158,11 +157,11 @@ export class AudioStore {
         delete log.transcript;
         delete log.transcribedAt;
       }
-      await writeJsonFile(this.metaPath, meta);
+      await writeJsonFile(this.entries.fs, this.metaPath, meta);
       this.entries.indexTranscript(id, log.linkedEntryDate ?? id.slice(0, 10), clean);
       return ok({ ...log, filePath: `audio/${id}.webm` });
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return err('That recording is no longer in the vault');
+      if (isNotFound(e)) return err('That recording is no longer in the vault');
       return err(`Could not save the transcript: ${(e as Error).message}`);
     }
   }
@@ -178,11 +177,11 @@ export class AudioStore {
   }
 
   private file(id: string): string {
-    return join(this.dir, `${id}.webm`);
+    return `${this.dir}/${id}.webm`;
   }
 
   private async readMeta(): Promise<AudioFile> {
-    const meta = await readJsonFile<AudioFile>(this.metaPath, { schema_version: 1, logs: [] });
+    const meta = await readJsonFile<AudioFile>(this.entries.fs, this.metaPath, { schema_version: 1, logs: [] });
     return { schema_version: 1, logs: Array.isArray(meta.logs) ? meta.logs : [] };
   }
 }

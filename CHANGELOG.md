@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Phase 9 mobile: an Android app built with Capacitor from the same code,
+  keeping the same Markdown vault in Documents/Paroh so a sync app can carry
+  it to your computer. The app now fits phone screens, with a menu drawer
+  and larger touch targets. A GitHub workflow builds the APK.
+
 - Phase 8 AI features, all off by default: an Editor's Note for each month in
   Chapters, written by Claude with your own Anthropic API key and saved only if
   you keep it, and on-device transcription of audio logs that makes them

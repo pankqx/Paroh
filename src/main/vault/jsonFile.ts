@@ -1,14 +1,12 @@
-import { mkdir, readFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
-import { atomicWrite } from './atomicWrite';
+import { isNotFound, parentPath, type VaultFs } from '../../shared/fs/VaultFs';
 
 /** Reads a JSON store under `.paroh/`. Missing → fallback; unreadable → throws, so nothing overwrites it blindly. */
-export async function readJsonFile<T>(path: string, fallback: T): Promise<T> {
+export async function readJsonFile<T>(fs: VaultFs, path: string, fallback: T): Promise<T> {
   let text: string;
   try {
-    text = await readFile(path, 'utf8');
+    text = await fs.readText(path);
   } catch (e) {
-    if ((e as NodeJS.ErrnoException).code === 'ENOENT') return fallback;
+    if (isNotFound(e)) return fallback;
     throw e;
   }
   try {
@@ -18,10 +16,10 @@ export async function readJsonFile<T>(path: string, fallback: T): Promise<T> {
   }
 }
 
-export async function writeJsonFile(path: string, data: unknown): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
+export async function writeJsonFile(fs: VaultFs, path: string, data: unknown): Promise<void> {
+  await fs.mkdir(parentPath(path));
   const text = `${JSON.stringify(data, null, 2)}\n`;
-  await atomicWrite(path, text, (written) => {
+  await fs.writeTextAtomic(path, text, (written) => {
     try {
       JSON.parse(written);
       return null;

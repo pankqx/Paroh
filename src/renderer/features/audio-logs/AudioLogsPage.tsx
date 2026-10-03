@@ -19,7 +19,7 @@ export function AudioLogsPage({ onOpenEntry }: { onOpenEntry: (date: string) => 
       <div className="page-head">
         <h1 className="page-title">Audio Logs</h1>
         <div className="page-head-actions">
-          <span className="micro muted">Ctrl/Cmd+Shift+R records from anywhere</span>
+          {window.paroh.platform === 'desktop' && <span className="micro muted">Ctrl/Cmd+Shift+R records from anywhere</span>}
           <button className={`btn ${recording ? 'btn-accent' : 'btn-record'}`} onClick={toggle}>
             {recording ? `■ Stop (${formatDuration(seconds)})` : '● Record'}
           </button>

@@ -4,6 +4,7 @@ import type { SpeechModelStatus } from '../shared/speechModel';
 
 // The renderer's only door to the vault: explicit methods, no generic invoke (docs/api.md).
 const api: ParohApi = {
+  platform: 'desktop',
   entries: {
     save: (entry) => ipcRenderer.invoke(IPC.entriesSave, entry),
     load: (date) => ipcRenderer.invoke(IPC.entriesLoad, date),

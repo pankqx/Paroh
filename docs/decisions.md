@@ -93,6 +93,13 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **The main process downloads the model**, keeping every network call in main per `security.md`; the renderer reads the files through a read-only `paroh-model://` scheme with path-escape checks. Whisper base (multilingual, 8-bit, about 80 MB) balances quality and download size.
 - **Transcripts go in `.paroh/audio.json`, not the entry body.** The person decides what enters their writing; the search index keeps transcripts findable on their own.
 
+### 2026-10-03 — Phase 9 implementation choices
+- **One React app, two hosts.** The phone runs the exact renderer bundle; only `window.paroh` differs. On the desktop it is the IPC bridge, on the phone it is `mobileApi.ts`, which calls the same vault services in the WebView. No second codebase, as `architecture.md` §Mobile Reuse Strategy planned.
+- **The swap happens at a `VaultFs` interface, not inside each store.** Every store and the `VaultAdapter` take a `VaultFs`, so the atomic save pipeline (write temp, read back, validate, replace) is the same code on both platforms. A contract test holds the two implementations to the same behaviour.
+- **An in-memory search index on phones.** `node:sqlite` does not exist in a WebView and a native SQLite plugin adds a second schema to keep in step. A personal journal is small enough to index on launch, and the index is disposable by design.
+- **Android first.** It can be built on Linux CI; iOS needs a Mac. The `Documents/Paroh` folder is where sync apps can reach it.
+- **Desktop-only features say so on the phone** instead of half-working: export/import (the phone folder is already plain files), the reminder (needs a notification plugin) and the AI features (key storage and the speech model need their own phone work).
+
 ---
 
 ## Template for New Entries

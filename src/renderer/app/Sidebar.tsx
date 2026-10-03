@@ -65,9 +65,11 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
         <div className="vault-path" title={vaultPath}>
           {vaultPath || '…'}
         </div>
-        <button className="link-btn" onClick={onChooseVault}>
-          Change folder
-        </button>
+        {window.paroh.platform === 'desktop' && (
+          <button className="link-btn" onClick={onChooseVault}>
+            Change folder
+          </button>
+        )}
       </div>
     </nav>
   );

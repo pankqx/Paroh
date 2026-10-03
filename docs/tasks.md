@@ -82,6 +82,18 @@
 - [x] Tests: Claude request shape (model, fallback beta, effort, key header) and error wording against a fake API, consent gating, draft-not-written, note file round trip, unsafe months rejected, key store, model download (optional files, failed downloads clean up, path escapes refused), transcripts stored, indexed and re-indexed, axe-core with the features on.
 - [ ] A real transcription run with the downloaded model (the build sandbox cannot reach Hugging Face; everything up to the model weights was checked in the packaged app).
 
+## DONE (Phase 9)
+
+- [x] The vault code no longer depends on Node: a `VaultFs` interface (`src/shared/fs/VaultFs.ts`) with `NodeVaultFs` on the desktop and `CapacitorVaultFs` on phones, and a `SearchIndex` interface with SQLite on the desktop and an in-memory index (`MemoryIndex`) on phones. `VaultService` holds the shared logic; the desktop's `EntryService` adds the file watcher. The same `VaultAdapter`, stores and atomic-save pipeline run on both.
+- [x] A Capacitor Android app (`android/`, `capacitor.config.ts`) running the same React app. Its `window.paroh` (`src/mobile-main/mobileApi.ts`) calls the vault services directly instead of over IPC. The vault lives in `Documents/Paroh`, in the identical Markdown format, and the app catches up on files a sync app changed whenever it comes back to the foreground.
+- [x] Phone layout: below 900px the sidebar becomes a drawer behind a menu button, the top bar compacts, pages and the editor stack in one column, touch targets are at least 44px on touch screens, safe-area insets are respected, and the Horizons label column narrows on phones.
+- [x] Desktop-only for now, and labelled as such on the phone: export/import, the daily reminder, the AI features and transcription. Recording audio works on the phone.
+- [x] The `Build Android` workflow builds a debug APK on a GitHub runner (`npm run build:android` does the same locally with the Android SDK).
+- [x] Tests: one contract suite runs every `VaultFs` behaviour against both the Node and Capacitor implementations, the index suite runs against both SQLite and the in-memory index, the phone API is tested end to end on a fake Capacitor filesystem, axe-core covers the phone layout, and `tsconfig.mobile.json` type-checks the phone bundle without Node types so a Node import there fails CI.
+- [ ] A run on a real Android phone, and the waiting-room test from the roadmap with a real sync app (needs a person and a phone).
+- [ ] iOS (needs a Mac with Xcode).
+- [ ] On Android 11 and newer, files another app (such as Syncthing) creates in `Documents/Paroh` may not be readable by Paroh without broader storage access; see `docs/mobile.md`.
+
 ## Later
 
 - [ ] Horizons: drag stories between periods, and rename or hide life areas.

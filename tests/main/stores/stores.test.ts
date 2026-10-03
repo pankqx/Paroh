@@ -77,7 +77,7 @@ describe('HabitStore', () => {
 });
 
 describe('TaskStore', () => {
-  const store = () => new TaskStore(root, () => today);
+  const store = () => new TaskStore(service.fs, () => today);
 
   it('creates, completes and reopens a task', async () => {
     const t = value(await store().create({ text: 'Call mom', dueDate: today }));

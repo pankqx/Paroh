@@ -38,6 +38,15 @@ export function App() {
   const vault = useVault(useCallback(() => void refresh(), [refresh]));
   const today = toEntryDate(new Date());
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  // On narrow screens the sidebar is a drawer behind the menu button.
+  const [navOpen, setNavOpen] = useState(false);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setNavOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navOpen]);
 
   useEffect(() => {
     void window.paroh.settings.get().then((s) => setOnboarded(s.onboarded));
@@ -46,6 +55,7 @@ export function App() {
   const navigate = useCallback<Navigate>(
     (next) => {
       setView(next);
+      setNavOpen(false);
       if (next.name !== 'editor') void refresh();
     },
     [refresh],
@@ -66,9 +76,20 @@ export function App() {
 
   return (
     <RecorderProvider>
-    <div className="app">
-      <TopBar today={today} query={view.name === 'entries' ? view.query : ''} onSearch={(query) => setView({ name: 'entries', query })} onNewEntry={() => openEntry(today)} />
+    <div className={`app ${navOpen ? 'nav-open' : ''}`}>
+      <TopBar
+        today={today}
+        query={view.name === 'entries' ? view.query : ''}
+        navOpen={navOpen}
+        onMenu={() => setNavOpen((o) => !o)}
+        onSearch={(query) => setView({ name: 'entries', query })}
+        onNewEntry={() => {
+          setNavOpen(false);
+          openEntry(today);
+        }}
+      />
       <div className="app-body">
+        {navOpen && <div className="nav-backdrop" aria-hidden="true" onClick={() => setNavOpen(false)} />}
         <Sidebar view={view} today={today} vaultPath={vault.path} onNavigate={navigate} onChooseVault={vault.choose} />
         <main className="app-main">
           {view.name === 'canvas' && <CanvasPage today={today} entries={entries} loadError={error} onOpenEntry={openEntry} onEntriesChanged={refreshList} onNavigate={navigate} />}

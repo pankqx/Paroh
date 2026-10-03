@@ -10,6 +10,7 @@ import { markdownToPlainText } from '../../shared/plainText';
 import { extractWikilinkTargets, normalizeLinkTarget } from '../../shared/wikilinks';
 import { toSummary } from '../vault/VaultAdapter';
 import { INDEX_VERSION, SCHEMA } from './schema';
+import type { SearchIndex } from './SearchIndex';
 
 interface EntryRow {
   date: string;
@@ -20,7 +21,7 @@ interface EntryRow {
 }
 
 /** SQLite FTS5 index over the vault. Never the source of truth: everything here can be rebuilt from the .md files. */
-export class IndexRepository {
+export class IndexRepository implements SearchIndex {
   private db: DatabaseSync;
 
   private constructor(db: DatabaseSync) {

@@ -32,6 +32,7 @@ const tasks: Task[] = [
 let aiFeatures: Record<string, boolean> = {};
 const story: LifeStory = { id: 'health/run-a-5k', schema_version: 1, title: 'Run a 5k', life_area: 'health', status: 'in-motion', created: '2026-06-01', when: '2027-Q2', linked_entries: ['2026-10-01'], why: 'To feel strong.' };
 window.paroh = {
+  platform: 'desktop',
   entries: {
     save: async (e) => ({ ok: true, value: e }),
     load: async () => ({ ok: true, value: null }),
@@ -201,6 +202,20 @@ describe('accessibility (axe-core)', () => {
     expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
     expect(await violations(<ChaptersPage today="2026-10-02" onOpenEntry={noop} onOpenRange={noop} />)).toEqual([]);
     expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('the phone layout has no violations: settings, onboarding, audio logs, sidebar', async () => {
+    const noop = () => {};
+    const api = window.paroh as { platform: string };
+    api.platform = 'mobile';
+    try {
+      expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+      expect(await violations(<OnboardingPage onDone={noop} />, 'div')).toEqual([]);
+      expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+      expect(await violations(<Sidebar view={{ name: 'canvas' }} today="2026-10-02" vaultPath="Documents/Paroh" onNavigate={noop} onChooseVault={noop} />)).toEqual([]);
+    } finally {
+      api.platform = 'desktop';
+    }
   });
 
   it('Editor metadata rail has no violations', async () => {

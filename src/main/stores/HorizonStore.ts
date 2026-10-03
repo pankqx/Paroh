@@ -1,10 +1,8 @@
-import { mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { isNotFound, joinPath as join, type VaultFs } from '../../shared/fs/VaultFs';
 import { toEntryDate } from '../../shared/localDate';
 import { isEntryDate } from '../../shared/types/Entry';
 import { DEFAULT_LIFE_AREAS, isPeriod, isSlug, isStoryStatus, slugify, type HorizonsData, type LifeStory, type LifeStoryInput } from '../../shared/types/LifeStory';
 import { err, ok, type Result } from '../../shared/types/Result';
-import { atomicWrite } from '../vault/atomicWrite';
 import { parseLifeStory, serializeLifeStory } from '../vault/lifeStoryFile';
 
 /** Life Stories as Markdown files under `<vault>/horizons/<area>/`, with the same atomic saves as entries. */
@@ -12,8 +10,8 @@ export class HorizonStore {
   private readonly dir: string;
   private queue: Promise<unknown> = Promise.resolve();
 
-  constructor(root: string) {
-    this.dir = join(root, 'horizons');
+  constructor(private fs: VaultFs) {
+    this.dir = 'horizons';
   }
 
   async list(): Promise<Result<HorizonsData>> {
@@ -21,11 +19,12 @@ export class HorizonStore {
       const folders = await this.folders();
       const stories: LifeStory[] = [];
       for (const area of folders) {
-        for (const file of await readdir(join(this.dir, area))) {
+        for (const file of await this.fs.list(join(this.dir, area))) {
           const slug = file.replace(/\.md$/, '');
           if (!file.endsWith('.md') || !isSlug(slug)) continue;
           const path = join(this.dir, area, file);
-          const parsed = parseLifeStory(await readFile(path, 'utf8'), `${area}/${slug}`, area, toEntryDate((await stat(path)).birthtime));
+          const info = await this.fs.stat(path);
+          const parsed = parseLifeStory(await this.fs.readText(path), `${area}/${slug}`, area, toEntryDate(new Date(info.birthtimeMs ?? info.mtimeMs)));
           // One unreadable story must not hide the others.
           if (parsed.ok) stories.push(parsed.value);
         }
@@ -50,13 +49,13 @@ export class HorizonStore {
         if (id) {
           const [oldArea, oldSlug] = id.split('/');
           const oldPath = join(this.dir, oldArea, `${oldSlug}.md`);
-          const existing = parseLifeStory(await readFile(oldPath, 'utf8'), id, oldArea, input.created);
+          const existing = parseLifeStory(await this.fs.readText(oldPath), id, oldArea, input.created);
           if (existing.ok) extra = existing.value.extra;
           slug = oldArea === input.life_area ? oldSlug : await this.uniqueSlug(input.life_area, oldSlug);
-          await mkdir(join(this.dir, input.life_area), { recursive: true });
-          if (oldArea !== input.life_area) await rename(oldPath, join(this.dir, input.life_area, `${slug}.md`));
+          await this.fs.mkdir(join(this.dir, input.life_area));
+          if (oldArea !== input.life_area) await this.fs.rename(oldPath, join(this.dir, input.life_area, `${slug}.md`));
         } else {
-          await mkdir(join(this.dir, input.life_area), { recursive: true });
+          await this.fs.mkdir(join(this.dir, input.life_area));
           slug = await this.uniqueSlug(input.life_area, slugify(input.title));
         }
         const story: LifeStory = {
@@ -72,7 +71,7 @@ export class HorizonStore {
           ...(extra ? { extra } : {}),
         };
         const text = serializeLifeStory(story);
-        await atomicWrite(join(this.dir, input.life_area, `${slug}.md`), text, (written) => {
+        await this.fs.writeTextAtomic(join(this.dir, input.life_area, `${slug}.md`), text, (written) => {
           const back = parseLifeStory(written, story.id, story.life_area, story.created);
           return back.ok && back.value.title === story.title && back.value.why === story.why ? null : 'Story did not round-trip';
         });
@@ -88,7 +87,7 @@ export class HorizonStore {
     const [area, slug] = id.split('/');
     return this.serial(async () => {
       try {
-        await rm(join(this.dir, area, `${slug}.md`), { force: true });
+        await this.fs.remove(join(this.dir, area, `${slug}.md`));
         return ok(undefined);
       } catch (e) {
         return err(`Could not delete story: ${(e as Error).message}`);
@@ -101,7 +100,7 @@ export class HorizonStore {
     const area = slugify(String(name ?? ''));
     if (!String(name ?? '').trim() || area === 'story') return err('Give the life area a name');
     try {
-      await mkdir(join(this.dir, area), { recursive: true });
+      await this.fs.mkdir(join(this.dir, area));
       return ok(area);
     } catch (e) {
       return err(`Could not add life area: ${(e as Error).message}`);
@@ -117,20 +116,20 @@ export class HorizonStore {
   private async folders(): Promise<string[]> {
     let names: string[];
     try {
-      names = await readdir(this.dir);
+      names = await this.fs.list(this.dir);
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      if (isNotFound(e)) return [];
       throw e;
     }
     const out: string[] = [];
-    for (const n of names) if (isSlug(n) && (await stat(join(this.dir, n))).isDirectory()) out.push(n);
+    for (const n of names) if (isSlug(n) && (await this.fs.stat(join(this.dir, n))).isDirectory) out.push(n);
     return out;
   }
 
   private async uniqueSlug(area: string, base: string): Promise<string> {
     let existing: string[] = [];
     try {
-      existing = await readdir(join(this.dir, area));
+      existing = await this.fs.list(join(this.dir, area));
     } catch {
       // A new area has no files yet.
     }

@@ -6,6 +6,10 @@ import { aiFeatureEnabled } from '../ai/aiFeatureEnabled';
 import type { NudgeAction } from '../../shared/types/Task';
 import type { AudioStore } from '../stores/AudioStore';
 import type { HabitStore } from '../stores/HabitStore';
+import type { Board } from '../../shared/types/Board';
+import type { PlanEventInput, PlanGoalInput } from '../../shared/types/Planner';
+import type { BoardStore } from '../stores/BoardStore';
+import type { PlannerStore } from '../stores/PlannerStore';
 import type { HorizonStore } from '../stores/HorizonStore';
 import type { MediaStore } from '../stores/MediaStore';
 import type { TaskStore } from '../stores/TaskStore';
@@ -16,6 +20,8 @@ export interface DailyStores {
   audio: AudioStore;
   horizons: HorizonStore;
   media: MediaStore;
+  boards: BoardStore;
+  planner: PlannerStore;
 }
 
 /** Habits, tasks, audio (feature-specifications.md §6–8) and Horizons (§10): the stores beside the entries. */
@@ -40,6 +46,16 @@ export function registerDailyIpc(stores: () => DailyStores): void {
   ipcMain.handle(IPC.tasksUncomment, (_e, id: string, commentId: string) => stores().tasks.uncomment(id, commentId));
   ipcMain.handle(IPC.tasksRemove, (_e, id: string) => stores().tasks.remove(id));
 
+  ipcMain.handle(IPC.plannerList, () => stores().planner.list());
+  ipcMain.handle(IPC.plannerSaveEvent, (_e, input: PlanEventInput, id?: string) => stores().planner.saveEvent(input, id ?? undefined));
+  ipcMain.handle(IPC.plannerRemoveEvent, (_e, id: string) => stores().planner.removeEvent(String(id ?? '')));
+  ipcMain.handle(IPC.plannerSaveGoal, (_e, input: PlanGoalInput, id?: string) => stores().planner.saveGoal(input, id ?? undefined));
+  ipcMain.handle(IPC.plannerRemoveGoal, (_e, id: string) => stores().planner.removeGoal(String(id ?? '')));
+  ipcMain.handle(IPC.boardsList, () => stores().boards.list());
+  ipcMain.handle(IPC.boardsLoad, (_e, id: string) => stores().boards.load(String(id ?? '')));
+  ipcMain.handle(IPC.boardsCreate, (_e, title: string) => stores().boards.create(String(title ?? '')));
+  ipcMain.handle(IPC.boardsSave, (_e, board: Board) => stores().boards.save(board));
+  ipcMain.handle(IPC.boardsRemove, (_e, id: string) => stores().boards.remove(String(id ?? '')));
   ipcMain.handle(IPC.mediaSave, (_e, fileName: string, bytes: Uint8Array) => stores().media.save(String(fileName ?? ''), bytes));
   ipcMain.handle(IPC.mediaRead, (_e, path: string) => stores().media.read(String(path ?? '')));
   ipcMain.handle(IPC.audioBegin, () => stores().audio.begin());

@@ -1,4 +1,4 @@
-import { AudioLines, BookMarked, BookOpen, CalendarDays, Flame, FolderOpen, House, ListChecks, Mountain, PenLine, Settings2, Sprout, type LucideIcon } from 'lucide-react';
+import { AudioLines, BookMarked, BookOpen, CalendarDays, CalendarRange, Flame, FolderOpen, House, LayoutDashboard, ListChecks, Mountain, PenLine, Settings2, Sprout, type LucideIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BrandMark } from '../components/BrandMark';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -41,6 +41,13 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
         { label: 'All Entries', Icon: BookOpen, active: is('entries'), go: { name: 'entries', query: '' } },
         { label: 'Chapters', Icon: BookMarked, active: is('chapters'), go: { name: 'chapters' } },
         { label: 'Horizons', Icon: Mountain, active: is('horizons'), go: { name: 'horizons' } },
+      ],
+    },
+    {
+      title: 'Create',
+      items: [
+        { label: 'Planner', Icon: CalendarRange, active: is('planner'), go: { name: 'planner' } },
+        { label: 'Boards', Icon: LayoutDashboard, active: is('boards'), go: { name: 'boards' } },
       ],
     },
   ];

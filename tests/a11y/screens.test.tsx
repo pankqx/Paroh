@@ -13,6 +13,11 @@ import type { Habit } from '../../src/shared/types/Habit';
 import type { Task } from '../../src/shared/types/Task';
 import { RecorderProvider } from '../../src/renderer/app/RecorderContext';
 import { HabitsPage } from '../../src/renderer/features/habits/HabitsPage';
+import { BoardEditor } from '../../src/renderer/features/boards/BoardEditor';
+import { BoardsPage } from '../../src/renderer/features/boards/BoardsPage';
+import type { Board } from '../../src/shared/types/Board';
+import type { PlannerData } from '../../src/shared/types/Planner';
+import { PlannerPage } from '../../src/renderer/features/planner/PlannerPage';
 import { TaskDetail } from '../../src/renderer/features/todo/TaskDetail';
 import { TodoPage } from '../../src/renderer/features/todo/TodoPage';
 import { AudioLogsPage } from '../../src/renderer/features/audio-logs/AudioLogsPage';
@@ -25,6 +30,16 @@ import { OnboardingPage } from '../../src/renderer/features/onboarding/Onboardin
 import { HealingPromptsPage } from '../../src/renderer/features/healing/HealingPromptsPage';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+const plannerData: PlannerData = {
+  events: [
+    { id: 'e1', title: 'Dentist', start: '2026-10-05', time: '10:00', area: 'health' },
+    { id: 'e2', title: 'Hills trip', start: '2026-10-12', end: '2026-10-15', area: 'travel', milestone: true },
+  ],
+  goals: [
+    { id: 'g1', period: '2026-10', text: 'Read two books', area: 'learning', progress: 50 },
+    { id: 'g2', period: '2026', text: 'Run a 10k', area: 'health', progress: 30 },
+  ],
+};
 const habits: Habit[] = [{ id: 'walk', name: 'Walk outside', frequency: 'daily', createdAt: '2026-09-01', archived: false }];
 const tasks: Task[] = [
   { id: 't1', text: 'Call mom', createdDate: '2026-09-30', dueDate: '2026-09-30', done: false },
@@ -87,6 +102,20 @@ window.paroh = {
       ],
     }),
   },
+  planner: {
+    list: async () => ({ ok: true, value: plannerData }),
+    saveEvent: async () => ({ ok: false, error: 'none' }),
+    removeEvent: async () => ({ ok: true, value: undefined }),
+    saveGoal: async () => ({ ok: false, error: 'none' }),
+    removeGoal: async () => ({ ok: true, value: undefined }),
+  },
+  boards: {
+    list: async () => ({ ok: true, value: [] }),
+    load: async () => ({ ok: false, error: 'none' }),
+    create: async () => ({ ok: false, error: 'none' }),
+    save: async () => ({ ok: false, error: 'none' }),
+    remove: async () => ({ ok: true, value: undefined }),
+  },
   horizons: {
     list: async () => ({ ok: true, value: { areas: ['career', 'health'], stories: [story] } }),
     save: async () => ({ ok: true, value: story }),
@@ -133,12 +162,16 @@ const entries: EntrySummary[] = [
 ];
 
 /** `hostTag` is `div` for screens that render their own `<main>` (onboarding). */
-async function violations(ui: ReactElement, hostTag: 'main' | 'div' = 'main') {
+async function violations(ui: ReactElement, hostTag: 'main' | 'div' = 'main', prepare?: (host: HTMLElement) => void) {
   const host = document.createElement(hostTag);
   document.body.appendChild(host);
   const root = createRoot(host);
   await act(async () => root.render(<RecorderProvider>{ui}</RecorderProvider>));
   await act(async () => {});
+  if (prepare) {
+    await act(async () => prepare(host));
+    await act(async () => {});
+  }
   // Colour contrast needs real layout, which jsdom does not have.
   const result = await axe.run(host, { rules: { 'color-contrast': { enabled: false } } });
   act(() => root.unmount());
@@ -220,6 +253,34 @@ describe('accessibility (axe-core)', () => {
     } finally {
       api.platform = 'desktop';
     }
+  });
+
+  it('Boards list and a board have no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<BoardsPage today="2026-10-02" />)).toEqual([]);
+    const board: Board = {
+      schema_version: 1,
+      id: 'plans',
+      title: 'Plans',
+      createdAt: '2026-10-02T09:00:00.000Z',
+      updatedAt: '2026-10-02T09:00:00.000Z',
+      items: [
+        { id: 'a', type: 'sticky', x: 0, y: 0, w: 200, h: 200, color: '#fde68a', text: 'Idea' },
+        { id: 'b', type: 'checklist', x: 240, y: 0, w: 240, h: 160, title: 'Bring', color: '#cfe4f7', entries: [{ text: 'Tea', done: true }] },
+        { id: 'c', type: 'shape', shape: 'ellipse', x: 0, y: 240, w: 160, h: 100, fill: '#fdd5b8', stroke: 'ink', text: 'Walk' },
+        { id: 'd', type: 'frame', x: -20, y: -40, w: 600, h: 400, title: 'Week', color: '#e3d7f6' },
+      ],
+    };
+    expect(await violations(<BoardEditor initial={board} today="2026-10-02" onBack={noop} />)).toEqual([]);
+  });
+
+  it('Monthly and yearly planners and the plan dialog have no violations', async () => {
+    const noop = () => {};
+    const page = <PlannerPage today="2026-10-02" entries={entries} onOpenEntry={noop} />;
+    const click = (label: string) => (host: HTMLElement) => [...host.querySelectorAll('button')].find((b) => b.textContent?.trim() === label)?.click();
+    expect(await violations(page)).toEqual([]);
+    expect(await violations(page, 'main', click('Year'))).toEqual([]);
+    expect(await violations(page, 'main', click('Add plan'))).toEqual([]);
   });
 
   it('Task details panel has no violations, with comments', async () => {

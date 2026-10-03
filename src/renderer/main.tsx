@@ -10,6 +10,8 @@ import './styles/home.css';
 import './styles/editor.css';
 import './styles/todo.css';
 import './styles/habits.css';
+import './styles/boards.css';
+import './styles/planner.css';
 import './styles/app.css';
 import { App } from './app/App';
 import { applyTheme } from './app/theme';

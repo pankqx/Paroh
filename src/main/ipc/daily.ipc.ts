@@ -7,6 +7,7 @@ import type { NudgeAction } from '../../shared/types/Task';
 import type { AudioStore } from '../stores/AudioStore';
 import type { HabitStore } from '../stores/HabitStore';
 import type { HorizonStore } from '../stores/HorizonStore';
+import type { MediaStore } from '../stores/MediaStore';
 import type { TaskStore } from '../stores/TaskStore';
 
 export interface DailyStores {
@@ -14,6 +15,7 @@ export interface DailyStores {
   tasks: TaskStore;
   audio: AudioStore;
   horizons: HorizonStore;
+  media: MediaStore;
 }
 
 /** Habits, tasks, audio (feature-specifications.md §6–8) and Horizons (§10): the stores beside the entries. */
@@ -34,8 +36,12 @@ export function registerDailyIpc(stores: () => DailyStores): void {
   ipcMain.handle(IPC.tasksUpdate, (_e, id: string, input: TaskInput) => stores().tasks.update(id, input));
   ipcMain.handle(IPC.tasksToggle, (_e, id: string) => stores().tasks.toggle(id));
   ipcMain.handle(IPC.tasksResolveNudge, (_e, id: string, action: NudgeAction, reflection?: string) => stores().tasks.resolveNudge(id, action, reflection));
+  ipcMain.handle(IPC.tasksComment, (_e, id: string, text: string) => stores().tasks.comment(id, text));
+  ipcMain.handle(IPC.tasksUncomment, (_e, id: string, commentId: string) => stores().tasks.uncomment(id, commentId));
   ipcMain.handle(IPC.tasksRemove, (_e, id: string) => stores().tasks.remove(id));
 
+  ipcMain.handle(IPC.mediaSave, (_e, fileName: string, bytes: Uint8Array) => stores().media.save(String(fileName ?? ''), bytes));
+  ipcMain.handle(IPC.mediaRead, (_e, path: string) => stores().media.read(String(path ?? '')));
   ipcMain.handle(IPC.audioBegin, () => stores().audio.begin());
   ipcMain.handle(IPC.audioAppend, (_e, id: string, chunk: Uint8Array) => stores().audio.append(id, chunk));
   ipcMain.handle(IPC.audioFinish, (_e, id: string, seconds: number) => stores().audio.finish(id, Number(seconds) || 0));

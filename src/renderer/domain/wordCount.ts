@@ -1,6 +1,8 @@
 export function countWords(markdown: string): number {
   const words = markdown
     .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/<\/?[a-z][^>]*>/gi, ' ')
     .replace(/[#>*_`~[\]()|-]/g, ' ')
     .split(/\s+/)
     .filter(Boolean);

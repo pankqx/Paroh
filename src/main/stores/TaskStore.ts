@@ -4,7 +4,7 @@ import { toEntryDate } from '../../shared/localDate';
 import { nextOccurrence } from '../../shared/recurrence';
 import { isEntryDate } from '../../shared/types/Entry';
 import { err, ok, type Result } from '../../shared/types/Result';
-import type { NudgeAction, Task } from '../../shared/types/Task';
+import type { NudgeAction, Priority, Task } from '../../shared/types/Task';
 import { readJsonFile, writeJsonFile } from '../vault/jsonFile';
 
 interface TasksFile {
@@ -19,6 +19,7 @@ export class TaskStore {
   constructor(
     private fs: VaultFs,
     private today: () => string = () => toEntryDate(new Date()),
+    private now: () => string = () => new Date().toISOString(),
   ) {
     this.path = '.paroh/tasks.json';
   }
@@ -47,6 +48,8 @@ export class TaskStore {
       else delete task.dueDate;
       if (input.recurring) task.recurring = input.recurring;
       else delete task.recurring;
+      setOptional(task, 'notes', input.notes?.trim() || undefined);
+      setOptional(task, 'priority', input.priority);
       return task;
     });
   }
@@ -66,7 +69,7 @@ export class TaskStore {
         const from = task.dueDate && task.dueDate > this.today() ? task.dueDate : this.today();
         const due = nextOccurrence(task.recurring, from);
         const exists = tasks.some((t) => !t.done && t.text === task.text && t.recurring === task.recurring && t.dueDate === due);
-        if (!exists) tasks.push({ id: crypto.randomUUID(), text: task.text, createdDate: this.today(), dueDate: due, done: false, recurring: task.recurring });
+        if (!exists) tasks.push({ id: crypto.randomUUID(), text: task.text, createdDate: this.today(), dueDate: due, done: false, recurring: task.recurring, ...(task.notes ? { notes: task.notes } : {}), ...(task.priority ? { priority: task.priority } : {}) });
       }
       return task;
     });
@@ -85,6 +88,26 @@ export class TaskStore {
       if (task.dueDate && task.dueDate < today) task.carriedOverFrom ??= task.dueDate;
       task.dueDate = today;
       if (action === 'reflect' && reflection?.trim()) task.stallReflection = reflection.trim().slice(0, 500);
+      return task;
+    });
+  }
+
+  comment(id: string, text: string): Promise<Result<Task>> {
+    const clean = text?.trim();
+    if (!clean) return Promise.resolve(err('Write a comment first'));
+    if (clean.length > 1000) return Promise.resolve(err('Keep a comment under 1000 characters'));
+    return this.write((tasks) => {
+      const task = find(tasks, id);
+      task.comments = [...(task.comments ?? []), { id: crypto.randomUUID(), text: clean, at: this.now() }];
+      return task;
+    });
+  }
+
+  uncomment(id: string, commentId: string): Promise<Result<Task>> {
+    return this.write((tasks) => {
+      const task = find(tasks, id);
+      task.comments = (task.comments ?? []).filter((c) => c.id !== commentId);
+      if (!task.comments.length) delete task.comments;
       return task;
     });
   }
@@ -128,11 +151,25 @@ function validate(input: TaskInput): string | null {
   if (input.text.trim().length > 300) return 'Keep the task under 300 characters';
   if (input.dueDate !== undefined && !isEntryDate(input.dueDate)) return 'That due date is not a real date';
   if (input.recurring && !input.dueDate) return 'A repeating task needs a start date';
+  if (input.notes && input.notes.length > 2000) return 'Keep the explanation under 2000 characters';
+  if (input.priority && !PRIORITIES.includes(input.priority)) return 'That priority is not one Paroh knows';
   return null;
 }
 
+const PRIORITIES: Priority[] = ['low', 'medium', 'high'];
+
 function optional(input: TaskInput): Partial<Task> {
-  return { ...(input.dueDate ? { dueDate: input.dueDate } : {}), ...(input.recurring ? { recurring: input.recurring } : {}) };
+  return {
+    ...(input.dueDate ? { dueDate: input.dueDate } : {}),
+    ...(input.recurring ? { recurring: input.recurring } : {}),
+    ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),
+    ...(input.priority ? { priority: input.priority } : {}),
+  };
+}
+
+function setOptional<K extends 'notes' | 'priority'>(task: Task, key: K, value: Task[K] | undefined) {
+  if (value) task[key] = value;
+  else delete task[key];
 }
 
 async function attempt<T>(fn: () => Promise<T>): Promise<Result<T>> {

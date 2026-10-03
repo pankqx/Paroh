@@ -4,6 +4,7 @@ import { MemoryIndex } from '../main/index-db/MemoryIndex';
 import { AudioStore } from '../main/stores/AudioStore';
 import { HabitStore } from '../main/stores/HabitStore';
 import { HorizonStore } from '../main/stores/HorizonStore';
+import { MediaStore } from '../main/stores/MediaStore';
 import { TaskStore } from '../main/stores/TaskStore';
 import { VaultService } from '../main/VaultService';
 import type { VaultFs } from '../shared/fs/VaultFs';
@@ -35,6 +36,7 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
   const tasks = new TaskStore(fs);
   const audio = new AudioStore(service);
   const horizons = new HorizonStore(fs);
+  const media = new MediaStore(fs);
   await audio.syncTranscriptIndex();
 
   // A sync app may have changed files while Paroh was in the background; catch up when it returns.
@@ -78,6 +80,8 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
       update: (id, input) => tasks.update(id, input),
       toggle: (id) => tasks.toggle(id),
       resolveNudge: (id, action, reflection) => tasks.resolveNudge(id, action, reflection),
+      comment: (id, text) => tasks.comment(id, text),
+      uncomment: (id, commentId) => tasks.uncomment(id, commentId),
       remove: (id) => tasks.remove(id),
     },
     audio: {
@@ -89,6 +93,10 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
       rename: (id, title) => audio.rename(id, String(title ?? '')),
       // Transcribing is desktop-only, but a transcript can still be removed here.
       setTranscript: (id, text) => (String(text ?? '').trim() ? desktopOnly() : audio.setTranscript(id, '')),
+    },
+    media: {
+      save: (fileName, bytes) => media.save(String(fileName ?? ''), bytes),
+      read: (path) => media.read(String(path ?? '')),
     },
     prompts: { history: async () => service.promptHistory() },
     chapters: { month: (month) => service.monthEntries(month) },

@@ -1,7 +1,7 @@
 import type { HabitInput } from '../../shared/ipc-contract';
 import { toEntryDate } from '../../shared/localDate';
 import { emptyEntry } from '../../shared/types/Entry';
-import type { Habit } from '../../shared/types/Habit';
+import { HABIT_COLORS, type Habit } from '../../shared/types/Habit';
 import { err, ok, type Result } from '../../shared/types/Result';
 import type { VaultService } from '../VaultService';
 import { readJsonFile, writeJsonFile } from '../vault/jsonFile';
@@ -41,7 +41,7 @@ export class HabitStore {
     if (problem) return err(problem);
     return this.serial(() => attempt(async () => {
       const file = await this.read();
-      const habit: Habit = { id: uniqueId(input.name, file.habits), name: input.name.trim(), ...frequencyOf(input), createdAt: this.today(), archived: false };
+      const habit: Habit = { id: uniqueId(input.name, file.habits), name: input.name.trim(), ...frequencyOf(input), createdAt: this.today(), archived: false, ...colorOf(input) };
       file.habits.push(habit);
       await writeJsonFile(this.entries.fs, this.path, file);
       return habit;
@@ -51,7 +51,7 @@ export class HabitStore {
   async update(id: string, input: HabitInput): Promise<Result<Habit>> {
     const problem = validate(input);
     if (problem) return err(problem);
-    return this.modify(id, (h) => ({ ...h, name: input.name.trim(), ...frequencyOf(input) }));
+    return this.modify(id, (h) => ({ ...h, name: input.name.trim(), ...frequencyOf(input), ...colorOf(input) }));
   }
 
   /** Never deletes: past entries keep their history and the heatmap stays intact (§6 edge cases). */
@@ -109,6 +109,10 @@ function frequencyOf(input: HabitInput): Pick<Habit, 'frequency' | 'customDays'>
   if (input.frequency !== 'custom') return { frequency: input.frequency, customDays: undefined };
   const days = [...new Set(input.customDays ?? [])].filter((d) => Number.isInteger(d) && d >= 0 && d <= 6).sort();
   return { frequency: 'custom', customDays: days };
+}
+
+function colorOf(input: HabitInput): Pick<Habit, 'color'> {
+  return input.color && HABIT_COLORS.includes(input.color) ? { color: input.color } : {};
 }
 
 /** Readable ids (`morning-pages`) because they appear in entry frontmatter. */

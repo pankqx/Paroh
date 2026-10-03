@@ -117,6 +117,22 @@ describe('TaskStore', () => {
     expect((await store().create({ text: '   ' })).ok).toBe(false);
   });
 
+  it('keeps an explanation, priority and comments, and carries them to the next repeat', async () => {
+    const t = value(await store().create({ text: 'Plan trip', dueDate: today, recurring: 'weekly', notes: '  Book trains first ', priority: 'high' }));
+    expect(t).toMatchObject({ notes: 'Book trains first', priority: 'high' });
+    const commented = value(await store().comment(t.id, ' Asked Sam about dates '));
+    expect(commented.comments).toHaveLength(1);
+    expect(commented.comments?.[0].text).toBe('Asked Sam about dates');
+    expect((await store().comment(t.id, '  ')).ok).toBe(false);
+    expect(value(await store().uncomment(t.id, commented.comments![0].id)).comments).toBeUndefined();
+    const cleared = value(await store().update(t.id, { text: 'Plan trip', dueDate: today, recurring: 'weekly' }));
+    expect(cleared.notes).toBeUndefined();
+    value(await store().update(t.id, { text: 'Plan trip', dueDate: today, recurring: 'weekly', notes: 'Trains', priority: 'low' }));
+    await store().toggle(t.id);
+    expect(value(await store().list()).find((x) => !x.done)).toMatchObject({ notes: 'Trains', priority: 'low' });
+    expect((await store().create({ text: 'x', priority: 'urgent' as never })).ok).toBe(false);
+  });
+
   it('removes a task', async () => {
     const t = value(await store().create({ text: 'Delete me' }));
     value(await store().remove(t.id));

@@ -40,3 +40,29 @@ export function heatmapWeeks(today: string, weeks: number): string[][] {
   const start = addDays(today, -offset - (weeks - 1) * 7);
   return Array.from({ length: weeks }, (_, w) => Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
 }
+
+/** The longest run of scheduled days kept, ever (days off between don't break it). */
+export function bestStreak(habit: Habit, done: Set<string>, today: string): number {
+  let best = 0;
+  let run = 0;
+  const first = [...done].sort()[0];
+  for (let date = first && first < habit.createdAt ? first : habit.createdAt; date <= today; date = addDays(date, 1)) {
+    if (done.has(date)) best = Math.max(best, ++run);
+    else if (isScheduled(habit, date) && date !== today) run = 0;
+  }
+  return best;
+}
+
+/** Share of scheduled days kept in the last `days` days (today counts only once done). 0–1. */
+export function keptRate(habit: Habit, done: Set<string>, today: string, days = 30): number {
+  let scheduled = 0;
+  let kept = 0;
+  for (let i = 0; i < days; i++) {
+    const date = addDays(today, -i);
+    if (date < habit.createdAt) break;
+    if (!isScheduled(habit, date) || (date === today && !done.has(date))) continue;
+    scheduled++;
+    if (done.has(date)) kept++;
+  }
+  return scheduled ? kept / scheduled : 0;
+}

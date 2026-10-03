@@ -39,6 +39,14 @@ describe('entry frontmatter', () => {
     expect(parseEntry(text, entry.date)).toEqual({ ok: true, value: withPrompt });
   });
 
+  it('round-trips a cover photo and where it is framed', () => {
+    const withCover: Entry = { ...entry, cover: 'media/2026-06/lake.jpg', cover_y: 30 };
+    const text = serializeEntry(withCover);
+    expect(text).toContain('cover: media/2026-06/lake.jpg\ncover_y: 30');
+    expect(parseEntry(text, entry.date)).toEqual({ ok: true, value: withCover });
+    expect(serializeEntry({ ...entry, cover: 'gradient:dawn', cover_y: 50 })).not.toContain('cover_y');
+  });
+
   it('reads a plain Markdown file with no frontmatter as a valid entry', () => {
     const parsed = parseEntry('Just some words.\n', '2026-06-12');
     expect(parsed.ok && parsed.value.body).toBe('Just some words.\n');

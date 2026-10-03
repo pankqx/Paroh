@@ -1,4 +1,6 @@
 export type HabitFrequency = 'daily' | 'weekdays' | 'custom';
+export const HABIT_COLORS = ['ember', 'gold', 'sage', 'ocean', 'plum', 'rose'] as const;
+export type HabitColor = (typeof HABIT_COLORS)[number];
 
 /** Definitions live in `<vault>/.paroh/habits.json`; each day's completions live in that entry's `habits_snapshot`. */
 export interface Habit {
@@ -8,6 +10,8 @@ export interface Habit {
   customDays?: number[]; // 0 = Sunday … 6 = Saturday
   createdAt: string; // YYYY-MM-DD
   archived: boolean;
+  /** The habit's ink on its card and heatmap. Unset habits take one by position. */
+  color?: HabitColor;
 }
 
 export interface HabitDay {

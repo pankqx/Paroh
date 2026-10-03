@@ -103,6 +103,17 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 ### 2026-10-03 — Redesign: one hand-made design system, not five libraries
 Pank asked for a much richer UI and named Lucide, Tailwind, Phosphor, shadcn/ui and 21st.dev as references. Paroh keeps its own token-based CSS and borrows the patterns (component shapes, motion, glass, focus rings) rather than installing all of them: mixing several kits is what makes an app look generated, and rewriting every screen into Tailwind classes would have cost the new features. Lucide is the one icon set (Phosphor would be a second visual language); `motion` handles screen and layout animation. The theme (Ivory, Midnight or system) is a per-device choice in localStorage, like a reading lamp, so it never syncs a laptop's dark mode onto a phone.
 
+### 2026-10-03 — Journal pages: media beside the entries, covers in frontmatter, an on-device "Make it beautiful"
+- **Photos, video and sound are copied into `<vault>/media/YYYY-MM/`** and embedded with ordinary Markdown image syntax (`![caption](media/2026-10/sunset.jpg "wide")`); the title slot carries the layout (normal, wide, full). The file stays readable in any Markdown app, and syncing or exporting the vault carries the media with it. Linking to files elsewhere on disk was rejected: they break when the folder moves.
+- **The cover is `cover:` (a media path or `gradient:<id>`) plus `cover_y:` in frontmatter.** Gradients need no file, so every page can have a cover.
+- **The editor's Markdown now allows inline HTML** so highlight colours, text colours and underline survive a save. Scripts, iframes and other unknown tags are dropped by the schema on load, so a pasted page cannot run code.
+- **"Make it beautiful" is rules, not a model.** Pank asked that no data leave the device. A rule-based tidy (capitals, punctuation, lists, headings, a Plan checklist with dates, a Grateful-for list) is instant, predictable, always undoable and never invents words. A local language model would be a large optional download and was left for later.
+
+### 2026-10-03 — Tasks gain an explanation, priority and comments; habits gain a colour
+- **All new task fields are optional keys in `.paroh/tasks.json`** (`notes`, `priority`, `comments[]` with an ISO time), so older files read unchanged and no schema bump is needed. The deadline is the existing `dueDate`. A repeating task carries its explanation and priority to the next instance; comments stay with the instance they were written on.
+- **Comments are a running log, not a chat.** Each is timestamped and can be deleted; there is no editing, which keeps the record honest in the same spirit as the habit history.
+- **Habits get an optional `color`** from a fixed palette of six inks, so cards, rings and heatmaps stay in the design system in both themes. Habits without one take a colour by position.
+
 ---
 
 ## Template for New Entries

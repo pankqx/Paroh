@@ -17,6 +17,7 @@ import { registerVaultIpc } from './ipc/vault.ipc';
 import { ReminderScheduler } from './reminders';
 import { readSettings, resolveVaultPath } from './settings';
 import { AudioStore } from './stores/AudioStore';
+import { MediaStore } from './stores/MediaStore';
 import { HabitStore } from './stores/HabitStore';
 import { HorizonStore } from './stores/HorizonStore';
 import { TaskStore } from './stores/TaskStore';
@@ -38,7 +39,7 @@ async function openVault(path: string): Promise<void> {
   next.watch((dates) => broadcast({ dates }));
   const previous = service;
   service = next;
-  stores = { habits: new HabitStore(next), tasks: new TaskStore(next.fs), audio: new AudioStore(next), horizons: new HorizonStore(next.fs) };
+  stores = { habits: new HabitStore(next), tasks: new TaskStore(next.fs), audio: new AudioStore(next), horizons: new HorizonStore(next.fs), media: new MediaStore(next.fs) };
   await stores.audio.syncTranscriptIndex();
   previous?.close();
 }

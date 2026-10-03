@@ -1,21 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
-import type { Recurrence, Task } from '../../../shared/types/Task';
-import { CheckRow } from '../../components/CheckRow';
-import { addDays, formatShortDate } from '../../domain/dates';
-import { groupTasks } from '../../domain/tasks';
+import { ChevronDown, Flag, NotebookPen, Plus } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { Priority, Recurrence, Task } from '../../../shared/types/Task';
+import { addDays, formatLongDate } from '../../domain/dates';
+import { groupTasks, todayProgress } from '../../domain/tasks';
 import { useTasks } from '../../hooks/useTasks';
 import { NudgeMenu } from './NudgeMenu';
+import { PRIORITY_LABEL, TaskCard } from './TaskCard';
+import { TaskDetail } from './TaskDetail';
 
 type When = 'today' | 'tomorrow' | 'date' | 'someday';
+const WHEN: { id: When; label: string }[] = [
+  { id: 'today', label: 'Today' },
+  { id: 'tomorrow', label: 'Tomorrow' },
+  { id: 'date', label: 'Pick a date' },
+  { id: 'someday', label: 'Someday' },
+];
 
 export function TodoPage({ today }: { today: string }) {
-  const { tasks, create, toggle, resolveNudge, remove, error, dismissError } = useTasks();
+  const { tasks, create, update, toggle, resolveNudge, remove, comment, uncomment, error, dismissError } = useTasks();
   const [text, setText] = useState('');
+  const [notes, setNotes] = useState('');
+  const [details, setDetails] = useState(false);
   const [when, setWhen] = useState<When>('today');
   const [date, setDate] = useState(addDays(today, 2));
   const [repeat, setRepeat] = useState<Recurrence | ''>('');
+  const [priority, setPriority] = useState<Priority | undefined>();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [showDone, setShowDone] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const g = groupTasks(tasks, today);
+  const progress = todayProgress(tasks, today);
+  const open = tasks.find((t) => t.id === openId);
 
   // N focuses the new-task box (feature-specifications.md §7), unless you're already typing somewhere.
   useEffect(() => {
@@ -33,88 +49,162 @@ export function TodoPage({ today }: { today: string }) {
   async function add() {
     if (!text.trim()) return;
     const dueDate = when === 'today' ? today : when === 'tomorrow' ? addDays(today, 1) : when === 'date' ? date : undefined;
-    if (await create({ text, dueDate, recurring: dueDate && repeat ? repeat : undefined })) setText('');
+    if (await create({ text, dueDate, recurring: dueDate && repeat ? repeat : undefined, notes, priority })) {
+      setText('');
+      setNotes('');
+      setPriority(undefined);
+      setDetails(false);
+    }
   }
 
-  const item = (t: Task, extra?: React.ReactNode) => (
-    <CheckRow key={t.id} checked={t.done} label={t.text} onToggle={() => void toggle(t.id)}>
-      <span className="task-meta micro muted">
-        {t.recurring && <span title={`Repeats ${t.recurring}`}>↻ {t.recurring} </span>}
-        {t.dueDate && t.dueDate !== today && !t.done && formatShortDate(t.dueDate)}
-        {t.done && t.doneDate && `done ${formatShortDate(t.doneDate)}`}
-      </span>
+  const confirmRemove = (t: Task) => {
+    if (!window.confirm(`Delete “${t.text}”?`)) return;
+    if (openId === t.id) setOpenId(null);
+    void remove(t.id);
+  };
+
+  const card = (t: Task, extra?: ReactNode) => (
+    <TaskCard key={t.id} task={t} today={today} selected={openId === t.id} onToggle={() => void toggle(t.id)} onOpen={() => setOpenId(openId === t.id ? null : t.id)} onRemove={() => confirmRemove(t)}>
       {extra}
-      <button
-        className="icon-btn task-remove"
-        aria-label={`Delete task: ${t.text}`}
-        onClick={() => window.confirm(`Delete “${t.text}”?`) && void remove(t.id)}
-      >
-        ×
-      </button>
-    </CheckRow>
+    </TaskCard>
   );
 
-  const section = (title: string, list: Task[], empty?: string) => (
+  const section = (title: string, list: Task[], empty: string, extra?: ReactNode) => (
     <section className="task-section" aria-label={title}>
-      <h2 className="section-title">
-        {title} <span className="micro muted">{list.length || ''}</span>
+      <h2 className="task-section-title">
+        {title} <span className="task-count">{list.length || ''}</span>
       </h2>
-      {list.length === 0 && empty ? <p className="muted small">{empty}</p> : <ul className="check-list">{list.map((t) => item(t))}</ul>}
+      {extra}
+      {list.length === 0 ? <p className="task-empty">{empty}</p> : <ul className="task-list">{list.map((t) => card(t))}</ul>}
     </section>
   );
 
+  const pct = progress.total ? progress.done / progress.total : 0;
+
   return (
-    <div className="page">
-      <div className="page-head">
-        <h1 className="page-title">To-Do</h1>
-        <span className="muted micro">Press N to add a task</span>
-      </div>
-      <form
-        className="task-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void add();
-        }}
-      >
-        <input ref={input} className="filter-input grow" placeholder="What needs doing?" aria-label="New task" value={text} onChange={(e) => setText(e.target.value)} />
-        <select className="filter-input" aria-label="When" value={when} onChange={(e) => setWhen(e.target.value as When)}>
-          <option value="today">Today</option>
-          <option value="tomorrow">Tomorrow</option>
-          <option value="date">On a date</option>
-          <option value="someday">Someday</option>
-        </select>
-        {when === 'date' && <input className="filter-input" type="date" aria-label="Due date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />}
-        {when !== 'someday' && (
-          <select className="filter-input" aria-label="Repeat" value={repeat} onChange={(e) => setRepeat(e.target.value as Recurrence | '')}>
-            <option value="">Doesn’t repeat</option>
-            <option value="daily">Every day</option>
-            <option value="weekdays">Weekdays</option>
-            <option value="weekly">Every week</option>
-          </select>
+    <div className={`page todo-page ${open ? 'with-detail' : ''}`}>
+      <div className="todo-main">
+        <header className="todo-hero">
+          <div>
+            <div className="eyebrow">{formatLongDate(today)}</div>
+            <h1 className="page-title">To-Do</h1>
+            <p className="todo-sub">
+              {progress.total === 0 ? 'A clear day. Add what matters, nothing more.' : progress.done === progress.total ? 'Everything for today is done. Well held.' : `${progress.total - progress.done} left for today.`}
+            </p>
+          </div>
+          <div className="todo-ring" role="img" aria-label={`${progress.done} of ${progress.total} done today`}>
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="27" className="ring-track" />
+              <circle cx="32" cy="32" r="27" className="ring-fill" pathLength={1} strokeDasharray={`${pct} 1`} />
+            </svg>
+            <span className="todo-ring-text">
+              {progress.done}
+              <small>/{progress.total}</small>
+            </span>
+          </div>
+        </header>
+
+        <form
+          className="task-composer"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void add();
+          }}
+        >
+          <div className="composer-row">
+            <Plus size={18} className="composer-plus" aria-hidden="true" />
+            <input ref={input} className="composer-input" placeholder="What needs doing?" aria-label="New task" value={text} onChange={(e) => setText(e.target.value)} />
+            <span className="composer-hint micro muted" aria-hidden="true">
+              N
+            </span>
+          </div>
+          {details && (
+            <textarea className="composer-notes" placeholder="A small explanation (optional)" aria-label="Explanation" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          )}
+          <div className="composer-options">
+            <div className="segmented" role="group" aria-label="When">
+              {WHEN.map((w) => (
+                <button key={w.id} type="button" className={`seg-btn ${when === w.id ? 'on' : ''}`} aria-pressed={when === w.id} onClick={() => setWhen(w.id)}>
+                  {w.label}
+                </button>
+              ))}
+            </div>
+            {when === 'date' && <input className="filter-input" type="date" aria-label="Deadline" min={today} value={date} onChange={(e) => setDate(e.target.value)} />}
+            {when !== 'someday' && (
+              <select aria-label="Repeat" value={repeat} onChange={(e) => setRepeat(e.target.value as Recurrence | '')}>
+                <option value="">Doesn’t repeat</option>
+                <option value="daily">Every day</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekly">Every week</option>
+              </select>
+            )}
+            <div className="prio-pick" role="group" aria-label="Priority">
+              {(['high', 'medium', 'low'] as Priority[]).map((p) => (
+                <button key={p} type="button" className={`prio-dot prio-${p} ${priority === p ? 'on' : ''}`} aria-pressed={priority === p} aria-label={`${PRIORITY_LABEL[p]} priority`} title={`${PRIORITY_LABEL[p]} priority`} onClick={() => setPriority(priority === p ? undefined : p)}>
+                  <Flag size={13} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+            <button type="button" className={`chip-btn ${details ? 'on' : ''}`} aria-pressed={details} onClick={() => setDetails((d) => !d)}>
+              <NotebookPen size={14} aria-hidden="true" />
+              Explanation
+            </button>
+            <button className="btn btn-primary composer-add" type="submit" disabled={!text.trim()}>
+              Add task
+            </button>
+          </div>
+        </form>
+
+        {error && (
+          <div className="banner-error" role="alert">
+            {error}{' '}
+            <button className="link-btn" onClick={dismissError}>
+              Dismiss
+            </button>
+          </div>
         )}
-        <button className="btn btn-primary" type="submit" disabled={!text.trim()}>
-          Add
-        </button>
-      </form>
-      {error && (
-        <div className="banner-error" role="alert">
-          {error}{' '}
-          <button className="link-btn" onClick={dismissError}>
-            Dismiss
-          </button>
-        </div>
-      )}
-      <section className="task-section" aria-label="Today">
-        <h2 className="section-title">Today</h2>
-        <ul className="check-list">
-          {g.nudges.map((t) => item(t, <NudgeMenu task={t} onResolve={(a, why) => void resolveNudge(t.id, a, why)} />))}
-          {g.today.map((t) => item(t))}
-        </ul>
-        {g.nudges.length + g.today.length === 0 && <p className="muted small">Nothing on your list. Add one, or just write.</p>}
-      </section>
-      {section('Upcoming', g.upcoming, 'Nothing scheduled ahead.')}
-      {section('Someday', g.someday, 'Ideas with no date go here.')}
-      {g.done.length > 0 && section('Done', g.done.slice(0, 30))}
+
+        <section className="task-section" aria-label="Today">
+          <h2 className="task-section-title">
+            Today <span className="task-count">{g.nudges.length + g.today.length || ''}</span>
+          </h2>
+          {g.nudges.length + g.today.length === 0 ? (
+            <p className="task-empty">Nothing on your list. Add one, or just write.</p>
+          ) : (
+            <ul className="task-list">
+              {g.nudges.map((t) => card(t, <NudgeMenu task={t} onResolve={(a, why) => void resolveNudge(t.id, a, why)} />))}
+              {g.today.map((t) => card(t))}
+            </ul>
+          )}
+        </section>
+        {section('Upcoming', g.upcoming, 'Nothing scheduled ahead.')}
+        {section('Someday', g.someday, 'Ideas with no date go here.')}
+        {g.done.length > 0 && (
+          <section className="task-section" aria-label="Done">
+            <button className="task-section-title task-done-toggle" aria-expanded={showDone} onClick={() => setShowDone((s) => !s)}>
+              Done <span className="task-count">{g.done.length}</span>
+              <ChevronDown size={16} className={showDone ? 'flip' : ''} aria-hidden="true" />
+            </button>
+            {showDone && <ul className="task-list">{g.done.slice(0, 30).map((t) => card(t))}</ul>}
+          </section>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {open && <div className="task-scrim" key="scrim" aria-hidden="true" onClick={() => setOpenId(null)} />}
+        {open && (
+          <TaskDetail
+            key={open.id}
+            task={open}
+            today={today}
+            onClose={() => setOpenId(null)}
+            onUpdate={(input) => update(open.id, input)}
+            onComment={(t) => comment(open.id, t)}
+            onUncomment={(c) => void uncomment(open.id, c)}
+            onRemove={() => confirmRemove(open)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import type { Mood } from '../../../shared/types/Mood';
 import type { Backlink } from '../../../shared/types/Search';
@@ -38,7 +39,7 @@ export function MetadataRail({ mood, tags, words, minutes, backlinks = [], onOpe
             <span key={t} className="tag">
               {t}
               <button className="tag-remove" aria-label={`Remove tag ${t}`} onClick={() => onTags(tags.filter((x) => x !== t))}>
-                ×
+                <X size={12} aria-hidden="true" />
               </button>
             </span>
           ))}
@@ -83,10 +84,11 @@ export function MetadataRail({ mood, tags, words, minutes, backlinks = [], onOpe
         </section>
       )}
       <section>
-        <span className="micro muted">Private journal entry, stored as Markdown in your vault.</span>
+        <span className="micro muted">Private. Stored as a Markdown file in your journal folder, with its photos beside it.</span>
       </section>
       {onDelete && (
         <button className="btn btn-danger" onClick={onDelete}>
+          <Trash2 size={15} aria-hidden="true" />
           Delete entry
         </button>
       )}

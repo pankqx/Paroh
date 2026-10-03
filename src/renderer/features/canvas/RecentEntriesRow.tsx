@@ -1,7 +1,9 @@
 import { PenLine } from 'lucide-react';
 import type { EntrySummary } from '../../../shared/types/Entry';
 import { MOOD_EMOJI } from '../../components/MoodSelector';
+import { gradientCss } from '../../domain/covers';
 import { fromEntryDate } from '../../domain/dates';
+import { useMediaUrl } from '../../hooks/useMediaUrl';
 
 interface Props {
   entries: EntrySummary[];
@@ -34,7 +36,8 @@ export function RecentEntriesRow({ entries, onOpenEntry, onWrite }: Props) {
 export function EntryCard({ entry: e, onOpen }: { entry: EntrySummary; onOpen: () => void }) {
   const d = fromEntryDate(e.date);
   return (
-    <button className={`card entry-card ${e.mood ? `tone-${e.mood}` : ''}`} onClick={onOpen}>
+    <button className={`card entry-card ${e.mood ? `tone-${e.mood}` : ''} ${e.cover ? 'has-cover' : ''}`} onClick={onOpen}>
+      {e.cover && <CardCover cover={e.cover} />}
       <div className="entry-card-head">
         <span className="entry-card-date">
           <span className="entry-card-day">{d.getDate()}</span>
@@ -63,4 +66,11 @@ export function EntryCard({ entry: e, onOpen }: { entry: EntrySummary; onOpen: (
       )}
     </button>
   );
+}
+
+/** The page's cover, cropped into the top of its card. */
+function CardCover({ cover }: { cover: string }) {
+  const gradient = gradientCss(cover);
+  const { url } = useMediaUrl(gradient ? undefined : cover);
+  return <div className="entry-card-cover" aria-hidden="true" style={gradient ? { background: gradient } : url ? { backgroundImage: `url(${url})` } : undefined} />;
 }

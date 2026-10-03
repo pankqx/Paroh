@@ -19,6 +19,8 @@ import { ChaptersPage } from '../../src/renderer/features/chapters/ChaptersPage'
 import { HorizonsPage } from '../../src/renderer/features/horizons/HorizonsPage';
 import { LifeStoryEditor } from '../../src/renderer/features/horizons/LifeStoryEditor';
 import type { LifeStory } from '../../src/shared/types/LifeStory';
+import { SettingsPage } from '../../src/renderer/features/settings/SettingsPage';
+import { OnboardingPage } from '../../src/renderer/features/onboarding/OnboardingPage';
 import { HealingPromptsPage } from '../../src/renderer/features/healing/HealingPromptsPage';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -78,7 +80,22 @@ window.paroh = {
     remove: async () => ({ ok: true, value: undefined }),
     addArea: async () => ({ ok: true, value: 'x' }),
   },
-  vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null, onChanged: () => () => {} },
+  settings: {
+    get: async () => ({ vaultPath: '/home/me/Paroh', onboarded: true, aiFeatures: {}, reminderTime: '21:00', version: '0.1.0' }),
+    setAiFeature: async () => ({ ok: true, value: undefined }),
+    setReminder: async () => ({ ok: true, value: undefined }),
+    completeOnboarding: async () => {},
+  },
+  vault: {
+    info: async () => ({ path: '/home/me/Paroh' }),
+    choose: async () => null,
+    confirmChoice: async () => null,
+    reveal: async () => '',
+    export: async () => ({ ok: true, value: null }),
+    import: async () => ({ ok: true, value: null }),
+    onExportProgress: () => () => {},
+    onChanged: () => () => {},
+  },
 } satisfies ParohApi;
 
 const entries: EntrySummary[] = [
@@ -86,8 +103,9 @@ const entries: EntrySummary[] = [
   { date: '2026-09-29', title: '', tags: [], excerpt: '' },
 ];
 
-async function violations(ui: ReactElement) {
-  const host = document.createElement('main');
+/** `hostTag` is `div` for screens that render their own `<main>` (onboarding). */
+async function violations(ui: ReactElement, hostTag: 'main' | 'div' = 'main') {
+  const host = document.createElement(hostTag);
   document.body.appendChild(host);
   const root = createRoot(host);
   await act(async () => root.render(<RecorderProvider>{ui}</RecorderProvider>));
@@ -144,6 +162,12 @@ describe('accessibility (axe-core)', () => {
     expect(await violations(<HorizonsPage today="2026-10-02" entries={entries} onOpenEntry={noop} initialView="list" />)).toEqual([]);
     const save = async () => ({ ok: true as const, value: undefined });
     expect(await violations(<LifeStoryEditor story={story} initialArea="health" areas={['career', 'health']} entries={entries} today="2026-10-02" onSave={save} onDelete={save} onClose={noop} onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('Settings and onboarding have no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+    expect(await violations(<OnboardingPage onDone={noop} />, 'div')).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {

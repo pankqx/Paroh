@@ -6,7 +6,8 @@ import { EntryService } from './EntryService';
 import { registerDailyIpc, type DailyStores } from './ipc/daily.ipc';
 import { registerEntriesIpc } from './ipc/entries.ipc';
 import { registerVaultIpc } from './ipc/vault.ipc';
-import { resolveVaultPath } from './settings';
+import { ReminderScheduler } from './reminders';
+import { readSettings, resolveVaultPath } from './settings';
 import { AudioStore } from './stores/AudioStore';
 import { HabitStore } from './stores/HabitStore';
 import { HorizonStore } from './stores/HorizonStore';
@@ -71,12 +72,15 @@ app.whenReady().then(async () => {
 
   registerEntriesIpc(() => service);
   registerDailyIpc(() => stores);
+  const reminders = new ReminderScheduler();
+  reminders.set((await readSettings()).reminderTime);
   registerVaultIpc(
     () => service.root,
     async (path) => {
       await openVault(path);
       broadcast({ dates: [], reset: true });
     },
+    reminders,
   );
 
   createWindow();

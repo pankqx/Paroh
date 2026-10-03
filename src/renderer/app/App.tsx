@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toEntryDate } from '../domain/dates';
 import { AllEntriesPage } from '../features/all-entries/AllEntriesPage';
 import { AudioLogsPage } from '../features/audio-logs/AudioLogsPage';
@@ -8,6 +8,8 @@ import { EditorPage } from '../features/editor/EditorPage';
 import { ChaptersPage } from '../features/chapters/ChaptersPage';
 import { HabitsPage } from '../features/habits/HabitsPage';
 import { HorizonsPage } from '../features/horizons/HorizonsPage';
+import { OnboardingPage } from '../features/onboarding/OnboardingPage';
+import { SettingsPage } from '../features/settings/SettingsPage';
 import { HealingPromptsPage } from '../features/healing/HealingPromptsPage';
 import { TodoPage } from '../features/todo/TodoPage';
 import { useEntries } from '../hooks/useEntries';
@@ -26,7 +28,8 @@ export type View =
   | { name: 'audio' }
   | { name: 'prompts' }
   | { name: 'chapters' }
-  | { name: 'horizons' };
+  | { name: 'horizons' }
+  | { name: 'settings' };
 export type Navigate = (view: View) => void;
 
 export function App() {
@@ -34,6 +37,11 @@ export function App() {
   const { entries, error, refresh } = useEntries();
   const vault = useVault(useCallback(() => void refresh(), [refresh]));
   const today = toEntryDate(new Date());
+  const [onboarded, setOnboarded] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    void window.paroh.settings.get().then((s) => setOnboarded(s.onboarded));
+  }, []);
 
   const navigate = useCallback<Navigate>(
     (next) => {
@@ -44,6 +52,17 @@ export function App() {
   );
   const openEntry = useCallback((date: string) => setView({ name: 'editor', date }), []);
   const refreshList = useCallback(() => void refresh(), [refresh]);
+
+  if (onboarded === null) return null;
+  if (!onboarded)
+    return (
+      <OnboardingPage
+        onDone={() => {
+          setOnboarded(true);
+          void refresh();
+        }}
+      />
+    );
 
   return (
     <RecorderProvider>
@@ -56,6 +75,7 @@ export function App() {
           {view.name === 'prompts' && <HealingPromptsPage today={today} entryDates={entries.map((e) => e.date)} onOpenEntry={openEntry} onChanged={refreshList} />}
           {view.name === 'chapters' && <ChaptersPage today={today} onOpenEntry={openEntry} onOpenRange={(from, to) => navigate({ name: 'entries', query: '', from, to })} />}
           {view.name === 'horizons' && <HorizonsPage today={today} entries={entries} onOpenEntry={openEntry} />}
+          {view.name === 'settings' && <SettingsPage onVaultChanged={refreshList} />}
           {view.name === 'habits' && <HabitsPage today={today} />}
           {view.name === 'todo' && <TodoPage today={today} />}
           {view.name === 'audio' && <AudioLogsPage onOpenEntry={openEntry} />}

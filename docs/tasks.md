@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 5 — Horizons & Chapters (implemented, in review)
+**Active phase:** Phase 6 — Polish & Packaging (implemented, in review)
 **Last updated:** 2026-10-02
 
 ---
@@ -53,14 +53,26 @@
 - [x] Sidebar grouped into Today and Reflect.
 - [x] Tests: word counts, chapter stats and week grouping, landscape summary, timeline spans, columns and lanes, life story file format and round-trip, the Horizons store (unique slugs, moving between areas, unknown keys kept, path escapes rejected), month loading, axe-core for Chapters, the timeline, the list and the editor.
 
-## TODO (Phase 6 — Polish & Packaging)
+## DONE (Phase 6)
 
-- [ ] Settings page (vault, export/import, reminders, privacy and crisis-resources line).
-- [ ] `.deb` / `.AppImage` builds via electron-builder, including `npm run build:ubuntu`.
-- [ ] Onboarding, and a design and accessibility pass across every screen.
+- [x] Settings page: vault folder (show, change), export and import, daily reminder, AI features section (every feature off by default, each with its own switch and a sentence on what leaves the device), the permanent privacy and crisis-resources line, About.
+- [x] Export: one `.zip` of the whole vault (entries, audio, horizons, `.paroh/*.json`), leaving out the disposable search index and temp files, with progress and specific errors (disk full, no permission). Import unpacks an export into an empty folder, checks it is a Paroh vault, and switches to it. No zip dependency: a small reader/writer in `src/main/vault/zip.ts`, with CRC checks and path-escape protection.
+- [x] Choosing a folder that already holds unrelated files asks first, everywhere (onboarding, Settings, sidebar).
+- [x] Onboarding on first launch: what Paroh is, where the journal will live, the privacy line. Shown once; anyone who already picked a folder skips it.
+- [x] Packaging: `npm run build:ubuntu` builds `.deb` and `.AppImage` with electron-builder (`electron-builder.yml`), with an app icon in `build/`. Only `yaml` ships as a runtime dependency; renderer libraries are bundled by Vite.
+- [x] A global reduced-motion rule.
+- [x] Tests: zip round-trip byte for byte, readable by Python's zipfile, unsafe paths and damaged archives rejected, folder classification, reminder timing, axe-core for Settings and onboarding.
+
+## TODO (Phase 7 — Windows Build)
+
+- [ ] `npm run build:windows` producing an installer in CI.
+- [ ] Windows QA: paths, notifications, window chrome, shortcuts.
+
+## Later
+
 - [ ] Horizons: drag stories between periods, and rename or hide life areas.
+- [ ] Accent colour and dark mode in Settings (the spec marks these "once available").
 
 ## Known gaps
 
-- `npm run build:ubuntu` (used by the release workflow) is not defined yet; packaging lands in the Polish & Packaging phase.
 - Opener images in `assets/openers/quotes.json` are placeholders; the opener card uses a gradient until real images exist.

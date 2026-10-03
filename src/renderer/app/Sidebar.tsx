@@ -58,6 +58,9 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
         </div>
       ))}
       <div className="sidebar-footer">
+        <button className={`nav-item ${is('settings') ? 'active' : ''}`} aria-current={is('settings') ? 'page' : undefined} onClick={() => onNavigate({ name: 'settings' })}>
+          Settings
+        </button>
         <div className="vault-label">Vault</div>
         <div className="vault-path" title={vaultPath}>
           {vaultPath || '…'}

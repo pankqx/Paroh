@@ -71,6 +71,14 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Horizons is not watched for outside edits** in v1; it reloads each time the page opens. Entries remain the only watched files.
 - **Dragging cards between periods is deferred.** The editor's "when" field does the same job and works by keyboard; drag can come in the polish phase.
 
+### 2026-10-03 — Phase 6 implementation choices
+- **A built-in ZIP writer and reader** instead of a dependency. The format needs only store and deflate, Node has `zlib.crc32`, and every byte of the user's safety net stays inspectable in one file. Archives are checked readable by Python's `zipfile` in the tests.
+- **Exports leave out `.paroh/index.db`**, since the index is rebuilt from the files on first open.
+- **The main process remembers the folder awaiting confirmation**, so the renderer can confirm a choice but never name an arbitrary path for Paroh to write into.
+- **electron-builder's old `@electron/get` is overridden to 5.x** (the version Electron itself uses), which removes a high-severity advisory in `http-cache-semantics` that has no patched release. It only affects the packaging tool, never the shipped app.
+- **Renderer libraries moved to devDependencies.** Vite bundles them, so shipping their `node_modules` again only made the installer bigger.
+- **Accent colour and dark mode wait.** The spec lists them "once available"; the design system has no dark tokens yet.
+
 ---
 
 ## Template for New Entries

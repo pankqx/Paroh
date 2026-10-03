@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Phase 6 polish and packaging: Settings (vault, export and import as .zip,
+  daily reminder, AI switches, privacy and support), first-launch onboarding,
+  and Ubuntu .deb and .AppImage builds.
+
 - Phase 5 reflection: Chapters (a monthly view with a mood landscape, stats
   and most-used words) and Horizons (life stories on a year or quarter
   timeline, with a list view). The sidebar is now grouped into Today and

@@ -52,9 +52,24 @@ const api: ParohApi = {
     remove: (id) => ipcRenderer.invoke(IPC.horizonsRemove, id),
     addArea: (name) => ipcRenderer.invoke(IPC.horizonsAddArea, name),
   },
+  settings: {
+    get: () => ipcRenderer.invoke(IPC.settingsGet),
+    setAiFeature: (id, on) => ipcRenderer.invoke(IPC.settingsSetAiFeature, id, on),
+    setReminder: (time) => ipcRenderer.invoke(IPC.settingsSetReminder, time),
+    completeOnboarding: () => ipcRenderer.invoke(IPC.settingsCompleteOnboarding),
+  },
   vault: {
     info: () => ipcRenderer.invoke(IPC.vaultInfo),
     choose: () => ipcRenderer.invoke(IPC.vaultChoose),
+    confirmChoice: () => ipcRenderer.invoke(IPC.vaultConfirmChoice),
+    reveal: () => ipcRenderer.invoke(IPC.vaultReveal),
+    export: () => ipcRenderer.invoke(IPC.vaultExport),
+    import: () => ipcRenderer.invoke(IPC.vaultImport),
+    onExportProgress: (listener) => {
+      const handler = (_e: IpcRendererEvent, p: { done: number; total: number }) => listener(p);
+      ipcRenderer.on(IPC.vaultExportProgress, handler);
+      return () => ipcRenderer.removeListener(IPC.vaultExportProgress, handler);
+    },
     onChanged: (listener) => {
       const handler = (_e: IpcRendererEvent, change: VaultChange) => listener(change);
       ipcRenderer.on(IPC.vaultChanged, handler);

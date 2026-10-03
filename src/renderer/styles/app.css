@@ -379,3 +379,25 @@ button:disabled { cursor: default; }
 .linked-list li { display: flex; align-items: center; justify-content: space-between; }
 .dialog-actions { display: flex; align-items: center; gap: var(--space-2); margin-top: auto; padding-top: var(--space-2); }
 .grow { flex: 1; }
+
+/* Settings and onboarding */
+.settings { max-width: 860px; }
+.settings-section { display: flex; flex-direction: column; gap: var(--space-3); }
+.settings-actions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-2); }
+.vault-path-full { display: block; padding: var(--space-2) var(--space-3); background: var(--canvas-bg); border-radius: var(--radius-sm); font: 400 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.banner-info { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--canvas-surface); border: 1px solid var(--canvas-border); font: var(--text-small); overflow-wrap: anywhere; }
+.inline-field { flex-direction: row; align-items: center; gap: var(--space-2); }
+.ai-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.switch-label { display: flex; align-items: center; gap: var(--space-2); font: var(--text-small); font-weight: 600; }
+.sidebar-footer .nav-item { margin-bottom: var(--space-2); }
+.onboarding { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: var(--space-8); background-color: var(--canvas-bg); background-image: radial-gradient(var(--canvas-dot) 1.2px, transparent 1.2px); background-size: 20px 20px; }
+.onboarding-card { width: min(620px, 100%); display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-8); background: var(--canvas-surface); border: 1px solid var(--canvas-border); border-radius: var(--radius-lg); }
+.onboarding-card p { margin: 0; font: var(--text-body); }
+.onboarding-title { margin: 0; font: 600 32px/1.2 var(--font-serif); }
+.onboarding-step { display: flex; flex-direction: column; gap: var(--space-2); }
+.onboarding-start { align-self: flex-start; padding: var(--space-3) var(--space-6); }
+
+/* Anyone who asks the OS for less motion gets none, everywhere (accessibility.md). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

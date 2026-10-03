@@ -44,12 +44,33 @@ export const IPC = {
   horizonsAddArea: 'horizons:addArea',
   vaultInfo: 'vault:info',
   vaultChoose: 'vault:choose',
+  vaultConfirmChoice: 'vault:confirmChoice',
+  vaultReveal: 'vault:reveal',
+  vaultExport: 'vault:export',
+  vaultImport: 'vault:import',
+  /** main → renderer: `{ done, total }` while an export runs. */
+  vaultExportProgress: 'vault:exportProgress',
+  settingsGet: 'settings:get',
+  settingsSetAiFeature: 'settings:setAiFeature',
+  settingsSetReminder: 'settings:setReminder',
+  settingsCompleteOnboarding: 'settings:completeOnboarding',
   /** main → renderer: entry files changed outside the app (or the vault itself was switched). */
   vaultChanged: 'vault:changed',
 } as const;
 
 export interface VaultInfo {
   path: string;
+}
+
+/** Picking a folder that holds unrelated files asks for confirmation before Paroh writes there (§12 Edge Cases). */
+export type VaultChoice = { status: 'switched'; path: string } | { status: 'needs-confirm'; path: string; sample: string[] };
+
+export interface SettingsView {
+  vaultPath: string;
+  onboarded: boolean;
+  aiFeatures: Record<string, boolean>;
+  reminderTime?: string;
+  version: string;
 }
 
 export interface VaultChange {
@@ -126,9 +147,22 @@ export interface ParohApi {
     /** Returns the new area's folder name. */
     addArea(name: string): Promise<Result<string>>;
   };
+  settings: {
+    get(): Promise<SettingsView>;
+    setAiFeature(id: string, on: boolean): Promise<Result<void>>;
+    /** `null` turns the reminder off. */
+    setReminder(time: string | null): Promise<Result<void>>;
+    completeOnboarding(): Promise<void>;
+  };
   vault: {
     info(): Promise<VaultInfo>;
-    choose(): Promise<VaultInfo | null>;
+    choose(): Promise<VaultChoice | null>;
+    /** Switches to the folder the last `choose()` asked about. */
+    confirmChoice(): Promise<VaultChoice | null>;
+    reveal(): Promise<string>;
+    export(): Promise<Result<{ path: string; files: number; bytes: number } | null>>;
+    import(): Promise<Result<{ path: string; files: number } | null>>;
+    onExportProgress(listener: (p: { done: number; total: number }) => void): () => void;
     /** Returns an unsubscribe function. */
     onChanged(listener: (change: VaultChange) => void): () => void;
   };

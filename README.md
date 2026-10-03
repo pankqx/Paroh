@@ -4,7 +4,7 @@ Paroh is an offline-first, privacy-first, open-source Personal Operating System 
 
 ## Current status
 
-Phases 1 to 5 are implemented: an Electron desktop app with a Canvas dashboard, an Editor, search, a calendar, habits, to-dos, audio logs, a 24-week healing prompt programme, monthly Chapters and a Horizons life timeline. Entries are saved as plain Markdown files with YAML frontmatter in a folder you own, through the atomic save pipeline in `docs/architecture.md`. See `docs/tasks.md` for what is done and what comes next.
+Phases 1 to 6 are implemented, including Ubuntu packages (`npm run build:ubuntu`): an Electron desktop app with a Canvas dashboard, an Editor, search, a calendar, habits, to-dos, audio logs, a 24-week healing prompt programme, monthly Chapters and a Horizons life timeline. Entries are saved as plain Markdown files with YAML frontmatter in a folder you own, through the atomic save pipeline in `docs/architecture.md`. See `docs/tasks.md` for what is done and what comes next.
 
 ## Run it
 
@@ -12,10 +12,13 @@ Requires Node.js 22 or newer.
 
 ```bash
 npm install
-npm run dev        # start the app with hot reload
+npm run dev            # start the app with hot reload
+npm run build:ubuntu   # build dist/*.deb and dist/*.AppImage
 ```
 
-Your vault defaults to `~/Paroh`. Pick another folder with **Change folder** at the bottom of the sidebar, or set `PAROH_VAULT=/path/to/folder` when starting the app.
+Install the `.deb` with `sudo apt install ./dist/Paroh-*.deb`, or make the `.AppImage` executable and run it.
+
+Your vault defaults to `~/Paroh`. On first launch Paroh asks where to keep it; change it later in **Settings**, or set `PAROH_VAULT=/path/to/folder` when starting the app.
 
 Each day is one file: `<vault>/YYYY-MM/YYYY-MM-DD.md`. You can open, edit or back up these files with any editor.
 

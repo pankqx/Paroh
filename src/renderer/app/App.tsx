@@ -14,6 +14,7 @@ import { SettingsPage } from '../features/settings/SettingsPage';
 import { HealingPromptsPage } from '../features/healing/HealingPromptsPage';
 import { TodoPage } from '../features/todo/TodoPage';
 import { BoardsPage } from '../features/boards/BoardsPage';
+import { PlannerPage } from '../features/planner/PlannerPage';
 import { useEntries } from '../hooks/useEntries';
 import { useVault } from '../hooks/useVault';
 import { RecorderProvider } from './RecorderContext';
@@ -33,6 +34,7 @@ export type View =
   | { name: 'chapters' }
   | { name: 'horizons' }
   | { name: 'boards' }
+  | { name: 'planner' }
   | { name: 'settings' };
 export type Navigate = (view: View) => void;
 
@@ -116,6 +118,7 @@ export function App() {
                   {view.name === 'habits' && <HabitsPage today={today} />}
                   {view.name === 'todo' && <TodoPage today={today} />}
                   {view.name === 'boards' && <BoardsPage today={today} />}
+                  {view.name === 'planner' && <PlannerPage today={today} entries={entries} onOpenEntry={openEntry} />}
                   {view.name === 'audio' && <AudioLogsPage onOpenEntry={openEntry} />}
                   {view.name === 'calendar' && <CalendarPage today={today} entries={entries} onOpenEntry={openEntry} />}
                   {view.name === 'entries' && <AllEntriesPage key={`${view.from ?? ''}:${view.to ?? ''}`} query={view.query} initialFrom={view.from} initialTo={view.to} onQuery={(query) => setView({ ...view, query })} onOpenEntry={openEntry} />}

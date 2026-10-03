@@ -4,6 +4,7 @@ import { MemoryIndex } from '../main/index-db/MemoryIndex';
 import { AudioStore } from '../main/stores/AudioStore';
 import { HabitStore } from '../main/stores/HabitStore';
 import { BoardStore } from '../main/stores/BoardStore';
+import { PlannerStore } from '../main/stores/PlannerStore';
 import { HorizonStore } from '../main/stores/HorizonStore';
 import { MediaStore } from '../main/stores/MediaStore';
 import { TaskStore } from '../main/stores/TaskStore';
@@ -38,6 +39,7 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
   const audio = new AudioStore(service);
   const horizons = new HorizonStore(fs);
   const boards = new BoardStore(fs);
+  const planner = new PlannerStore(fs);
   const media = new MediaStore(fs);
   await audio.syncTranscriptIndex();
 
@@ -102,6 +104,13 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
     },
     prompts: { history: async () => service.promptHistory() },
     chapters: { month: (month) => service.monthEntries(month) },
+    planner: {
+      list: () => planner.list(),
+      saveEvent: (input, id) => planner.saveEvent(input, id ?? undefined),
+      removeEvent: (id) => planner.removeEvent(String(id ?? '')),
+      saveGoal: (input, id) => planner.saveGoal(input, id ?? undefined),
+      removeGoal: (id) => planner.removeGoal(String(id ?? '')),
+    },
     boards: {
       list: () => boards.list(),
       load: (id) => boards.load(String(id ?? '')),

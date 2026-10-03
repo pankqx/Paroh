@@ -8,6 +8,7 @@ import type { PromptLog } from './types/Prompt';
 import type { Result } from './types/Result';
 import type { Backlink, SearchFilters, SearchResult } from './types/Search';
 import type { Board, BoardSummary } from './types/Board';
+import type { PlanEvent, PlanEventInput, PlanGoal, PlanGoalInput, PlannerData } from './types/Planner';
 import type { NudgeAction, Priority, Recurrence, Task } from './types/Task';
 
 /** Channel names, `domain:action` per docs/coding-standards.md. */
@@ -46,6 +47,11 @@ export const IPC = {
   mediaRead: 'media:read',
   promptsHistory: 'prompts:history',
   chaptersMonth: 'chapters:month',
+  plannerList: 'planner:list',
+  plannerSaveEvent: 'planner:saveEvent',
+  plannerRemoveEvent: 'planner:removeEvent',
+  plannerSaveGoal: 'planner:saveGoal',
+  plannerRemoveGoal: 'planner:removeGoal',
   boardsList: 'boards:list',
   boardsLoad: 'boards:load',
   boardsCreate: 'boards:create',
@@ -190,6 +196,14 @@ export interface ParohApi {
   chapters: {
     /** That month's entries with full bodies, read from the files (Chapters is computed in the renderer). */
     month(month: string): Promise<Result<Entry[]>>;
+  };
+  planner: {
+    list(): Promise<Result<PlannerData>>;
+    /** Creates a plan, or replaces the one with `id`. */
+    saveEvent(input: PlanEventInput, id?: string): Promise<Result<PlanEvent>>;
+    removeEvent(id: string): Promise<Result<void>>;
+    saveGoal(input: PlanGoalInput, id?: string): Promise<Result<PlanGoal>>;
+    removeGoal(id: string): Promise<Result<void>>;
   };
   boards: {
     list(): Promise<Result<BoardSummary[]>>;

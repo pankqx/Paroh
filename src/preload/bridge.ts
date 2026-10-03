@@ -55,6 +55,13 @@ const api: ParohApi = {
   chapters: {
     month: (month) => ipcRenderer.invoke(IPC.chaptersMonth, month),
   },
+  planner: {
+    list: () => ipcRenderer.invoke(IPC.plannerList),
+    saveEvent: (input, id) => ipcRenderer.invoke(IPC.plannerSaveEvent, input, id),
+    removeEvent: (id) => ipcRenderer.invoke(IPC.plannerRemoveEvent, id),
+    saveGoal: (input, id) => ipcRenderer.invoke(IPC.plannerSaveGoal, input, id),
+    removeGoal: (id) => ipcRenderer.invoke(IPC.plannerRemoveGoal, id),
+  },
   boards: {
     list: () => ipcRenderer.invoke(IPC.boardsList),
     load: (id) => ipcRenderer.invoke(IPC.boardsLoad, id),

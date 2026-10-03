@@ -121,6 +121,12 @@ Pank asked for a much richer UI and named Lucide, Tailwind, Phosphor, shadcn/ui 
 - **Saved 0.7 s after the last change, and at once when the board is closed**, so leaving mid-edit never loses work.
 - **On touch, one finger on empty paper pans and two fingers pinch-zoom**; on a mouse, dragging empty paper draws a selection box and the wheel pans.
 
+### 2026-10-03 — Planners: one month and one year, woven from what's already there
+- **Plans and goals live in `.paroh/planner.json`** (events with an area, optional end date, time, note and milestone flag; goals per month `YYYY-MM` or year `YYYY` with a 0–100 progress). Older vaults simply have no file yet.
+- **The planners sit beside Horizons and Chapters, not inside them.** Horizons are long-range life stories and Chapters look back; the planners are for dates. Merging them would have meant a schema change to both for little gain.
+- **Tasks and entries are read, not copied.** The month shows To-Do deadlines and the days you wrote; the year marks written days in gold. Nothing is duplicated, so nothing drifts.
+- **Multi-day plans keep one row across a week** (and one lane across the year ribbon), so they read as bars rather than repeated chips.
+
 ---
 
 ## Template for New Entries

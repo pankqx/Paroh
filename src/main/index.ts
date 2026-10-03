@@ -20,6 +20,7 @@ import { AudioStore } from './stores/AudioStore';
 import { MediaStore } from './stores/MediaStore';
 import { HabitStore } from './stores/HabitStore';
 import { BoardStore } from './stores/BoardStore';
+import { PlannerStore } from './stores/PlannerStore';
 import { HorizonStore } from './stores/HorizonStore';
 import { TaskStore } from './stores/TaskStore';
 
@@ -40,7 +41,7 @@ async function openVault(path: string): Promise<void> {
   next.watch((dates) => broadcast({ dates }));
   const previous = service;
   service = next;
-  stores = { habits: new HabitStore(next), tasks: new TaskStore(next.fs), audio: new AudioStore(next), horizons: new HorizonStore(next.fs), media: new MediaStore(next.fs), boards: new BoardStore(next.fs) };
+  stores = { habits: new HabitStore(next), tasks: new TaskStore(next.fs), audio: new AudioStore(next), horizons: new HorizonStore(next.fs), media: new MediaStore(next.fs), boards: new BoardStore(next.fs), planner: new PlannerStore(next.fs) };
   await stores.audio.syncTranscriptIndex();
   previous?.close();
 }

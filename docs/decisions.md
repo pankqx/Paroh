@@ -100,6 +100,9 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Android first.** It can be built on Linux CI; iOS needs a Mac. The `Documents/Paroh` folder is where sync apps can reach it.
 - **Desktop-only features say so on the phone** instead of half-working: export/import (the phone folder is already plain files), the reminder (needs a notification plugin) and the AI features (key storage and the speech model need their own phone work).
 
+### 2026-10-03 — Redesign: one hand-made design system, not five libraries
+Pank asked for a much richer UI and named Lucide, Tailwind, Phosphor, shadcn/ui and 21st.dev as references. Paroh keeps its own token-based CSS and borrows the patterns (component shapes, motion, glass, focus rings) rather than installing all of them: mixing several kits is what makes an app look generated, and rewriting every screen into Tailwind classes would have cost the new features. Lucide is the one icon set (Phosphor would be a second visual language); `motion` handles screen and layout animation. The theme (Ivory, Midnight or system) is a per-device choice in localStorage, like a reading lamp, so it never syncs a laptop's dark mode onto a phone.
+
 ---
 
 ## Template for New Entries

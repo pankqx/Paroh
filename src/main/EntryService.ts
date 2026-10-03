@@ -46,6 +46,15 @@ export class EntryService {
     return saved;
   }
 
+  /** Recording transcripts live in `.paroh/audio.json`, not in entries; the index keeps them searchable. */
+  indexTranscripts(rows: { id: string; date: string; text: string }[]): void {
+    this.index.replaceTranscripts(rows);
+  }
+
+  indexTranscript(id: string, date: string, text: string): void {
+    this.index.setTranscript(id, date, text);
+  }
+
   monthEntries(month: string): Promise<Result<Entry[]>> {
     return this.vault.loadMonth(String(month));
   }

@@ -130,6 +130,10 @@ All channels are invoked from the renderer as `window.paroh.<namespace>.<method>
 Any change to a method's signature is a breaking change to this file and must be called out explicitly in `CHANGELOG.md` and, if it affects the renderer/main boundary in a way that could break a mid-flight operation, considered against `release-plan.md`'s "extra scrutiny" list.
 
 
+## Phase 8 notes
+
+`ai.setApiKey(key | null)` stores or forgets the Anthropic key; `settings.get()` now also returns `hasApiKey` and `apiKeyEncrypted`, never the key. `ai.note.generate(month)` returns an `EditorsNoteDraft` (`{ month, text, model, entryCount }`) and is refused in main unless the `editors-note` switch is on and a key is stored; `ai.note.cancel()` stops it. `ai.note.save(draft)` writes `<vault>/chapters/YYYY-MM.md`; `ai.note.load(month)` / `ai.note.remove(month)` read and delete it. `ai.model.status()` / `download()` / `remove()` manage the speech model, with `ai.model.onChanged` for progress (`ai:modelChanged`); `download()` is refused unless the `transcription` switch is on. `audio.setTranscript(id, text)` stores on-device transcript text (an empty string removes it). The planned `ai.isEnabled` / `ai.requestSummary` pair below became these per-feature methods.
+
 ## Phase 6 notes
 
 `settings.get()` returns `{ vaultPath, onboarded, aiFeatures, reminderTime?, version }`; `settings.setAiFeature(id, on)` only accepts ids in `src/shared/aiFeatures.ts`; `settings.setReminder("HH:MM" | null)`; `settings.completeOnboarding()`. `vault.choose()` now returns `{ status: 'switched' }` or `{ status: 'needs-confirm', sample }`, followed by `vault.confirmChoice()`. `vault.export()` / `vault.import()` show their own dialogs and report progress on `vault:exportProgress`. `vault.reveal()` opens the folder.

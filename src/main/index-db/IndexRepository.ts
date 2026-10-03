@@ -142,11 +142,40 @@ export class IndexRepository {
         WHERE entries_fts MATCH ? ${where.length ? `AND ${where.join(' AND ')}` : ''}
         ORDER BY bm25(entries_fts, 0, 5, 1, 2) LIMIT 200`;
       const rows = this.db.prepare(sql).all(query, ...params) as unknown as (EntryRow & { snippet: string })[];
-      return rows.map((r) => ({ ...rowToSummary(r), snippet: r.snippet }));
+      const results = rows.map((r) => ({ ...rowToSummary(r), snippet: r.snippet }));
+      // Transcribed recordings are findable too; a hit shows up as the day the recording belongs to.
+      const seen = new Set(results.map((r) => r.date));
+      const tsql = `SELECT e.date, e.title, e.mood, e.tags, snippet(transcripts_fts, 2, '${MATCH_START}', '${MATCH_END}', '…', 24) AS snippet
+        FROM transcripts_fts t JOIN entries e ON e.date = t.date
+        WHERE transcripts_fts MATCH ? ${where.length ? `AND ${where.join(' AND ')}` : ''}
+        ORDER BY bm25(transcripts_fts) LIMIT 200`;
+      for (const r of this.db.prepare(tsql).all(query, ...params) as unknown as (EntryRow & { snippet: string })[]) {
+        if (seen.has(r.date)) continue;
+        seen.add(r.date);
+        results.push({ ...rowToSummary(r), snippet: `🎙 ${r.snippet}` });
+      }
+      return results;
     }
     const sql = `SELECT e.* FROM entries e ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY e.date DESC LIMIT 500`;
     const rows = this.db.prepare(sql).all(...params) as unknown as EntryRow[];
     return rows.map((r) => ({ ...rowToSummary(r), snippet: r.excerpt }));
+  }
+
+  /** Replaces every indexed transcript (on vault open, from `.paroh/audio.json`). */
+  replaceTranscripts(rows: { id: string; date: string; text: string }[]): void {
+    this.transaction(() => {
+      this.db.exec('DELETE FROM transcripts_fts');
+      const insert = this.db.prepare('INSERT INTO transcripts_fts (id, date, text) VALUES (?, ?, ?)');
+      for (const r of rows) if (r.text.trim()) insert.run(r.id, r.date, r.text);
+    });
+  }
+
+  /** An empty text removes the recording's transcript from the index. */
+  setTranscript(id: string, date: string, text: string): void {
+    this.transaction(() => {
+      this.db.prepare('DELETE FROM transcripts_fts WHERE id = ?').run(id);
+      if (text.trim()) this.db.prepare('INSERT INTO transcripts_fts (id, date, text) VALUES (?, ?, ?)').run(id, date, text);
+    });
   }
 
   /** Entries linking here, by date (`[[2026-06-11]]`) or by title (`[[A quiet morning]]`). */

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import { IPC, type ParohApi, type VaultChange } from '../shared/ipc-contract';
+import type { SpeechModelStatus } from '../shared/speechModel';
 
 // The renderer's only door to the vault: explicit methods, no generic invoke (docs/api.md).
 const api: ParohApi = {
@@ -39,6 +40,7 @@ const api: ParohApi = {
     list: () => ipcRenderer.invoke(IPC.audioList),
     read: (id) => ipcRenderer.invoke(IPC.audioRead, id),
     rename: (id, title) => ipcRenderer.invoke(IPC.audioRename, id, title),
+    setTranscript: (id, text) => ipcRenderer.invoke(IPC.audioSetTranscript, id, text),
   },
   prompts: {
     history: () => ipcRenderer.invoke(IPC.promptsHistory),
@@ -57,6 +59,26 @@ const api: ParohApi = {
     setAiFeature: (id, on) => ipcRenderer.invoke(IPC.settingsSetAiFeature, id, on),
     setReminder: (time) => ipcRenderer.invoke(IPC.settingsSetReminder, time),
     completeOnboarding: () => ipcRenderer.invoke(IPC.settingsCompleteOnboarding),
+  },
+  ai: {
+    setApiKey: (key) => ipcRenderer.invoke(IPC.aiSetApiKey, key),
+    note: {
+      generate: (month) => ipcRenderer.invoke(IPC.aiNoteGenerate, month),
+      cancel: () => ipcRenderer.invoke(IPC.aiNoteCancel),
+      load: (month) => ipcRenderer.invoke(IPC.aiNoteLoad, month),
+      save: (draft) => ipcRenderer.invoke(IPC.aiNoteSave, draft),
+      remove: (month) => ipcRenderer.invoke(IPC.aiNoteRemove, month),
+    },
+    model: {
+      status: () => ipcRenderer.invoke(IPC.aiModelStatus),
+      download: () => ipcRenderer.invoke(IPC.aiModelDownload),
+      remove: () => ipcRenderer.invoke(IPC.aiModelRemove),
+      onChanged: (listener) => {
+        const handler = (_e: IpcRendererEvent, status: SpeechModelStatus) => listener(status);
+        ipcRenderer.on(IPC.aiModelChanged, handler);
+        return () => ipcRenderer.removeListener(IPC.aiModelChanged, handler);
+      },
+    },
   },
   vault: {
     info: () => ipcRenderer.invoke(IPC.vaultInfo),

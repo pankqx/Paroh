@@ -2,8 +2,8 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 7 — Windows Build (implemented, in review; needs a real-machine pass)
-**Last updated:** 2026-10-02
+**Active phase:** Phase 8 — AI Features, Opt-In (implemented, in review)
+**Last updated:** 2026-10-03
 
 ---
 
@@ -71,6 +71,16 @@
 - [x] `.gitattributes` keeps LF line endings on Windows checkouts.
 - [ ] Real-machine pass with `docs/windows-qa.md` (needs a person on Windows).
 - [ ] Code signing, so SmartScreen stops warning (needs a certificate).
+
+## DONE (Phase 8)
+
+- [x] The `AIProvider` seam (`src/main/ai/AIProvider.ts`): one narrow binding per feature, so switching one on never routes another feature's data anywhere.
+- [x] Editor's Note in Chapters, through `CloudAIProvider` (Claude via the Anthropic API, the person's own key). Off by default. Sends only that month's entry text, moods and tags. The draft is shown first and only written to `<vault>/chapters/YYYY-MM.md` when the person keeps it; it can be stopped, retried, discarded or removed.
+- [x] The Anthropic key is stored encrypted with the OS keyring in the app's config folder (never the vault, never sent back to the renderer). Without a keyring it is stored obscured, owner-only, and Settings says so.
+- [x] Local transcription: a per-recording Transcribe button in Audio Logs runs Whisper base on this computer (Transformers.js on ONNX Runtime Web, in a worker). The model is downloaded once from Hugging Face by the main process into the app's config folder and served read-only over `paroh-model://`. Transcripts live in `.paroh/audio.json` and are searchable (index version 4).
+- [x] Each feature has its own switch in Settings with its sentence on what leaves the device. The main process re-reads the switch on every request, so turning one off stops the very next action.
+- [x] Tests: Claude request shape (model, fallback beta, effort, key header) and error wording against a fake API, consent gating, draft-not-written, note file round trip, unsafe months rejected, key store, model download (optional files, failed downloads clean up, path escapes refused), transcripts stored, indexed and re-indexed, axe-core with the features on.
+- [ ] A real transcription run with the downloaded model (the build sandbox cannot reach Hugging Face; everything up to the model weights was checked in the packaged app).
 
 ## Later
 

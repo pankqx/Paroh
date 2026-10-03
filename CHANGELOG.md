@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Phase 8 AI features, all off by default: an Editor's Note for each month in
+  Chapters, written by Claude with your own Anthropic API key and saved only if
+  you keep it, and on-device transcription of audio logs that makes them
+  searchable. Each has its own switch in Settings.
+
 - Phase 7 Windows build: a Windows installer from CI, the test suite running
   on Windows, and Windows fixes (notifications, file watching, one window at
   a time, hidden menu bar).

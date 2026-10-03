@@ -16,5 +16,7 @@ export default defineConfig({
     resolve: { alias: { '@assets': resolve(__dirname, 'assets') } },
     build: { rollupOptions: { input: { index: resolve(__dirname, 'src/renderer/index.html') } } },
     plugins: [react()],
+    // The speech worker (Phase 8) imports ONNX Runtime as an ES module.
+    worker: { format: 'es' },
   },
 });

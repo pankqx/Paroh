@@ -1,7 +1,15 @@
-import { app, BrowserWindow, session, shell } from 'electron';
-import { mkdir } from 'node:fs/promises';
+import { app, BrowserWindow, net, protocol, safeStorage, session, shell } from 'electron';
+import { pathToFileURL } from 'node:url';
+import { mkdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { IPC, type VaultChange } from '../shared/ipc-contract';
+import { MODEL_SCHEME } from '../shared/speechModel';
+import { aiFeatureEnabled } from './ai/aiFeatureEnabled';
+import { ApiKeyStore } from './ai/apiKeyStore';
+import { CloudAIProvider } from './ai/CloudAIProvider';
+import { EditorsNoteService } from './ai/EditorsNoteService';
+import { SpeechModelStore } from './ai/SpeechModelStore';
+import { registerAiIpc } from './ipc/ai.ipc';
 import { EntryService } from './EntryService';
 import { registerDailyIpc, type DailyStores } from './ipc/daily.ipc';
 import { registerEntriesIpc } from './ipc/entries.ipc';
@@ -15,6 +23,10 @@ import { TaskStore } from './stores/TaskStore';
 
 let service: EntryService;
 let stores: DailyStores;
+let notes: EditorsNoteService;
+
+// Model files reach the renderer through this read-only scheme; it must be registered before the app is ready.
+protocol.registerSchemesAsPrivileged([{ scheme: MODEL_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
 
 function broadcast(change: VaultChange): void {
   for (const win of BrowserWindow.getAllWindows()) win.webContents.send(IPC.vaultChanged, change);
@@ -27,6 +39,7 @@ async function openVault(path: string): Promise<void> {
   const previous = service;
   service = next;
   stores = { habits: new HabitStore(next), tasks: new TaskStore(path), audio: new AudioStore(next), horizons: new HorizonStore(path) };
+  await stores.audio.syncTranscriptIndex();
   previous?.close();
 }
 
@@ -81,7 +94,43 @@ app.whenReady().then(async () => {
   });
   session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === 'media');
 
+  const keys = new ApiKeyStore(join(app.getPath('userData'), 'secrets.json'), {
+    available: () => safeStorage.isEncryptionAvailable(),
+    encrypt: (text) => safeStorage.encryptString(text),
+    decrypt: (data) => safeStorage.decryptString(data),
+    strong: () => process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text',
+  });
+  const speechModel = new SpeechModelStore({
+    root: join(app.getPath('userData'), 'models'),
+    fetch: (input, init) => net.fetch(input instanceof Request ? input : String(input), init),
+    onChange: (status) => {
+      for (const win of BrowserWindow.getAllWindows()) win.webContents.send(IPC.aiModelChanged, status);
+    },
+  });
+  protocol.handle(MODEL_SCHEME, async (request) => {
+    const url = new URL(request.url);
+    const file = url.host === 'models' && request.method === 'GET' ? speechModel.resolveFile(url.pathname.slice(1)) : null;
+    const res = file ? await net.fetch(pathToFileURL(file).toString()).catch(() => null) : null;
+    // The speech worker runs on the app's own origin, so model files need a CORS header to be readable.
+    const headers = { 'Access-Control-Allow-Origin': '*' };
+    if (!res?.ok) return new Response('Not found', { status: 404, headers });
+    const size = file ? (await stat(file)).size : 0;
+    return new Response(res.body, { status: 200, headers: { ...headers, 'Content-Type': res.headers.get('content-type') ?? 'application/octet-stream', 'Content-Length': String(size) } });
+  });
+
   await openVault(await resolveVaultPath());
+  notes = new EditorsNoteService({
+    vaultRoot: () => service.root,
+    loadMonth: (month) => service.monthEntries(month),
+    enabled: () => aiFeatureEnabled('editors-note'),
+    provider: async () => {
+      const apiKey = await keys.get();
+      // A local stand-in for Anthropic's API, honoured only in development builds (used by the end-to-end checks).
+      const baseURL = !app.isPackaged ? process.env.PAROH_ANTHROPIC_BASE_URL : undefined;
+      return apiKey ? new CloudAIProvider({ apiKey, baseURL }) : null;
+    },
+  });
+  registerAiIpc(keys, () => notes, speechModel);
 
   registerEntriesIpc(() => service);
   registerDailyIpc(() => stores);
@@ -94,6 +143,7 @@ app.whenReady().then(async () => {
       broadcast({ dates: [], reset: true });
     },
     reminders,
+    keys,
   );
 
   createWindow();

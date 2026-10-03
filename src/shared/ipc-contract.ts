@@ -1,4 +1,6 @@
+import type { SpeechModelStatus } from './speechModel';
 import type { AudioLog } from './types/AudioLog';
+import type { EditorsNote } from './types/EditorsNote';
 import type { DateRange, Entry, EntrySummary } from './types/Entry';
 import type { Habit, HabitDay, HabitFrequency } from './types/Habit';
 import type { HorizonsData, LifeStory, LifeStoryInput } from './types/LifeStory';
@@ -36,6 +38,7 @@ export const IPC = {
   audioList: 'audio:list',
   audioRead: 'audio:read',
   audioRename: 'audio:rename',
+  audioSetTranscript: 'audio:setTranscript',
   promptsHistory: 'prompts:history',
   chaptersMonth: 'chapters:month',
   horizonsList: 'horizons:list',
@@ -54,6 +57,17 @@ export const IPC = {
   settingsSetAiFeature: 'settings:setAiFeature',
   settingsSetReminder: 'settings:setReminder',
   settingsCompleteOnboarding: 'settings:completeOnboarding',
+  aiSetApiKey: 'ai:setApiKey',
+  aiNoteGenerate: 'ai:noteGenerate',
+  aiNoteCancel: 'ai:noteCancel',
+  aiNoteLoad: 'ai:noteLoad',
+  aiNoteSave: 'ai:noteSave',
+  aiNoteRemove: 'ai:noteRemove',
+  aiModelStatus: 'ai:modelStatus',
+  aiModelDownload: 'ai:modelDownload',
+  aiModelRemove: 'ai:modelRemove',
+  /** main → renderer: speech model download progress and state changes. */
+  aiModelChanged: 'ai:modelChanged',
   /** main → renderer: entry files changed outside the app (or the vault itself was switched). */
   vaultChanged: 'vault:changed',
 } as const;
@@ -71,6 +85,18 @@ export interface SettingsView {
   aiFeatures: Record<string, boolean>;
   reminderTime?: string;
   version: string;
+  /** True once an Anthropic API key is stored (encrypted). The key itself never comes back to the renderer. */
+  hasApiKey: boolean;
+  /** False when the OS has no keyring, so the stored key is only obscured, not encrypted. */
+  apiKeyEncrypted: boolean;
+}
+
+/** A draft from Claude, not yet saved anywhere (architecture.md: nothing is written until the person accepts it). */
+export interface EditorsNoteDraft {
+  month: string;
+  text: string;
+  model: string;
+  entryCount: number;
 }
 
 export interface VaultChange {
@@ -130,6 +156,8 @@ export interface ParohApi {
     list(): Promise<Result<AudioLog[]>>;
     read(id: string): Promise<Result<Uint8Array>>;
     rename(id: string, title: string): Promise<Result<void>>;
+    /** Stores text the renderer transcribed on-device; an empty string removes it. */
+    setTranscript(id: string, text: string): Promise<Result<AudioLog>>;
   };
   prompts: {
     /** Answered and skipped healing prompts, newest first, read from entry frontmatter. */
@@ -153,6 +181,25 @@ export interface ParohApi {
     /** `null` turns the reminder off. */
     setReminder(time: string | null): Promise<Result<void>>;
     completeOnboarding(): Promise<void>;
+  };
+  ai: {
+    /** Stores the key encrypted with the OS keyring; `null` forgets it. */
+    setApiKey(key: string | null): Promise<Result<void>>;
+    note: {
+      /** Asks Claude for a draft. Refused unless the Editor's Note switch is on and a key is stored. */
+      generate(month: string): Promise<Result<EditorsNoteDraft>>;
+      cancel(): Promise<void>;
+      load(month: string): Promise<Result<EditorsNote | null>>;
+      save(draft: EditorsNoteDraft): Promise<Result<EditorsNote>>;
+      remove(month: string): Promise<Result<void>>;
+    };
+    model: {
+      status(): Promise<SpeechModelStatus>;
+      /** Refused unless the transcription switch is on. Progress arrives through `onChanged`. */
+      download(): Promise<Result<void>>;
+      remove(): Promise<Result<void>>;
+      onChanged(listener: (status: SpeechModelStatus) => void): () => void;
+    };
   };
   vault: {
     info(): Promise<VaultInfo>;

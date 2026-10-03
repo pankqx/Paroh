@@ -11,7 +11,7 @@
 | Malicious/buggy future plugin reading vault content it shouldn't | Medium (once plugins exist) | High | Plugin code runs renderer-side under `contextIsolation`; all vault access routes through the same `VaultAdapter` IPC contract as core, no direct `fs`/network access ever granted |
 | Renderer-side XSS via pasted/untrusted content (e.g., pasted HTML) | Medium | Medium | All pasted content sanitized down to supported Markdown-representable formatting before entering Tiptap's document model; no raw HTML persisted or rendered |
 | Cloud AI backend receiving more data than intended | Low, but high impact if it happens | High | Per-feature `AIProvider` binding (`architecture.md`); each cloud call constructed explicitly with only the data that feature needs, never a full-vault dump |
-| Credential/API key exposure (once cloud AI ships) | Low | Medium | API credentials stored via the OS keychain (not a plaintext config file), accessed only from the main process, never exposed to the renderer |
+| Credential/API key exposure (once cloud AI ships) | Low | Medium | API credentials stored via the OS keychain (Electron `safeStorage`, not a plaintext config file), accessed only from the main process, never exposed to the renderer. On a Linux desktop with no keyring service, the key is stored base64-obscured in an owner-only (0600) file and Settings tells the person so. |
 | Local malware/compromised OS reading vault files directly | Out of scope | N/A | Explicitly not defended against — see `architecture.md`; full-disk encryption is the user's/OS's responsibility |
 | Physical access to an unlocked machine | Out of scope | N/A | Same as above — Paroh is not a security product |
 

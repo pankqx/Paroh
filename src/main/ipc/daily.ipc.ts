@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron';
 import { IPC, type HabitInput, type TaskInput } from '../../shared/ipc-contract';
 import type { LifeStoryInput } from '../../shared/types/LifeStory';
+import { err } from '../../shared/types/Result';
+import { aiFeatureEnabled } from '../ai/aiFeatureEnabled';
 import type { NudgeAction } from '../../shared/types/Task';
 import type { AudioStore } from '../stores/AudioStore';
 import type { HabitStore } from '../stores/HabitStore';
@@ -40,4 +42,10 @@ export function registerDailyIpc(stores: () => DailyStores): void {
   ipcMain.handle(IPC.audioList, () => stores().audio.list());
   ipcMain.handle(IPC.audioRead, (_e, id: string) => stores().audio.read(id));
   ipcMain.handle(IPC.audioRename, (_e, id: string, title: string) => stores().audio.rename(id, String(title ?? '')));
+  ipcMain.handle(IPC.audioSetTranscript, async (_e, id: string, text: string) => {
+    const clean = String(text ?? '');
+    // Removing a transcript is always allowed; adding one only while transcription is switched on.
+    if (clean.trim() && !(await aiFeatureEnabled('transcription'))) return err('Transcription is switched off in Settings.');
+    return stores().audio.setTranscript(id, clean);
+  });
 }

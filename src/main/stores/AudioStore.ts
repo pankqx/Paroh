@@ -12,6 +12,7 @@ interface AudioFile {
   logs: Omit<AudioLog, 'filePath'>[];
 }
 
+const MAX_TRANSCRIPT_CHARS = 100_000;
 const ID_RE = /^\d{4}-\d{2}-\d{2}-\d{6}(-\d+)?$/;
 
 /**
@@ -135,6 +136,44 @@ export class AudioStore {
       return ok(undefined);
     } catch (e) {
       return err(`Could not rename: ${(e as Error).message}`);
+    }
+  }
+
+  /** Saves text transcribed on this computer next to the recording's other details; empty text removes it. */
+  async setTranscript(id: string, text: string): Promise<Result<AudioLog>> {
+    if (!ID_RE.test(id) || typeof text !== 'string') return err('Unknown recording');
+    const clean = text.trim().slice(0, MAX_TRANSCRIPT_CHARS);
+    try {
+      const meta = await this.readMeta();
+      let log = meta.logs.find((l) => l.id === id);
+      if (!log) {
+        await stat(this.file(id));
+        log = { id, title: 'Interrupted recording', createdAt: this.now().toISOString(), linkedEntryDate: id.slice(0, 10) };
+        meta.logs.push(log);
+      }
+      if (clean) {
+        log.transcript = clean;
+        log.transcribedAt = this.now().toISOString();
+      } else {
+        delete log.transcript;
+        delete log.transcribedAt;
+      }
+      await writeJsonFile(this.metaPath, meta);
+      this.entries.indexTranscript(id, log.linkedEntryDate ?? id.slice(0, 10), clean);
+      return ok({ ...log, filePath: `audio/${id}.webm` });
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return err('That recording is no longer in the vault');
+      return err(`Could not save the transcript: ${(e as Error).message}`);
+    }
+  }
+
+  /** Called when a vault opens, so transcripts made earlier (or on another computer) are searchable. */
+  async syncTranscriptIndex(): Promise<void> {
+    try {
+      const meta = await this.readMeta();
+      this.entries.indexTranscripts(meta.logs.filter((l) => l.transcript).map((l) => ({ id: l.id, date: l.linkedEntryDate ?? l.id.slice(0, 10), text: l.transcript ?? '' })));
+    } catch (e) {
+      console.warn('Could not index transcripts:', (e as Error).message);
     }
   }
 

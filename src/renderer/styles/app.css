@@ -397,6 +397,24 @@ button:disabled { cursor: default; }
 .onboarding-step { display: flex; flex-direction: column; gap: var(--space-2); }
 .onboarding-start { align-self: flex-start; padding: var(--space-3) var(--space-6); }
 
+/* Phase 8: opt-in AI features */
+.ai-details { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2); padding: var(--space-3) var(--space-4); border-left: 2px solid var(--canvas-border); }
+.ai-details p { margin: 0; }
+.ai-details .settings-actions { align-items: center; }
+.ai-details a { color: inherit; }
+.api-key-input { width: 320px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.model-progress { display: flex; flex-direction: column; gap: var(--space-2); }
+.model-progress progress { width: 100%; max-width: 420px; accent-color: var(--canvas-text-primary); }
+.editors-note { display: flex; flex-direction: column; gap: var(--space-3); }
+.editors-note-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.editors-note .btn-primary { align-self: flex-start; }
+.editors-note-text { max-width: 68ch; }
+.editors-note-text p { margin: 0 0 var(--space-3); font: 400 18px/1.65 var(--font-serif); }
+.transcript { margin-top: var(--space-2); }
+.transcript summary { cursor: pointer; font-weight: 600; }
+.transcript-text { margin: var(--space-2) 0; font: var(--text-body); white-space: pre-wrap; max-width: 72ch; }
+.btn-small { padding: var(--space-1) var(--space-3); }
+
 /* Anyone who asks the OS for less motion gets none, everywhere (accessibility.md). */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }

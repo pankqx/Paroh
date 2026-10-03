@@ -85,6 +85,14 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Single-instance lock on every platform.** Two windows on one vault would mean two watchers and two indexes racing on the same files.
 - **Unsigned for now.** Signing needs a certificate only the project owner can buy; `docs/windows-qa.md` tells testers how to get past SmartScreen.
 
+### 2026-10-03 — Phase 8 implementation choices
+- **The person's own Anthropic key, no Paroh server.** There is nothing in between to trust or pay for. The key is encrypted with Electron's `safeStorage` in the config folder, so an exported or synced vault never carries it.
+- **Claude Opus 5.5 at low effort, with server-side fallback.** A month's note is short; low effort keeps it quick and cheap. `fallbacks: "default"` lets Anthropic retry a classifier decline on its recommended model instead of failing.
+- **Notes live in `<vault>/chapters/`** as Markdown with frontmatter, so they export, sync and read like everything else. Nothing is written until the person keeps a draft.
+- **Transcription runs in the renderer on ONNX Runtime Web (WASM), not a native module.** `onnxruntime-node` downloads extra binaries at install time and would need per-platform packaging; the WASM build runs everywhere Electron does, including the planned Capacitor app. The native `onnxruntime-node` and `sharp` packages Transformers.js lists are replaced with empty stubs (`tools/stubs/`, npm `overrides`) because they are never used.
+- **The main process downloads the model**, keeping every network call in main per `security.md`; the renderer reads the files through a read-only `paroh-model://` scheme with path-escape checks. Whisper base (multilingual, 8-bit, about 80 MB) balances quality and download size.
+- **Transcripts go in `.paroh/audio.json`, not the entry body.** The person decides what enters their writing; the search index keeps transcripts findable on their own.
+
 ---
 
 ## Template for New Entries

@@ -29,6 +29,7 @@ const tasks: Task[] = [
   { id: 't1', text: 'Call mom', createdDate: '2026-09-30', dueDate: '2026-09-30', done: false },
   { id: 't2', text: 'Finish chapter 3', createdDate: '2026-10-02', dueDate: '2026-10-02', done: false, recurring: 'daily' },
 ];
+let aiFeatures: Record<string, boolean> = {};
 const story: LifeStory = { id: 'health/run-a-5k', schema_version: 1, title: 'Run a 5k', life_area: 'health', status: 'in-motion', created: '2026-06-01', when: '2027-Q2', linked_entries: ['2026-10-01'], why: 'To feel strong.' };
 window.paroh = {
   entries: {
@@ -60,9 +61,16 @@ window.paroh = {
     begin: async () => ({ ok: true, value: { id: 'x' } }),
     append: async () => ({ ok: true, value: undefined }),
     finish: async () => ({ ok: false, error: 'unused' }),
-    list: async () => ({ ok: true, value: [{ id: '2026-10-01-090000', filePath: 'audio/2026-10-01-090000.webm', title: 'Morning', createdAt: '2026-10-01T09:00:00Z', durationSeconds: 65, linkedEntryDate: '2026-10-01' }] }),
+    list: async () => ({
+      ok: true,
+      value: [
+        { id: '2026-10-01-090000', filePath: 'audio/2026-10-01-090000.webm', title: 'Morning', createdAt: '2026-10-01T09:00:00Z', durationSeconds: 65, linkedEntryDate: '2026-10-01', transcript: 'Walked to the station and thought about Sunday.' },
+        { id: '2026-10-01-200000', filePath: 'audio/2026-10-01-200000.webm', title: 'Evening', createdAt: '2026-10-01T20:00:00Z', durationSeconds: 30, linkedEntryDate: '2026-10-01' },
+      ],
+    }),
     read: async () => ({ ok: true, value: new Uint8Array() }),
     rename: async () => ({ ok: true, value: undefined }),
+    setTranscript: async () => ({ ok: false, error: 'unused' }),
   },
   prompts: { history: async () => ({ ok: true, value: [{ prompt_id: 'noticing-001', date: '2026-10-01', outcome: 'answered' }] }) },
   chapters: {
@@ -81,10 +89,26 @@ window.paroh = {
     addArea: async () => ({ ok: true, value: 'x' }),
   },
   settings: {
-    get: async () => ({ vaultPath: '/home/me/Paroh', onboarded: true, aiFeatures: {}, reminderTime: '21:00', version: '0.1.0' }),
+    get: async () => ({ vaultPath: '/home/me/Paroh', onboarded: true, aiFeatures, reminderTime: '21:00', version: '0.1.0', hasApiKey: false, apiKeyEncrypted: true }),
     setAiFeature: async () => ({ ok: true, value: undefined }),
     setReminder: async () => ({ ok: true, value: undefined }),
     completeOnboarding: async () => {},
+  },
+  ai: {
+    setApiKey: async () => ({ ok: true, value: undefined }),
+    note: {
+      generate: async () => ({ ok: false, error: 'unused' }),
+      cancel: async () => {},
+      load: async (month) => ({ ok: true, value: { month, text: 'October began quietly.\n\nBy the second week you were writing about Sunday walks.', createdAt: '2026-10-31T20:00:00Z', model: 'claude-opus-5-5' } }),
+      save: async () => ({ ok: false, error: 'unused' }),
+      remove: async () => ({ ok: true, value: undefined }),
+    },
+    model: {
+      status: async () => ({ state: 'ready', bytes: 81_000_000 }),
+      download: async () => ({ ok: true, value: undefined }),
+      remove: async () => ({ ok: true, value: undefined }),
+      onChanged: () => () => {},
+    },
   },
   vault: {
     info: async () => ({ path: '/home/me/Paroh' }),
@@ -119,6 +143,7 @@ async function violations(ui: ReactElement, hostTag: 'main' | 'div' = 'main') {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  aiFeatures = {};
 });
 
 describe('accessibility (axe-core)', () => {
@@ -168,6 +193,14 @@ describe('accessibility (axe-core)', () => {
     const noop = () => {};
     expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
     expect(await violations(<OnboardingPage onDone={noop} />, 'div')).toEqual([]);
+  });
+
+  it('AI features have no violations when switched on: settings, Editor’s Note, transcripts', async () => {
+    const noop = () => {};
+    aiFeatures = { 'editors-note': true, transcription: true };
+    expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+    expect(await violations(<ChaptersPage today="2026-10-02" onOpenEntry={noop} onOpenRange={noop} />)).toEqual([]);
+    expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {

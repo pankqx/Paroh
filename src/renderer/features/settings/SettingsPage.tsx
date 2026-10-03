@@ -3,6 +3,7 @@ import { AI_FEATURES } from '../../../shared/aiFeatures';
 import type { SettingsView } from '../../../shared/ipc-contract';
 import { SupportLine } from '../../components/SupportLine';
 import { chooseVaultFolder } from '../../hooks/useVault';
+import { ApiKeyField, SpeechModelPanel } from './AiFeatureDetails';
 
 interface Props {
   onVaultChanged: () => void;
@@ -138,23 +139,24 @@ export function SettingsPage({ onVaultChanged }: Props) {
           AI features
         </h2>
         <p className="small muted">Every AI feature is off until you switch it on, one at a time. Paroh works fully without any of them.</p>
-        {AI_FEATURES.length === 0 ? (
-          <p className="small">No AI features are built yet. Each one will arrive switched off, with its own switch here.</p>
-        ) : (
-          <ul className="ai-list">
-            {AI_FEATURES.map((f) => (
+        <ul className="ai-list">
+          {AI_FEATURES.map((f) => {
+            const on = settings?.aiFeatures[f.id] === true;
+            return (
               <li key={f.id} className="ai-row">
                 <label className="switch-label">
-                  <input type="checkbox" role="switch" checked={settings?.aiFeatures[f.id] === true} onChange={(e) => void toggleAi(f.id, e.target.checked)} aria-describedby={`ai-${f.id}-desc`} />
+                  <input type="checkbox" role="switch" checked={on} onChange={(e) => void toggleAi(f.id, e.target.checked)} aria-describedby={`ai-${f.id}-desc`} />
                   <span className="ai-name">{f.label}</span>
                 </label>
                 <p className="small muted" id={`ai-${f.id}-desc`}>
                   {f.leavesDevice}
                 </p>
+                {on && settings && f.id === 'editors-note' && <ApiKeyField settings={settings} onChanged={() => void load()} />}
+                {on && f.id === 'transcription' && <SpeechModelPanel />}
               </li>
-            ))}
-          </ul>
-        )}
+            );
+          })}
+        </ul>
       </section>
 
       <section className="settings-section" aria-labelledby="set-privacy">

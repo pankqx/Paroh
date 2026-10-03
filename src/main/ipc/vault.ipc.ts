@@ -16,7 +16,12 @@ function stamp(d = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
 }
 
-export function registerVaultIpc(getPath: () => string, setPath: (path: string) => Promise<void>, reminders: ReminderScheduler): void {
+export function registerVaultIpc(
+  getPath: () => string,
+  setPath: (path: string) => Promise<void>,
+  reminders: ReminderScheduler,
+  apiKey: { has(): Promise<boolean>; strong(): boolean },
+): void {
   // A folder the user picked that holds unrelated files waits here until they confirm it; the renderer can never name a path itself.
   let pending: string | null = null;
 
@@ -90,7 +95,15 @@ export function registerVaultIpc(getPath: () => string, setPath: (path: string) 
 
   ipcMain.handle(IPC.settingsGet, async (): Promise<SettingsView> => {
     const s = await readSettings();
-    return { vaultPath: getPath(), onboarded: isOnboarded(s), aiFeatures: s.aiFeatures ?? {}, reminderTime: s.reminderTime, version: app.getVersion() };
+    return {
+      vaultPath: getPath(),
+      onboarded: isOnboarded(s),
+      aiFeatures: s.aiFeatures ?? {},
+      reminderTime: s.reminderTime,
+      version: app.getVersion(),
+      hasApiKey: await apiKey.has(),
+      apiKeyEncrypted: apiKey.strong(),
+    };
   });
 
   ipcMain.handle(IPC.settingsSetAiFeature, async (_e, id: string, on: boolean): Promise<Result<void>> => {

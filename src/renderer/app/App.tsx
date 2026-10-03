@@ -13,6 +13,7 @@ import { OnboardingPage } from '../features/onboarding/OnboardingPage';
 import { SettingsPage } from '../features/settings/SettingsPage';
 import { HealingPromptsPage } from '../features/healing/HealingPromptsPage';
 import { TodoPage } from '../features/todo/TodoPage';
+import { BoardsPage } from '../features/boards/BoardsPage';
 import { useEntries } from '../hooks/useEntries';
 import { useVault } from '../hooks/useVault';
 import { RecorderProvider } from './RecorderContext';
@@ -31,6 +32,7 @@ export type View =
   | { name: 'prompts' }
   | { name: 'chapters' }
   | { name: 'horizons' }
+  | { name: 'boards' }
   | { name: 'settings' };
 export type Navigate = (view: View) => void;
 
@@ -113,6 +115,7 @@ export function App() {
                   {view.name === 'settings' && <SettingsPage onVaultChanged={refreshList} />}
                   {view.name === 'habits' && <HabitsPage today={today} />}
                   {view.name === 'todo' && <TodoPage today={today} />}
+                  {view.name === 'boards' && <BoardsPage today={today} />}
                   {view.name === 'audio' && <AudioLogsPage onOpenEntry={openEntry} />}
                   {view.name === 'calendar' && <CalendarPage today={today} entries={entries} onOpenEntry={openEntry} />}
                   {view.name === 'entries' && <AllEntriesPage key={`${view.from ?? ''}:${view.to ?? ''}`} query={view.query} initialFrom={view.from} initialTo={view.to} onQuery={(query) => setView({ ...view, query })} onOpenEntry={openEntry} />}

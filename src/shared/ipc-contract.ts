@@ -7,6 +7,7 @@ import type { HorizonsData, LifeStory, LifeStoryInput } from './types/LifeStory'
 import type { PromptLog } from './types/Prompt';
 import type { Result } from './types/Result';
 import type { Backlink, SearchFilters, SearchResult } from './types/Search';
+import type { Board, BoardSummary } from './types/Board';
 import type { NudgeAction, Priority, Recurrence, Task } from './types/Task';
 
 /** Channel names, `domain:action` per docs/coding-standards.md. */
@@ -45,6 +46,11 @@ export const IPC = {
   mediaRead: 'media:read',
   promptsHistory: 'prompts:history',
   chaptersMonth: 'chapters:month',
+  boardsList: 'boards:list',
+  boardsLoad: 'boards:load',
+  boardsCreate: 'boards:create',
+  boardsSave: 'boards:save',
+  boardsRemove: 'boards:remove',
   horizonsList: 'horizons:list',
   horizonsSave: 'horizons:save',
   horizonsRemove: 'horizons:remove',
@@ -184,6 +190,14 @@ export interface ParohApi {
   chapters: {
     /** That month's entries with full bodies, read from the files (Chapters is computed in the renderer). */
     month(month: string): Promise<Result<Entry[]>>;
+  };
+  boards: {
+    list(): Promise<Result<BoardSummary[]>>;
+    load(id: string): Promise<Result<Board>>;
+    create(title: string): Promise<Result<Board>>;
+    /** Replaces the whole board; returns it with the new `updatedAt`. */
+    save(board: Board): Promise<Result<Board>>;
+    remove(id: string): Promise<Result<void>>;
   };
   horizons: {
     list(): Promise<Result<HorizonsData>>;

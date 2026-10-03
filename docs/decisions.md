@@ -114,6 +114,13 @@ Pank asked for a much richer UI and named Lucide, Tailwind, Phosphor, shadcn/ui 
 - **Comments are a running log, not a chat.** Each is timestamped and can be deleted; there is no editing, which keeps the record honest in the same spirit as the habit history.
 - **Habits get an optional `color`** from a fixed palette of six inks, so cards, rings and heatmaps stay in the design system in both themes. Habits without one take a colour by position.
 
+### 2026-10-03 — Boards: a hand-built canvas, one JSON file per board
+- **Boards live in `<vault>/boards/<id>.json`** (readable ids, like habits), with pictures copied into `media/` like journal pages. They export and sync with the rest of the vault, and a board can be read or repaired by hand.
+- **Built on plain DOM and SVG, not a whiteboard library.** tldraw and Excalidraw are large, bring their own look and file formats, and tldraw's licence needs a key for production use. Paroh needs notes, text, shapes, pen, arrows, pictures and a few widgets in its own visual language; the camera, history and hit-testing are a few hundred lines with tests.
+- **Whole-list undo snapshots**, not operation diffs. Boards are small enough, and snapshots cannot drift out of sync with what's on screen.
+- **Saved 0.7 s after the last change, and at once when the board is closed**, so leaving mid-edit never loses work.
+- **On touch, one finger on empty paper pans and two fingers pinch-zoom**; on a mouse, dragging empty paper draws a selection box and the wheel pans.
+
 ---
 
 ## Template for New Entries

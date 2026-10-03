@@ -3,6 +3,7 @@ import { err, ok, type Result } from '../shared/types/Result';
 import { MemoryIndex } from '../main/index-db/MemoryIndex';
 import { AudioStore } from '../main/stores/AudioStore';
 import { HabitStore } from '../main/stores/HabitStore';
+import { BoardStore } from '../main/stores/BoardStore';
 import { HorizonStore } from '../main/stores/HorizonStore';
 import { MediaStore } from '../main/stores/MediaStore';
 import { TaskStore } from '../main/stores/TaskStore';
@@ -36,6 +37,7 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
   const tasks = new TaskStore(fs);
   const audio = new AudioStore(service);
   const horizons = new HorizonStore(fs);
+  const boards = new BoardStore(fs);
   const media = new MediaStore(fs);
   await audio.syncTranscriptIndex();
 
@@ -100,6 +102,13 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
     },
     prompts: { history: async () => service.promptHistory() },
     chapters: { month: (month) => service.monthEntries(month) },
+    boards: {
+      list: () => boards.list(),
+      load: (id) => boards.load(String(id ?? '')),
+      create: (title) => boards.create(String(title ?? '')),
+      save: (board) => boards.save(board),
+      remove: (id) => boards.remove(String(id ?? '')),
+    },
     horizons: {
       list: () => horizons.list(),
       save: (input, id) => horizons.save(input, id ?? undefined),

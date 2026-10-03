@@ -32,6 +32,8 @@ const api: ParohApi = {
     update: (id, input) => ipcRenderer.invoke(IPC.tasksUpdate, id, input),
     toggle: (id) => ipcRenderer.invoke(IPC.tasksToggle, id),
     resolveNudge: (id, action, reflection) => ipcRenderer.invoke(IPC.tasksResolveNudge, id, action, reflection),
+    comment: (id, text) => ipcRenderer.invoke(IPC.tasksComment, id, text),
+    uncomment: (id, commentId) => ipcRenderer.invoke(IPC.tasksUncomment, id, commentId),
     remove: (id) => ipcRenderer.invoke(IPC.tasksRemove, id),
   },
   audio: {

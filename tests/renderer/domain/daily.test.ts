@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { completedDates, computeStreak, heatmapWeeks, isScheduled } from '../../../src/renderer/domain/streak';
+import { bestStreak, completedDates, computeStreak, heatmapWeeks, isScheduled, keptRate } from '../../../src/renderer/domain/streak';
 import { groupTasks } from '../../../src/renderer/domain/tasks';
 import { moodTrend } from '../../../src/renderer/domain/moodTrend';
 import { nextOccurrence } from '../../../src/shared/recurrence';
@@ -26,6 +26,20 @@ describe('computeStreak', () => {
   });
   it('reads completions out of habit history', () => {
     expect(completedDates('walk', [{ date: '2026-10-01', habits: ['walk', 'read'] }, { date: '2026-10-02', habits: ['read'] }])).toEqual(new Set(['2026-10-01']));
+  });
+});
+
+describe('bestStreak and keptRate', () => {
+  const recent: Habit = { ...daily, createdAt: '2026-09-24' };
+  const done = new Set(['2026-09-24', '2026-09-25', '2026-09-26', '2026-09-27', '2026-09-29', '2026-10-01', '2026-10-02']);
+  it('finds the longest run, even when it is over', () => {
+    expect(bestStreak(recent, done, '2026-10-02')).toBe(4);
+  });
+  it('shares kept days over scheduled days, not counting an unfinished today', () => {
+    // Sep 24 – Oct 2 is 9 days, 7 kept.
+    expect(keptRate(recent, done, '2026-10-02')).toBeCloseTo(7 / 9);
+    expect(keptRate(recent, done, '2026-10-03')).toBeCloseTo(7 / 9);
+    expect(keptRate(recent, new Set(), '2026-09-24')).toBe(0);
   });
 });
 

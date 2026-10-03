@@ -13,6 +13,7 @@ import type { Habit } from '../../src/shared/types/Habit';
 import type { Task } from '../../src/shared/types/Task';
 import { RecorderProvider } from '../../src/renderer/app/RecorderContext';
 import { HabitsPage } from '../../src/renderer/features/habits/HabitsPage';
+import { TaskDetail } from '../../src/renderer/features/todo/TaskDetail';
 import { TodoPage } from '../../src/renderer/features/todo/TodoPage';
 import { AudioLogsPage } from '../../src/renderer/features/audio-logs/AudioLogsPage';
 import { ChaptersPage } from '../../src/renderer/features/chapters/ChaptersPage';
@@ -57,6 +58,8 @@ window.paroh = {
     toggle: async () => ({ ok: true, value: tasks[0] }),
     resolveNudge: async () => ({ ok: true, value: tasks[0] }),
     remove: async () => ({ ok: true, value: undefined }),
+    comment: async () => ({ ok: true, value: tasks[0] }),
+    uncomment: async () => ({ ok: true, value: tasks[0] }),
   },
   audio: {
     begin: async () => ({ ok: true, value: { id: 'x' } }),
@@ -217,6 +220,12 @@ describe('accessibility (axe-core)', () => {
     } finally {
       api.platform = 'desktop';
     }
+  });
+
+  it('Task details panel has no violations, with comments', async () => {
+    const noop = () => {};
+    const task: Task = { ...tasks[1], notes: 'Two scenes left', priority: 'high', comments: [{ id: 'c1', text: 'Drafted the first', at: '2026-10-02T09:00:00.000Z' }] };
+    expect(await violations(<TaskDetail task={task} today="2026-10-02" onClose={noop} onUpdate={async () => true} onComment={async () => true} onUncomment={noop} onRemove={noop} />)).toEqual([]);
   });
 
   it('Editor metadata rail has no violations', async () => {

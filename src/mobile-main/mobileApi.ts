@@ -80,6 +80,8 @@ export async function createMobileApi(fs: VaultFs, version: string): Promise<Par
       update: (id, input) => tasks.update(id, input),
       toggle: (id) => tasks.toggle(id),
       resolveNudge: (id, action, reflection) => tasks.resolveNudge(id, action, reflection),
+      comment: (id, text) => tasks.comment(id, text),
+      uncomment: (id, commentId) => tasks.uncomment(id, commentId),
       remove: (id) => tasks.remove(id),
     },
     audio: {

@@ -2,12 +2,12 @@ import type { SpeechModelStatus } from './speechModel';
 import type { AudioLog } from './types/AudioLog';
 import type { EditorsNote } from './types/EditorsNote';
 import type { DateRange, Entry, EntrySummary } from './types/Entry';
-import type { Habit, HabitDay, HabitFrequency } from './types/Habit';
+import type { Habit, HabitColor, HabitDay, HabitFrequency } from './types/Habit';
 import type { HorizonsData, LifeStory, LifeStoryInput } from './types/LifeStory';
 import type { PromptLog } from './types/Prompt';
 import type { Result } from './types/Result';
 import type { Backlink, SearchFilters, SearchResult } from './types/Search';
-import type { NudgeAction, Recurrence, Task } from './types/Task';
+import type { NudgeAction, Priority, Recurrence, Task } from './types/Task';
 
 /** Channel names, `domain:action` per docs/coding-standards.md. */
 export const IPC = {
@@ -32,6 +32,8 @@ export const IPC = {
   tasksToggle: 'tasks:toggle',
   tasksResolveNudge: 'tasks:resolveNudge',
   tasksRemove: 'tasks:remove',
+  tasksComment: 'tasks:comment',
+  tasksUncomment: 'tasks:uncomment',
   audioBegin: 'audio:begin',
   audioAppend: 'audio:append',
   audioFinish: 'audio:finish',
@@ -111,12 +113,15 @@ export interface HabitInput {
   name: string;
   frequency: HabitFrequency;
   customDays?: number[];
+  color?: HabitColor;
 }
 
 export interface TaskInput {
   text: string;
   dueDate?: string;
   recurring?: Recurrence;
+  notes?: string;
+  priority?: Priority;
 }
 
 /** Which shell is running the renderer. The phone app has no folder picker, export, reminders or AI yet. */
@@ -154,6 +159,8 @@ export interface ParohApi {
     toggle(id: string): Promise<Result<Task>>;
     resolveNudge(id: string, action: NudgeAction, reflection?: string): Promise<Result<Task>>;
     remove(id: string): Promise<Result<void>>;
+    comment(id: string, text: string): Promise<Result<Task>>;
+    uncomment(id: string, commentId: string): Promise<Result<Task>>;
   };
   audio: {
     begin(): Promise<Result<{ id: string }>>;

@@ -1,0 +1,98 @@
+/* Habits: a colour per habit, rings that close as the day is kept, and a year of honest squares. */
+.habit-ember { --habit: #d9692f; }
+.habit-gold { --habit: #b98a2c; }
+.habit-sage { --habit: #4f9160; }
+.habit-ocean { --habit: #357fae; }
+.habit-plum { --habit: #8b5cb0; }
+.habit-rose { --habit: #c94d6d; }
+:root[data-theme='dark'] .habit-ember { --habit: #f08a4f; }
+:root[data-theme='dark'] .habit-gold { --habit: #d8b46a; }
+:root[data-theme='dark'] .habit-sage { --habit: #7cc08c; }
+:root[data-theme='dark'] .habit-ocean { --habit: #6cb2dd; }
+:root[data-theme='dark'] .habit-plum { --habit: #b993dc; }
+:root[data-theme='dark'] .habit-rose { --habit: #ec7f9a; }
+
+.habits-page { max-width: 1120px; }
+.habits-hero { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+.habits-hero-text { display: flex; flex-direction: column; }
+.habits-hero .eyebrow { margin-bottom: 6px; color: var(--accent); }
+.habits-hero .page-title { font-size: 52px; }
+.habits-note { margin: -8px 0 0; }
+
+.today-rings { position: relative; width: 168px; height: 168px; flex-shrink: 0; }
+.today-rings svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.today-rings circle { fill: none; stroke-width: 9; stroke-linecap: round; }
+.today-rings .ring-bg { stroke: color-mix(in srgb, var(--habit) 16%, transparent); }
+.today-rings .ring-arc { stroke: var(--habit); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--habit) 45%, transparent)); }
+.today-rings-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 500 28px/1 var(--font-serif); }
+.today-rings-text small { font-size: 15px; color: var(--text-3); }
+
+.week-strip { list-style: none; display: flex; gap: var(--space-3); margin: var(--space-5) 0 0; padding: 0; }
+.week-day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.week-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: conic-gradient(var(--success) calc(var(--share) * 360deg), transparent 0); transition: transform var(--dur) var(--ease-spring); }
+.week-day:hover .week-dot { transform: scale(1.12); }
+.week-label { font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.week-day.today .week-dot { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+.week-day.today .week-label { color: var(--accent); }
+
+/* The form shares the to-do composer's look. */
+.habit-form { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-card); transition: box-shadow var(--dur), border-color var(--dur); }
+.habit-form:focus-within { border-color: color-mix(in srgb, var(--habit) 50%, var(--border)); box-shadow: var(--shadow-card-hover), 0 0 0 4px color-mix(in srgb, var(--habit) 18%, transparent); }
+.habit-form .composer-plus { color: var(--habit); }
+.habit-form.editing { padding: 0; border: 0; box-shadow: none; background: none; }
+.composer-add { display: inline-flex; gap: var(--space-2); }
+.habit-colors { display: inline-flex; gap: 6px; padding: 4px; }
+.habit-swatch { width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--habit); color: #fff; display: inline-flex; align-items: center; justify-content: center; transition: transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast); }
+.habit-swatch:hover { transform: scale(1.15); }
+.habit-swatch.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--habit); }
+.day-picker { display: inline-flex; gap: 4px; }
+.day-chip { position: relative; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-full); font: 500 12px/1.2 var(--font-sans); color: var(--text-2); background: var(--surface); }
+.day-chip.on { background: var(--habit, var(--ink)); color: #fff; border-color: transparent; }
+
+/* A habit */
+.habit-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-4); }
+.habit-card { position: relative; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-card); overflow: hidden; isolation: isolate; transition: transform var(--dur) var(--ease-out), box-shadow var(--dur), border-color var(--dur); animation: rise 520ms var(--ease-out) both; }
+.habit-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 120px; z-index: -1; background: radial-gradient(120% 100% at 0% 0%, color-mix(in srgb, var(--habit) 14%, transparent), transparent 70%); opacity: 0.8; transition: opacity var(--dur-slow); }
+.habit-card.checked::before { opacity: 1; background: radial-gradient(130% 120% at 0% 0%, color-mix(in srgb, var(--habit) 24%, transparent), transparent 75%); }
+.habit-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+.habit-card.archived { opacity: 0.65; }
+.habit-card-head { display: flex; align-items: center; gap: var(--space-3); }
+.habit-card-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.habit-name { font: 500 21px/1.25 var(--font-serif); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.habit-freq { font: 500 12.5px/1.4 var(--font-sans); color: var(--text-3); }
+.habit-actions { display: flex; gap: 2px; opacity: 0; transition: opacity var(--dur-fast); }
+.habit-card:hover .habit-actions, .habit-actions:focus-within { opacity: 1; }
+
+.habit-tick { position: relative; flex-shrink: 0; width: 48px; height: 48px; cursor: pointer; }
+.habit-tick input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.habit-tick-face { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px dashed color-mix(in srgb, var(--habit) 60%, transparent); color: transparent; transition: background-color var(--dur) var(--ease-out), border-color var(--dur), color var(--dur), transform var(--dur) var(--ease-spring), box-shadow var(--dur); pointer-events: none; }
+.habit-tick:hover .habit-tick-face { border-style: solid; transform: scale(1.06); color: color-mix(in srgb, var(--habit) 50%, transparent); }
+.habit-tick input:checked + .habit-tick-face { background: var(--habit); border: 2px solid var(--habit); color: #fff; box-shadow: 0 6px 18px color-mix(in srgb, var(--habit) 45%, transparent); animation: tick-pop 420ms var(--ease-spring); }
+.habit-tick input:focus-visible + .habit-tick-face { outline: 2px solid var(--accent); outline-offset: 3px; }
+.habit-tick input:disabled + .habit-tick-face { opacity: 0.5; }
+@keyframes tick-pop { 0% { transform: scale(0.8); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+.habit-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); padding: var(--space-3) 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.habit-stat { display: flex; flex-direction: column; gap: 2px; }
+.habit-stat-value { display: inline-flex; align-items: center; gap: 6px; font: 500 24px/1.1 var(--font-serif); }
+.habit-stat-value svg { color: var(--text-3); }
+.habit-stat-value svg.lit { color: var(--habit); fill: color-mix(in srgb, var(--habit) 35%, transparent); }
+.habit-stat-label { font: 500 11.5px/1.3 var(--font-sans); color: var(--text-3); }
+
+.heatmap { display: flex; gap: 3px; padding-bottom: 2px; }
+.heatmap-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.heat { width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--surface-3); transition: transform var(--dur-fast) var(--ease-spring); }
+.heat:hover { transform: scale(1.3); }
+.heat-done { background: var(--habit, var(--success)); box-shadow: 0 0 6px color-mix(in srgb, var(--habit, var(--success)) 35%, transparent); }
+.heat-missed { background: color-mix(in srgb, var(--habit, var(--text-3)) 12%, var(--surface-3)); }
+.heat-off { background: transparent; border: 1px dashed var(--border); }
+.heat-future { background: transparent; }
+
+@media (max-width: 899px) {
+  .habits-hero { flex-direction: column-reverse; align-items: flex-start; gap: var(--space-4); }
+  .habits-hero .page-title { font-size: 38px; }
+  .today-rings { width: 128px; height: 128px; align-self: center; }
+  .habit-grid { grid-template-columns: 1fr; }
+  .habit-actions { opacity: 1; }
+  .week-strip { gap: var(--space-2); }
+}

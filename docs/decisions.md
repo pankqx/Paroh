@@ -109,6 +109,11 @@ Pank asked for a much richer UI and named Lucide, Tailwind, Phosphor, shadcn/ui 
 - **The editor's Markdown now allows inline HTML** so highlight colours, text colours and underline survive a save. Scripts, iframes and other unknown tags are dropped by the schema on load, so a pasted page cannot run code.
 - **"Make it beautiful" is rules, not a model.** Pank asked that no data leave the device. A rule-based tidy (capitals, punctuation, lists, headings, a Plan checklist with dates, a Grateful-for list) is instant, predictable, always undoable and never invents words. A local language model would be a large optional download and was left for later.
 
+### 2026-10-03 — Tasks gain an explanation, priority and comments; habits gain a colour
+- **All new task fields are optional keys in `.paroh/tasks.json`** (`notes`, `priority`, `comments[]` with an ISO time), so older files read unchanged and no schema bump is needed. The deadline is the existing `dueDate`. A repeating task carries its explanation and priority to the next instance; comments stay with the instance they were written on.
+- **Comments are a running log, not a chat.** Each is timestamped and can be deleted; there is no editing, which keeps the record honest in the same spirit as the habit history.
+- **Habits get an optional `color`** from a fixed palette of six inks, so cards, rings and heatmaps stay in the design system in both themes. Habits without one take a colour by position.
+
 ---
 
 ## Template for New Entries

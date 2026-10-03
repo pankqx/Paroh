@@ -34,5 +34,7 @@ export function useTasks() {
     toggle: (id: string) => run(() => window.paroh.tasks.toggle(id)),
     resolveNudge: (id: string, action: NudgeAction, reflection?: string) => run(() => window.paroh.tasks.resolveNudge(id, action, reflection)),
     remove: (id: string) => run(() => window.paroh.tasks.remove(id)),
+    comment: (id: string, text: string) => run(() => window.paroh.tasks.comment(id, text)),
+    uncomment: (id: string, commentId: string) => run(() => window.paroh.tasks.uncomment(id, commentId)),
   };
 }

@@ -1,3 +1,4 @@
+import { ArrowRight, ListChecks, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { CheckRow } from '../../components/CheckRow';
 import { groupTasks } from '../../domain/tasks';
@@ -18,7 +19,12 @@ export function TasksCard({ today, onOpenPage }: { today: string; onOpenPage: ()
   return (
     <section className="card daily-card" aria-label="Today’s tasks">
       <div className="card-head">
-        <h3 className="card-title">Today’s Tasks</h3>
+        <div className="card-head-title">
+          <span className="card-icon green">
+            <ListChecks size={16} strokeWidth={1.9} aria-hidden="true" />
+          </span>
+          <h2 className="card-title">Today’s Tasks</h2>
+        </div>
       </div>
       <ul className="check-list">
         {g.nudges.map((t) => (
@@ -39,13 +45,13 @@ export function TasksCard({ today, onOpenPage }: { today: string; onOpenPage: ()
         }}
       >
         <input className="filter-input grow" placeholder="Add a task for today" aria-label="Add a task for today" value={text} onChange={(e) => setText(e.target.value)} />
-        <button className="icon-btn" type="submit" aria-label="Add task">
-          +
+        <button className="icon-btn add-btn" type="submit" aria-label="Add task">
+          <Plus size={18} aria-hidden="true" />
         </button>
       </form>
       {error && <p className="error-text">{error}</p>}
       <button className="link-btn card-foot" onClick={onOpenPage}>
-        All tasks →
+        All tasks <ArrowRight size={14} aria-hidden="true" />
       </button>
     </section>
   );

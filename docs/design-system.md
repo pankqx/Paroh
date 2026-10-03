@@ -1,5 +1,15 @@
 # Design System
 
+> **October 2026 redesign — read this first.** Pank asked for a richer, "designed, not generated" Paroh with both light and dark screens. The values in `src/renderer/styles/tokens.css` are now the source of truth and supersede the estimated hex values further down this file; the structure below (two moods of one language, restrained serif, one accent) still holds.
+>
+> - **Two themes, one token set.** *Ivory* (light: warm paper `--bg #F4EFE6`, ink `--text #1B1813`, ember `--accent #B04B20`, gold `--gold #A9822F`) and *Midnight* (dark: warm black `--bg #0C0B09`, candle-lit `--text #F3EDE1`, ember `--accent #F08A4F`, gold `#D8B46A`). Components use semantic names (`--bg`, `--surface`, `--surface-2/3`, `--border`, `--text`, `--text-2/3`, `--ink`, `--on-ink`, `--accent`, `--gold`, `--night-*`); the older `--canvas-*`/`--editor-*` names alias onto them. The theme is `data-theme` on `<html>`, chosen per device (light, dark or follow the system) in the sidebar or Settings → Appearance.
+> - **Type.** Fraunces Variable (opsz, SOFT, WONK axes) for titles, quotes and numbers; Inter Variable for everything else. The italic accent (`.italic-accent`) is the one flourish: one or two words per screen, never a whole sentence.
+> - **Shape.** Cards `--radius-lg` (22px) with a hairline border, a soft shadow and a light-catching top edge; the hero `--radius-xl`. Buttons 38px tall, 12px radius; the primary button is an ink gradient, the accent button an ember gradient.
+> - **Icons.** Lucide only, 1.75–2px stroke, always with a text label in navigation.
+> - **Night cards.** The daily opener and the healing prompt stay dark in both themes (gold eyebrow, serif text). Nothing else uses the dark-card treatment.
+> - **Motion.** See *Motion Principles*: one easing family (`--ease-out`), screens rise into place, the sidebar highlight slides, checks pop. A splash (the mark drawing itself) covers start-up.
+
+
 > A correction, stated up front: `PRODUCT.md` and `architecture.md` describe Canvas mode as "dark." Re-reading the reference screenshots closely, that's wrong — Canvas is a **light, warm, structured** surface with dotted texture and white cards; only the Healing Prompt card is deliberately dark, as a single point of contrast. Editor mode is also light — warm cream, editorial. This document reflects what's actually in the references. If you want a genuinely dark Canvas as an intentional departure, say so and this gets revised; otherwise this file is the correction of record, and `PRODUCT.md`/`architecture.md` should be read as superseded on this one point.
 
 > Every value below is read directly off the two reference screenshots where possible. Where a screenshot can't give full precision (exact hex, exact px), the value is a considered best match, marked **[estimated]** — eyedrop and correct against the real files if you have them at higher resolution.
@@ -188,19 +198,21 @@ Vertical icon strip, `--space-2` between icons, `--canvas-text-secondary` defaul
 
 ## Motion Principles
 
-Motion is felt, not seen — nothing in Paroh should call attention to itself as an animation.
+Motion shows what changed and makes the app feel crafted; it never loops at rest. Everything respects `prefers-reduced-motion` (the `MotionConfig reducedMotion="user"` wrapper plus the global CSS rule).
 
-- Card hover: 120ms ease-out, shadow + 1px lift only, no scale/bounce
-- Panel/page transitions (Canvas → Editor): 180ms cross-fade, no slide, no skeuomorphic page-turn
-- Mood/habit selection: a quiet 100ms scale-and-settle on the selected element, nothing else moves
-- Toasts/save-status ("Saved 2s ago"): fade in over 150ms, no slide-in from an edge
-- Nothing in the app should loop, pulse, or animate at rest — that reads as anxious, which is the opposite of the point
+- Easing: `--ease-out` (`cubic-bezier(0.22, 1, 0.36, 1)`) for movement, `--ease-spring` only for small "pop" confirmations
+- Screen change: the new screen fades in and rises 10px over ~380ms (`motion` in `App.tsx`); cards on a page stagger in 50–60ms apart
+- Sidebar: the active highlight slides between items (shared layout animation)
+- Cards: hover lifts 3px with a deeper shadow over 240ms; press settles back
+- Checkboxes and habit ticks: a 260ms pop; the strike-through draws across over 280ms
+- Splash: the mark draws itself and the name settles in, letter by letter, for at least 1.4s
+- The only things that animate at rest are the splash while the vault opens and the recording indicator, both of which represent something genuinely in progress
 
 ---
 
-## Dark Mode — Not Built Yet, Not Forgotten
+## Dark Mode
 
-Both current modes are light. A true dark mode (distinct from the single dark *card* in Canvas) is a reasonable future request — likely Phase 5 polish or later, tracked in `future-ideas.md`. If built, it inherits this same token structure: new `--canvas-bg`/`--editor-bg` etc. values under a `[data-theme="dark"]` scope, same spacing/radius/motion rules unchanged. Do not build a parallel design system for it — extend this one.
+Built in October 2026 as *Midnight*: the same tokens redefined under `:root[data-theme='dark']` in `tokens.css`, with the same spacing, radius and motion rules. Contrast was checked for body, secondary (`--text-2`) and faint (`--text-3`) text and the accent on both themes (all at least 4.5:1).
 
 ---
 

@@ -1,0 +1,128 @@
+/* Home: the daily dashboard. */
+.canvas { min-height: 100%; padding: var(--space-8) var(--space-10) var(--space-16); display: flex; flex-direction: column; gap: var(--space-6); max-width: 1440px; margin: 0 auto; }
+.canvas-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.05fr) minmax(0, 1fr); gap: var(--space-5); align-items: stretch; }
+.canvas-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); }
+.canvas-stack { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+@media (max-width: 1200px) { .canvas-grid { grid-template-columns: 1fr 1fr; } .hero-card { grid-column: 1 / -1; } }
+@media (max-width: 900px) { .canvas-grid, .canvas-row { grid-template-columns: 1fr; } }
+
+.home-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap; padding-top: var(--space-2); }
+.home-title { margin: 0; font: 400 46px/1.05 var(--font-serif); letter-spacing: -0.03em; font-variation-settings: 'opsz' 144, 'SOFT' 40; }
+.home-stats { display: flex; gap: var(--space-2); margin: 0; }
+.home-stat { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; column-gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3); border-radius: 14px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-xs); color: var(--accent); }
+.home-stat svg { grid-row: 1 / 3; }
+.home-stat dt { font: 500 11px/1.3 var(--font-sans); color: var(--text-3); letter-spacing: 0.02em; }
+.home-stat dd { margin: 0; font: 600 20px/1.1 var(--font-serif); color: var(--text); font-variant-numeric: lining-nums; }
+
+.home-section { display: flex; flex-direction: column; gap: var(--space-3); }
+.home-section-head { display: flex; align-items: baseline; justify-content: space-between; }
+.home-section-title { margin: 0; font: 500 22px/1.2 var(--font-serif); letter-spacing: -0.015em; }
+
+/* Hero: the one deliberately dark, candle-lit card. */
+.hero-card {
+  min-height: 300px;
+  padding: var(--space-8) var(--space-8);
+  border: 1px solid var(--night-border);
+  border-radius: var(--radius-xl);
+  color: var(--night-text);
+  background:
+    radial-gradient(120% 120% at 0% 0%, #3a3d2f 0%, transparent 55%),
+    linear-gradient(160deg, #23211b 0%, #15130f 100%);
+  overflow: hidden;
+  display: flex;
+  box-shadow: 0 24px 48px -24px rgba(20, 14, 6, 0.55), var(--shadow-card);
+}
+.hero-card::before { box-shadow: inset 0 1px 0 rgba(255, 240, 210, 0.1); }
+.hero-card::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.35; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"); }
+.hero-art { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero-content { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--space-4); max-width: 640px; }
+.hero-card .eyebrow { color: var(--gold); margin: 0; opacity: 0.9; }
+.hero-card figure { margin: 0; }
+.hero-quote { margin: 0; font: 400 38px/1.14 var(--font-serif); letter-spacing: -0.02em; font-variation-settings: 'opsz' 144, 'SOFT' 50; text-wrap: balance; }
+.hero-attribution { margin-top: var(--space-3); font: italic 400 15px/1.4 var(--font-serif); color: var(--night-text-2); }
+.hero-attribution::before { content: ''; display: inline-block; width: 22px; height: 1px; margin-right: 10px; vertical-align: middle; background: var(--gold); }
+.hero-cta { align-self: flex-start; margin-top: var(--space-2); }
+
+/* Mood */
+.mood-card { flex: 0 0 auto; }
+.mood-selector { display: flex; justify-content: space-between; gap: var(--space-1); }
+.mood { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 44px; padding: var(--space-2) var(--space-1); border: 0; background: none; border-radius: 14px; transition: background-color var(--dur-fast); }
+.mood:hover { background: var(--surface-3); }
+.mood-emoji { font-size: 26px; line-height: 1; filter: grayscale(0.7); opacity: 0.55; transition: transform var(--dur) var(--ease-spring), opacity var(--dur-fast), filter var(--dur-fast); }
+.mood-label { font: 500 11.5px/1.2 var(--font-sans); color: var(--text-3); }
+.mood:hover .mood-emoji { opacity: 0.9; filter: none; transform: translateY(-2px); }
+.mood.selected { background: var(--accent-soft); }
+.mood.selected .mood-emoji { opacity: 1; filter: none; transform: scale(1.18); }
+.mood.selected .mood-label { color: var(--text); font-weight: 600; }
+
+/* Healing prompt (dark card) */
+.prompt-card { flex: 1; background: linear-gradient(165deg, var(--night-bg-2), var(--night-bg)); color: var(--night-text); border-color: var(--night-border); display: flex; flex-direction: column; gap: var(--space-3); }
+.prompt-card::before { box-shadow: inset 0 1px 0 rgba(255, 240, 210, 0.08); }
+.prompt-card .eyebrow { color: var(--gold); margin: 0; }
+.prompt-text { margin: 0; font: 400 19px/1.4 var(--font-serif); letter-spacing: -0.01em; user-select: text; text-wrap: pretty; }
+.prompt-note { margin: 0; font: var(--text-small); color: var(--night-text-2); }
+.prompt-actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; margin-top: auto; }
+.prompt-actions .btn-light { flex: 1; }
+.prompt-status { font: var(--text-small); color: var(--night-text-2); flex: 1; }
+.link-light { color: var(--night-text-2); }
+.link-light:hover { color: var(--night-text); }
+.prompt-more { align-self: flex-start; }
+.prompt-card .error-text { color: #f0a493; }
+
+/* Mini calendar */
+.calendar-card { display: flex; flex-direction: column; }
+.calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+.calendar-head .card-title { font: 500 19px/1.2 var(--font-serif); letter-spacing: -0.01em; }
+.calendar { width: 100%; border-collapse: collapse; text-align: center; }
+.calendar th { font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); padding-bottom: var(--space-2); }
+.calendar td { padding: 2px; }
+.day { position: relative; width: 100%; aspect-ratio: 1; max-height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; background: none; border-radius: 11px; font: 600 13px/1 var(--font-sans); font-variant-numeric: tabular-nums; transition: background-color var(--dur-fast), transform var(--dur-fast) var(--ease-out); }
+.day:hover:not(:disabled) { background: var(--surface-3); }
+.day:active:not(:disabled) { transform: scale(0.92); }
+.day:disabled { color: var(--text-3); font-weight: 400; }
+.day.today { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); color: #fff; box-shadow: 0 4px 12px -4px var(--accent); }
+.day.today .dot.visible { background: #fff; }
+.dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+.dot.visible { background: var(--accent); }
+
+/* Entry cards: each one a small page */
+.entry-card { display: flex; flex-direction: column; gap: var(--space-2); min-height: 200px; cursor: pointer; overflow: hidden; color: inherit; font: inherit; }
+.entry-card::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--tone, var(--border)); opacity: 0.85; }
+.tone-low { --tone: var(--mood-low); }
+.tone-sad { --tone: var(--mood-sad); }
+.tone-meh { --tone: var(--mood-meh); }
+.tone-ok { --tone: var(--mood-ok); }
+.tone-good { --tone: var(--mood-good); }
+.entry-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-3px); border-color: var(--border-strong); }
+.entry-card:active { transform: translateY(-1px) scale(0.995); }
+.entry-card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-1); }
+.entry-card-date { display: flex; align-items: center; gap: var(--space-2); }
+.entry-card-day { font: 400 34px/1 var(--font-serif); letter-spacing: -0.03em; font-variation-settings: 'opsz' 144; }
+.entry-card-month { font: 600 10.5px/1.25 var(--font-sans); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
+.entry-card-mood { font-size: 20px; }
+.entry-card-title { font: 500 20px/1.25 var(--font-serif); letter-spacing: -0.015em; }
+.entry-card-excerpt { margin: 0; font: var(--text-small); color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.entry-card .tags { margin-top: auto; padding-top: var(--space-2); }
+.empty-card { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+.empty-card p { margin: 0; }
+
+/* Daily cards: habits, tasks, audio */
+.daily-card { display: flex; flex-direction: column; gap: var(--space-2); min-height: 240px; }
+.check-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.check-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); min-height: 42px; border-bottom: 1px solid var(--border); }
+.check-row:last-child { border-bottom: 0; }
+.check-label { display: flex; align-items: center; gap: var(--space-3); flex: 1; min-width: 0; cursor: pointer; font: 500 14px/1.4 var(--font-sans); }
+.check-text { background: linear-gradient(currentColor, currentColor) no-repeat 0 55% / 0 1px; transition: background-size 280ms var(--ease-out), color var(--dur-fast); }
+.check-row.checked .check-text { background-size: 100% 1px; color: var(--text-3); }
+.seed-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.quick-add { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+.add-btn { width: 38px; height: 38px; border: 1px solid var(--border-strong); background: var(--surface); }
+
+@media (max-width: 899px) {
+  .canvas { padding: var(--space-5) var(--space-4) var(--space-10); gap: var(--space-4); }
+  .home-title { font-size: 34px; }
+  .home-stats { width: 100%; }
+  .home-stat { flex: 1; padding: var(--space-2); }
+  .hero-card { padding: var(--space-6); min-height: 0; }
+  .hero-quote { font-size: 30px; }
+}

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { BrandMark } from '../../components/BrandMark';
 import { SupportLine } from '../../components/SupportLine';
 import { chooseVaultFolder } from '../../hooks/useVault';
 
@@ -28,10 +30,13 @@ export function OnboardingPage({ onDone }: Props) {
   return (
     <main className="onboarding">
       <div className="onboarding-card">
-        <div className="brand">
+        <div className="onboarding-brand">
+          <BrandMark size={44} />
           <span className="brand-name">Paroh</span>
         </div>
-        <h1 className="onboarding-title">A quiet place to write, that stays yours.</h1>
+        <h1 className="onboarding-title">
+          A quiet place to write, <span className="italic-accent">that stays yours.</span>
+        </h1>
         <p>Every day becomes one plain Markdown file in a folder on this {mobile ? 'phone' : 'computer'}. There is no account and no cloud. If you stop using Paroh, your journal is still right there.</p>
         <section className="onboarding-step" aria-labelledby="onb-folder">
           <h2 className="card-title" id="onb-folder">
@@ -51,6 +56,7 @@ export function OnboardingPage({ onDone }: Props) {
         <SupportLine />
         <button className="btn btn-primary onboarding-start" onClick={() => void finish()} disabled={!path}>
           Start writing
+          <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
     </main>

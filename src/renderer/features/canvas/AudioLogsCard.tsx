@@ -1,3 +1,4 @@
+import { ArrowRight, AudioLines, Mic, Square } from 'lucide-react';
 import { formatDuration, useRecorder } from '../../app/RecorderContext';
 import { AudioPlayer } from '../../components/AudioPlayer';
 import { formatShortDate } from '../../domain/dates';
@@ -9,9 +10,15 @@ export function AudioLogsCard({ onOpenPage }: { onOpenPage: () => void }) {
   return (
     <section className="card daily-card" aria-label="Audio logs">
       <div className="card-head">
-        <h3 className="card-title">Audio Logs</h3>
+        <div className="card-head-title">
+          <span className="card-icon gold">
+            <AudioLines size={16} strokeWidth={1.9} aria-hidden="true" />
+          </span>
+          <h2 className="card-title">Audio Logs</h2>
+        </div>
         <button className={`btn ${recording ? 'btn-accent' : 'btn-record'}`} onClick={toggle} title="Ctrl/Cmd+Shift+R from anywhere">
-          {recording ? '■ Stop' : '● Record'}
+          {recording ? <Square size={13} fill="currentColor" aria-hidden="true" /> : <Mic size={15} aria-hidden="true" />}
+          {recording ? 'Stop' : 'Record'}
         </button>
       </div>
       {logs.length === 0 ? (
@@ -32,7 +39,7 @@ export function AudioLogsCard({ onOpenPage }: { onOpenPage: () => void }) {
         </ul>
       )}
       <button className="link-btn card-foot" onClick={onOpenPage}>
-        All recordings →
+        All recordings <ArrowRight size={14} aria-hidden="true" />
       </button>
     </section>
   );

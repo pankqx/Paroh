@@ -64,7 +64,7 @@ export function EditorPage({ date, entries, onOpenEntry, onBack, onSaved }: Prop
       <div className="editor-error">
         <p className="error-text">This entry could not be opened safely, so nothing was changed: {state.error}</p>
         <button className="btn" onClick={onBack}>
-          Back to Canvas
+          Back home
         </button>
       </div>
     );

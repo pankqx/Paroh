@@ -1,3 +1,7 @@
+import { AudioLines, BookMarked, BookOpen, CalendarDays, Flame, FolderOpen, House, ListChecks, Mountain, PenLine, Settings2, Sprout, type LucideIcon } from 'lucide-react';
+import { motion } from 'motion/react';
+import { BrandMark } from '../components/BrandMark';
+import { ThemeToggle } from '../components/ThemeToggle';
 import type { Navigate, View } from './App';
 
 interface Props {
@@ -10,6 +14,7 @@ interface Props {
 
 interface NavItem {
   label: string;
+  Icon: LucideIcon;
   active: boolean;
   go: View;
 }
@@ -21,26 +26,33 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
     {
       title: 'Today',
       items: [
-        { label: 'Canvas', active: is('canvas'), go: { name: 'canvas' } },
-        { label: 'Today’s entry', active: view.name === 'editor' && view.date === today, go: { name: 'editor', date: today } },
-        { label: 'Healing Prompts', active: is('prompts'), go: { name: 'prompts' } },
-        { label: 'Habits', active: is('habits'), go: { name: 'habits' } },
-        { label: 'To-Do', active: is('todo'), go: { name: 'todo' } },
-        { label: 'Audio Logs', active: is('audio'), go: { name: 'audio' } },
+        { label: 'Home', Icon: House, active: is('canvas'), go: { name: 'canvas' } },
+        { label: 'Today’s entry', Icon: PenLine, active: view.name === 'editor' && view.date === today, go: { name: 'editor', date: today } },
+        { label: 'Healing Prompts', Icon: Sprout, active: is('prompts'), go: { name: 'prompts' } },
+        { label: 'Habits', Icon: Flame, active: is('habits'), go: { name: 'habits' } },
+        { label: 'To-Do', Icon: ListChecks, active: is('todo'), go: { name: 'todo' } },
+        { label: 'Audio Logs', Icon: AudioLines, active: is('audio'), go: { name: 'audio' } },
       ],
     },
     {
       title: 'Reflect',
       items: [
-        { label: 'Calendar', active: is('calendar'), go: { name: 'calendar' } },
-        { label: 'All Entries', active: is('entries'), go: { name: 'entries', query: '' } },
-        { label: 'Chapters', active: is('chapters'), go: { name: 'chapters' } },
-        { label: 'Horizons', active: is('horizons'), go: { name: 'horizons' } },
+        { label: 'Calendar', Icon: CalendarDays, active: is('calendar'), go: { name: 'calendar' } },
+        { label: 'All Entries', Icon: BookOpen, active: is('entries'), go: { name: 'entries', query: '' } },
+        { label: 'Chapters', Icon: BookMarked, active: is('chapters'), go: { name: 'chapters' } },
+        { label: 'Horizons', Icon: Mountain, active: is('horizons'), go: { name: 'horizons' } },
       ],
     },
   ];
   return (
     <nav className="sidebar" aria-label="Main">
+      <button className="sidebar-brand" onClick={() => onNavigate({ name: 'canvas' })} aria-label="Paroh, home">
+        <BrandMark size={34} />
+        <span className="sidebar-brand-text">
+          <span className="sidebar-brand-name">Paroh</span>
+          <span className="sidebar-brand-sub">Personal journal</span>
+        </span>
+      </button>
       {groups.map((group) => (
         <div key={group.title} className="nav-group">
           <h2 className="nav-group-title" id={`nav-${group.title}`}>
@@ -49,28 +61,41 @@ export function Sidebar({ view, today, vaultPath, onNavigate, onChooseVault }: P
           <ul className="nav" aria-labelledby={`nav-${group.title}`}>
             {group.items.map((item) => (
               <li key={item.label}>
-                <button className={`nav-item ${item.active ? 'active' : ''}`} aria-current={item.active ? 'page' : undefined} onClick={() => onNavigate(item.go)}>
-                  {item.label}
-                </button>
+                <NavButton item={item} onNavigate={onNavigate} />
               </li>
             ))}
           </ul>
         </div>
       ))}
       <div className="sidebar-footer">
-        <button className={`nav-item ${is('settings') ? 'active' : ''}`} aria-current={is('settings') ? 'page' : undefined} onClick={() => onNavigate({ name: 'settings' })}>
-          Settings
-        </button>
-        <div className="vault-label">Vault</div>
-        <div className="vault-path" title={vaultPath}>
-          {vaultPath || '…'}
+        <NavButton item={{ label: 'Settings', Icon: Settings2, active: is('settings'), go: { name: 'settings' } }} onNavigate={onNavigate} />
+        <ThemeToggle id="sidebar-theme" />
+        <div className="vault-card">
+          <FolderOpen size={15} strokeWidth={1.8} aria-hidden="true" />
+          <div className="vault-card-text">
+            <div className="vault-label">Vault</div>
+            <div className="vault-path" title={vaultPath}>
+              {vaultPath || '…'}
+            </div>
+          </div>
+          {window.paroh.platform === 'desktop' && (
+            <button className="link-btn" onClick={onChooseVault}>
+              Change
+            </button>
+          )}
         </div>
-        {window.paroh.platform === 'desktop' && (
-          <button className="link-btn" onClick={onChooseVault}>
-            Change folder
-          </button>
-        )}
       </div>
     </nav>
+  );
+}
+
+function NavButton({ item, onNavigate }: { item: NavItem; onNavigate: Navigate }) {
+  const { Icon } = item;
+  return (
+    <button className={`nav-item ${item.active ? 'active' : ''}`} aria-current={item.active ? 'page' : undefined} onClick={() => onNavigate(item.go)}>
+      {item.active && <motion.span layoutId="nav-pill" className="nav-pill" transition={{ type: 'spring', stiffness: 480, damping: 38 }} />}
+      <Icon className="nav-icon" size={17} strokeWidth={1.75} aria-hidden="true" />
+      <span className="nav-label">{item.label}</span>
+    </button>
   );
 }

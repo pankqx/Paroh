@@ -1,6 +1,7 @@
 import Placeholder from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { ArrowLeft } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { Markdown } from 'tiptap-markdown';
 import type { Entry, EntrySummary } from '../../../shared/types/Entry';
@@ -121,8 +122,9 @@ export function EntryEditor({ initial, isNew, notice, entries, dirtyRef, onOpenE
   return (
     <div className="editor">
       <div className="editor-topbar">
-        <button className="btn" onClick={() => void back()}>
-          ← Canvas
+        <button className="btn btn-ghost" onClick={() => void back()}>
+          <ArrowLeft size={16} aria-hidden="true" />
+          Home
         </button>
         <div className="editor-date">
           {formatLongDate(entry.date)} · <SaveStatusText status={status} isNew={isNew} />

@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { EntrySummary } from '../../../shared/types/Entry';
 import { fromEntryDate, monthGrid } from '../../domain/dates';
@@ -26,13 +27,13 @@ export function MiniCalendarCard({ today, entries, onOpenEntry }: Props) {
   return (
     <section className="card calendar-card" aria-label="Calendar">
       <div className="calendar-head">
-        <h3 className="card-title">{label}</h3>
+        <h2 className="card-title">{label}</h2>
         <div>
           <button className="icon-btn" aria-label="Previous month" onClick={() => shift(-1)}>
-            ‹
+            <ChevronLeft size={18} aria-hidden="true" />
           </button>
           <button className="icon-btn" aria-label="Next month" onClick={() => shift(1)}>
-            ›
+            <ChevronRight size={18} aria-hidden="true" />
           </button>
         </div>
       </div>

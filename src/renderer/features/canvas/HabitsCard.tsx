@@ -1,3 +1,4 @@
+import { ArrowRight, Flame } from 'lucide-react';
 import { SEED_HABITS } from '../../../shared/types/Habit';
 import { CheckRow } from '../../components/CheckRow';
 import { isScheduled } from '../../domain/streak';
@@ -13,7 +14,12 @@ export function HabitsCard({ today, onOpenPage }: { today: string; onOpenPage: (
   return (
     <section className="card daily-card" aria-label="Today’s habits">
       <div className="card-head">
-        <h3 className="card-title">Today’s Habits</h3>
+        <div className="card-head-title">
+          <span className="card-icon">
+            <Flame size={16} strokeWidth={1.9} aria-hidden="true" />
+          </span>
+          <h2 className="card-title">Today’s Habits</h2>
+        </div>
         {due.length > 0 && (
           <span className="micro accent-text">
             {done} / {due.length}
@@ -48,7 +54,7 @@ export function HabitsCard({ today, onOpenPage }: { today: string; onOpenPage: (
       )}
       {error && <p className="error-text">{error}</p>}
       <button className="link-btn card-foot" onClick={onOpenPage}>
-        All habits →
+        All habits <ArrowRight size={14} aria-hidden="true" />
       </button>
     </section>
   );

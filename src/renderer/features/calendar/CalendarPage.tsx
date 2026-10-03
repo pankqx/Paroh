@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { EntrySummary } from '../../../shared/types/Entry';
 import { MOOD_EMOJI } from '../../components/MoodSelector';
@@ -38,10 +39,10 @@ export function CalendarPage({ today, entries, onOpenEntry }: Props) {
             Today
           </button>
           <button className="icon-btn" aria-label="Previous month" onClick={() => shift(-1)}>
-            ‹
+            <ChevronLeft size={18} aria-hidden="true" />
           </button>
           <button className="icon-btn" aria-label="Next month" onClick={() => shift(1)}>
-            ›
+            <ChevronRight size={18} aria-hidden="true" />
           </button>
         </div>
       </div>

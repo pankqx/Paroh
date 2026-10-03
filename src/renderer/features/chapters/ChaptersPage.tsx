@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Entry } from '../../../shared/types/Entry';
 import { markdownToPlainText } from '../../../shared/plainText';
@@ -52,15 +53,15 @@ export function ChaptersPage({ today, onOpenEntry, onOpenRange }: Props) {
     <div className="page chapters">
       <div className="page-head">
         <div>
-          <div className="eyebrow">Chapter</div>
+          <div className="page-kicker">Chapter</div>
           <h1 className="page-title chapter-title">{formatMonth(month)}</h1>
         </div>
         <div className="page-head-actions">
           <button className="btn" onClick={() => setMonth(shiftMonth(month, -1))} aria-label="Previous month" title="←">
-            ‹ {formatMonth(shiftMonth(month, -1))}
+            <ChevronLeft size={16} aria-hidden="true" /> {formatMonth(shiftMonth(month, -1))}
           </button>
           <button className="btn" onClick={() => setMonth(shiftMonth(month, 1))} aria-label="Next month" title="→">
-            {formatMonth(shiftMonth(month, 1))} ›
+            {formatMonth(shiftMonth(month, 1))} <ChevronRight size={16} aria-hidden="true" />
           </button>
         </div>
       </div>

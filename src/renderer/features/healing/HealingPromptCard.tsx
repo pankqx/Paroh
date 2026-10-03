@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import { useState, type KeyboardEvent } from 'react';
 import { PROMPT_CATEGORIES } from '../../../shared/types/Prompt';
 import type { Result } from '../../../shared/types/Result';
@@ -80,7 +81,7 @@ export function HealingPromptCard({ today, entryDates, onOpenEntry, onChanged, o
       )}
       {onOpenPage && (
         <button className="link-btn link-light prompt-more" onClick={onOpenPage}>
-          All prompts →
+          All prompts <ArrowRight size={14} aria-hidden="true" />
         </button>
       )}
       {error && <p className="error-text">{error}</p>}

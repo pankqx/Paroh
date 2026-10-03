@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AI_FEATURES } from '../../../shared/aiFeatures';
 import type { SettingsView } from '../../../shared/ipc-contract';
 import { SupportLine } from '../../components/SupportLine';
+import { ThemeToggle } from '../../components/ThemeToggle';
 import { chooseVaultFolder } from '../../hooks/useVault';
 import { ApiKeyField, SpeechModelPanel } from './AiFeatureDetails';
 
@@ -82,6 +83,16 @@ export function SettingsPage({ onVaultChanged }: Props) {
           {status.kind === 'busy' ? status.label : status.message}
         </div>
       )}
+
+      <section className="card settings-section" aria-labelledby="set-look">
+        <h2 className="card-title" id="set-look">
+          Appearance
+        </h2>
+        <p className="small muted">Ivory for daylight, Midnight for late pages, or follow this device. Saved on this device only.</p>
+        <div className="settings-theme">
+          <ThemeToggle id="settings-theme" />
+        </div>
+      </section>
 
       <section className="card settings-section" aria-labelledby="set-vault">
         <h2 className="card-title" id="set-vault">

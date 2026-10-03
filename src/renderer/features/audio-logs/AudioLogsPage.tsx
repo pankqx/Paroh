@@ -1,3 +1,4 @@
+import { Mic, Square } from 'lucide-react';
 import { useState } from 'react';
 import { formatDuration, useRecorder } from '../../app/RecorderContext';
 import { AudioPlayer } from '../../components/AudioPlayer';
@@ -21,7 +22,8 @@ export function AudioLogsPage({ onOpenEntry }: { onOpenEntry: (date: string) => 
         <div className="page-head-actions">
           {window.paroh.platform === 'desktop' && <span className="micro muted">Ctrl/Cmd+Shift+R records from anywhere</span>}
           <button className={`btn ${recording ? 'btn-accent' : 'btn-record'}`} onClick={toggle}>
-            {recording ? `■ Stop (${formatDuration(seconds)})` : '● Record'}
+            {recording ? <Square size={13} fill="currentColor" aria-hidden="true" /> : <Mic size={15} aria-hidden="true" />}
+            {recording ? `Stop (${formatDuration(seconds)})` : 'Record'}
           </button>
         </div>
       </div>

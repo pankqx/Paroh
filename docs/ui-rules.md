@@ -52,9 +52,9 @@ Prefer inline expansion, side panels, or a dedicated page over a modal dialog. M
 
 Every place color indicates state (mood, tag category, active toolbar formatting, calendar entry-dots) has a redundant non-color signal too — shape, icon, text label, or position — per the Accessibility notes already established in `design-system.md`. This is checked explicitly in every feature's Accessibility section in `feature-specifications.md`.
 
-## 12. Motion Answers "What Changed," Never Decorates
+## 12. Motion Shows What Changed, With Care
 
-Every animation in the app should be answerable with "this exists to show the user what just changed state." If an animation's purpose can't be stated that plainly, cut it. Loops, pulses, and idle motion are banned outside the one named exception (the audio-recording indicator, which represents a genuinely ongoing process).
+Every animation either shows what just changed state (a screen arriving, a highlight moving, a box being ticked) or marks a moment worth marking (opening the app). Motion is quick, eased with the shared curve, and never loops at rest. The exceptions are processes genuinely in progress: the splash while the vault opens and the audio-recording indicator. Reduced-motion users get none of it. Details in `design-system.md` § Motion Principles.
 
 ## 13. The Two Modes Never Mix Mid-Screen
 

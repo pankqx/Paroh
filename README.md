@@ -14,6 +14,7 @@ Requires Node.js 22 or newer.
 npm install
 npm run dev            # start the app with hot reload
 npm run build:ubuntu   # build dist/*.deb and dist/*.AppImage
+npm run build:windows  # on Windows: build dist/Paroh-Setup-*.exe
 ```
 
 Install the `.deb` with `sudo apt install ./dist/Paroh-*.deb`, or make the `.AppImage` executable and run it.

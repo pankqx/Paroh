@@ -53,9 +53,9 @@ describe('vault export and import', () => {
     await writeZip(zip, await vaultFiles(vault));
     let listing: string;
     try {
-      listing = execFileSync('python3', ['-c', 'import sys,zipfile; z=zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None; print("\\n".join(z.namelist()))', zip], { encoding: 'utf8' });
+      listing = execFileSync(process.platform === 'win32' ? 'python' : 'python3', ['-c', 'import sys,zipfile; z=zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None; print("\\n".join(z.namelist()))', zip], { encoding: 'utf8' });
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return; // python3 not installed here
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return; // Python not installed here
       throw e;
     }
     expect(listing.trim().split('\n')).toContain('2026-10/2026-10-02.md');

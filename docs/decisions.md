@@ -79,6 +79,12 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Renderer libraries moved to devDependencies.** Vite bundles them, so shipping their `node_modules` again only made the installer bigger.
 - **Accent colour and dark mode wait.** The spec lists them "once available"; the design system has no dark tokens yet.
 
+### 2026-10-03 — Phase 7 implementation choices
+- **NSIS, per user, not one-click.** No admin prompt, and the person can see and choose where it goes. MSI was dropped from the workflow's artifact list because nothing builds one; NSIS is electron-builder's default and supports updates later.
+- **Windows runs the whole unit suite in CI** rather than a separate Windows-only test set, so any path or file-locking difference shows up as a normal red check.
+- **Single-instance lock on every platform.** Two windows on one vault would mean two watchers and two indexes racing on the same files.
+- **Unsigned for now.** Signing needs a certificate only the project owner can buy; `docs/windows-qa.md` tells testers how to get past SmartScreen.
+
 ---
 
 ## Template for New Entries

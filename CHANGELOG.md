@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Phase 7 Windows build: a Windows installer from CI, the test suite running
+  on Windows, and Windows fixes (notifications, file watching, one window at
+  a time, hidden menu bar).
+
 - Phase 6 polish and packaging: Settings (vault, export and import as .zip,
   daily reminder, AI switches, privacy and support), first-launch onboarding,
   and Ubuntu .deb and .AppImage builds.

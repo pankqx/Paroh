@@ -1,5 +1,5 @@
 import { watch, type FSWatcher } from 'node:fs';
-import { join, sep } from 'node:path';
+import { join } from 'node:path';
 import { isEntryDate, type DateRange, type Entry, type EntrySummary } from '../shared/types/Entry';
 import type { PromptLog } from '../shared/types/Prompt';
 import type { HabitDay } from '../shared/types/Habit';
@@ -105,7 +105,8 @@ export class EntryService {
   watch(onChange: (dates: string[]) => void): void {
     this.watcher = watch(this.root, { recursive: true }, (_event, filename) => {
       if (!filename) return;
-      const parts = filename.toString().split(sep);
+      // Windows reports `2026-10\\2026-10-02.md`, Linux and macOS `2026-10/2026-10-02.md`.
+      const parts = filename.toString().split(/[\\/]/);
       const file = parts[parts.length - 1];
       const date = file.replace(/\.md$/, '');
       if (parts.length !== 2 || !file.endsWith('.md') || !isEntryDate(date) || parts[0] !== date.slice(0, 7)) return;

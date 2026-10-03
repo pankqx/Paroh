@@ -35,4 +35,19 @@ deb:
     - libatspi2.0-0
     - libuuid1
     - libsecret-1-0
+win:
+  target:
+    - nsis
+  icon: build/icon.png
+  artifactName: ${productName}-Setup-${version}.${ext}
+nsis:
+  # A normal per-user installer: no admin prompt, choose the folder, Start menu and desktop shortcuts.
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Paroh
+  # Uninstalling removes the app, never the journal: the vault lives wherever the user chose.
+  deleteAppDataOnUninstall: false
 publish: null

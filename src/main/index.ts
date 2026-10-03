@@ -38,6 +38,8 @@ function createWindow(): void {
     minHeight: 640,
     title: 'Paroh',
     backgroundColor: '#F3F1EA',
+    // Hides the default File/Edit/View bar on Windows and Linux; Alt still reveals it.
+    autoHideMenuBar: true,
     show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -59,6 +61,17 @@ function createWindow(): void {
   if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(process.env.ELECTRON_RENDERER_URL);
   else void win.loadFile(join(__dirname, '../renderer/index.html'));
 }
+
+// One Paroh at a time: a second launch focuses the open window instead of opening the vault twice.
+if (!app.requestSingleInstanceLock()) app.quit();
+app.on('second-instance', () => {
+  const win = BrowserWindow.getAllWindows()[0];
+  if (!win) return;
+  if (win.isMinimized()) win.restore();
+  win.focus();
+});
+// Windows only shows notifications (the daily reminder) for apps with an AppUserModelID matching the installer's.
+if (process.platform === 'win32') app.setAppUserModelId('org.paroh.app');
 
 app.whenReady().then(async () => {
   // The microphone (for Audio Logs) is the only permission the app ever grants, and only to its own page.

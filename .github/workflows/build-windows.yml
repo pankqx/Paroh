@@ -42,4 +42,4 @@ jobs:
           name: paroh-windows
           path: |
             dist/*.exe
-            dist/*.msi
+            dist/*.exe.blockmap

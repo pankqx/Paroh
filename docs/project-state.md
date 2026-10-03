@@ -7,13 +7,13 @@ Paroh
 0.1.0 (Phase 1 skeleton)
 
 ## Current phase
-Phase 6 — Polish & Packaging (implemented 2026-10-03, in review); Phases 1 to 5 merged
+Phase 7 — Windows Build (implemented 2026-10-03, in review); Phase 6 in review; Phases 1 to 5 merged
 
 ## Documentation status
 The repository currently contains the product constitution, vision, architecture, design system, feature specifications, roadmap, tasks, contribution, security, testing, accessibility, performance, release plan, decisions log, and future ideas documents.
 
 ## Application implementation status
-Phase 1 is implemented under src/ and tests/: Electron shell, VaultAdapter with atomic saves, Canvas and Editor wired to real Markdown files. Phase 2 adds the SQLite search index, Calendar and All Entries pages, wikilinks and a file watcher. Phase 3 adds habits, to-dos, audio logs and the mood chart. Phase 4 adds the healing prompt programme. Phase 5 adds Chapters and Horizons. Phase 6 adds Settings, export/import, onboarding and Ubuntu packages. See docs/tasks.md.
+Phase 1 is implemented under src/ and tests/: Electron shell, VaultAdapter with atomic saves, Canvas and Editor wired to real Markdown files. Phase 2 adds the SQLite search index, Calendar and All Entries pages, wikilinks and a file watcher. Phase 3 adds habits, to-dos, audio logs and the mood chart. Phase 4 adds the healing prompt programme. Phase 5 adds Chapters and Horizons. Phase 6 adds Settings, export/import, onboarding and Ubuntu packages. Phase 7 adds the Windows installer and Windows CI. See docs/tasks.md.
 
 ## Current objective
 Align the repository documentation with the current Paroh product direction and preserve an accurate record of the repository's current state for future sessions.
@@ -28,7 +28,7 @@ Align the repository documentation with the current Paroh product direction and 
 Preserve the reconciled documentation and prepare for Phase 1 implementation.
 
 ## Next task
-Phase 7 — Windows Build.
+Phase 8 — AI Features (Opt-In).
 
 ## Known blockers
 - None.

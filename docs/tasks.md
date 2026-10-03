@@ -2,7 +2,7 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 6 — Polish & Packaging (implemented, in review)
+**Active phase:** Phase 7 — Windows Build (implemented, in review; needs a real-machine pass)
 **Last updated:** 2026-10-02
 
 ---
@@ -63,10 +63,14 @@
 - [x] A global reduced-motion rule.
 - [x] Tests: zip round-trip byte for byte, readable by Python's zipfile, unsafe paths and damaged archives rejected, folder classification, reminder timing, axe-core for Settings and onboarding.
 
-## TODO (Phase 7 — Windows Build)
+## DONE (Phase 7)
 
-- [ ] `npm run build:windows` producing an installer in CI.
-- [ ] Windows QA: paths, notifications, window chrome, shortcuts.
+- [x] `npm run build:windows` builds a per-user NSIS installer (`Paroh-Setup-<version>.exe`) with Start menu and desktop shortcuts; uninstalling never touches the vault. The `Build Windows` workflow uploads it.
+- [x] The unit suite runs on `windows-latest` as well as Ubuntu in CI.
+- [x] Windows fixes: notifications get an AppUserModelID, the file watcher understands `\` paths, the default menu bar is hidden (Alt shows it), and a second launch focuses the open window (on every platform).
+- [x] `.gitattributes` keeps LF line endings on Windows checkouts.
+- [ ] Real-machine pass with `docs/windows-qa.md` (needs a person on Windows).
+- [ ] Code signing, so SmartScreen stops warning (needs a certificate).
 
 ## Later
 

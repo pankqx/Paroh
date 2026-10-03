@@ -30,16 +30,22 @@ export class IndexRepository {
   /** Opens the index, or throws it away and starts fresh if it is corrupt or from another schema version. */
   static open(path: string): IndexRepository {
     if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
+    let existing: DatabaseSync | null = null;
     try {
-      const db = new DatabaseSync(path);
-      const version = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+      existing = new DatabaseSync(path);
+      const version = (existing.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
       if (version === INDEX_VERSION) {
-        db.prepare('SELECT count(*) FROM entries').get();
-        return new IndexRepository(db);
+        existing.prepare('SELECT count(*) FROM entries').get();
+        return new IndexRepository(existing);
       }
-      db.close();
     } catch (e) {
       console.warn('Search index unreadable, rebuilding:', (e as Error).message);
+    }
+    // Close before deleting: Windows refuses to remove a file that is still open.
+    try {
+      existing?.close();
+    } catch {
+      // already closed, or never opened
     }
     if (path !== ':memory:') for (const suffix of ['', '-wal', '-shm']) rmSync(path + suffix, { force: true });
     const db = new DatabaseSync(path);

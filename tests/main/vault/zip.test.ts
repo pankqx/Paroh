@@ -58,7 +58,7 @@ describe('vault export and import', () => {
       if ((e as NodeJS.ErrnoException).code === 'ENOENT') return; // Python not installed here
       throw e;
     }
-    expect(listing.trim().split('\n')).toContain('2026-10/2026-10-02.md');
+    expect(listing.trim().split(/\r?\n/)).toContain('2026-10/2026-10-02.md');
   });
 
   it('rejects archives that would write outside the destination, or are damaged', async () => {

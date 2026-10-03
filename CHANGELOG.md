@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- Phase 9 mobile: an Android app built with Capacitor from the same code,
+  keeping the same Markdown vault in Documents/Paroh so a sync app can carry
+  it to your computer. The app now fits phone screens, with a menu drawer
+  and larger touch targets. A GitHub workflow builds the APK.
+
+- Phase 8 AI features, all off by default: an Editor's Note for each month in
+  Chapters, written by Claude with your own Anthropic API key and saved only if
+  you keep it, and on-device transcription of audio logs that makes them
+  searchable. Each has its own switch in Settings.
+
+- Phase 7 Windows build: a Windows installer from CI, the test suite running
+  on Windows, and Windows fixes (notifications, file watching, one window at
+  a time, hidden menu bar).
+
+- Phase 6 polish and packaging: Settings (vault, export and import as .zip,
+  daily reminder, AI switches, privacy and support), first-launch onboarding,
+  and Ubuntu .deb and .AppImage builds.
+
 - Phase 5 reflection: Chapters (a monthly view with a mood landscape, stats
   and most-used words) and Horizons (life stories on a year or quarter
   timeline, with a list view). The sidebar is now grouped into Today and

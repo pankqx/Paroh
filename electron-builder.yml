@@ -1,0 +1,53 @@
+# Packaging (docs/release-plan.md, architecture.md §Platform Strategy): native builds on each OS, no compatibility layer.
+appId: org.paroh.app
+productName: Paroh
+copyright: Copyright © 2026 Paroh contributors
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+# Journal data never ships inside the app; only the compiled app does.
+asar: true
+linux:
+  target:
+    - deb
+    - AppImage
+  category: Office
+  icon: build/icon.png
+  maintainer: pankqx <pankqx@users.noreply.github.com>
+  synopsis: An offline-first journal that keeps your writing as plain files
+  description: Paroh is a calm, local-first journal. Every day is a plain Markdown file in a folder you own.
+  syncDesktopName: true
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  desktop:
+    entry:
+      StartupWMClass: Paroh
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+win:
+  target:
+    - nsis
+  icon: build/icon.png
+  artifactName: ${productName}-Setup-${version}.${ext}
+nsis:
+  # A normal per-user installer: no admin prompt, choose the folder, Start menu and desktop shortcuts.
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Paroh
+  # Uninstalling removes the app, never the journal: the vault lives wherever the user chose.
+  deleteAppDataOnUninstall: false
+publish: null

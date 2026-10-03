@@ -1,0 +1,1 @@
+{ "name": "onnxruntime-node", "version": "0.0.0-paroh-stub", "private": true, "main": "index.js", "description": "Empty stand-in. Paroh runs speech models in the browser (onnxruntime-web), so the native Node build is never used." }

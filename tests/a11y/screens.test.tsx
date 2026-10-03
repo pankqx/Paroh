@@ -19,6 +19,8 @@ import { ChaptersPage } from '../../src/renderer/features/chapters/ChaptersPage'
 import { HorizonsPage } from '../../src/renderer/features/horizons/HorizonsPage';
 import { LifeStoryEditor } from '../../src/renderer/features/horizons/LifeStoryEditor';
 import type { LifeStory } from '../../src/shared/types/LifeStory';
+import { SettingsPage } from '../../src/renderer/features/settings/SettingsPage';
+import { OnboardingPage } from '../../src/renderer/features/onboarding/OnboardingPage';
 import { HealingPromptsPage } from '../../src/renderer/features/healing/HealingPromptsPage';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -27,8 +29,10 @@ const tasks: Task[] = [
   { id: 't1', text: 'Call mom', createdDate: '2026-09-30', dueDate: '2026-09-30', done: false },
   { id: 't2', text: 'Finish chapter 3', createdDate: '2026-10-02', dueDate: '2026-10-02', done: false, recurring: 'daily' },
 ];
+let aiFeatures: Record<string, boolean> = {};
 const story: LifeStory = { id: 'health/run-a-5k', schema_version: 1, title: 'Run a 5k', life_area: 'health', status: 'in-motion', created: '2026-06-01', when: '2027-Q2', linked_entries: ['2026-10-01'], why: 'To feel strong.' };
 window.paroh = {
+  platform: 'desktop',
   entries: {
     save: async (e) => ({ ok: true, value: e }),
     load: async () => ({ ok: true, value: null }),
@@ -58,9 +62,16 @@ window.paroh = {
     begin: async () => ({ ok: true, value: { id: 'x' } }),
     append: async () => ({ ok: true, value: undefined }),
     finish: async () => ({ ok: false, error: 'unused' }),
-    list: async () => ({ ok: true, value: [{ id: '2026-10-01-090000', filePath: 'audio/2026-10-01-090000.webm', title: 'Morning', createdAt: '2026-10-01T09:00:00Z', durationSeconds: 65, linkedEntryDate: '2026-10-01' }] }),
+    list: async () => ({
+      ok: true,
+      value: [
+        { id: '2026-10-01-090000', filePath: 'audio/2026-10-01-090000.webm', title: 'Morning', createdAt: '2026-10-01T09:00:00Z', durationSeconds: 65, linkedEntryDate: '2026-10-01', transcript: 'Walked to the station and thought about Sunday.' },
+        { id: '2026-10-01-200000', filePath: 'audio/2026-10-01-200000.webm', title: 'Evening', createdAt: '2026-10-01T20:00:00Z', durationSeconds: 30, linkedEntryDate: '2026-10-01' },
+      ],
+    }),
     read: async () => ({ ok: true, value: new Uint8Array() }),
     rename: async () => ({ ok: true, value: undefined }),
+    setTranscript: async () => ({ ok: false, error: 'unused' }),
   },
   prompts: { history: async () => ({ ok: true, value: [{ prompt_id: 'noticing-001', date: '2026-10-01', outcome: 'answered' }] }) },
   chapters: {
@@ -78,7 +89,38 @@ window.paroh = {
     remove: async () => ({ ok: true, value: undefined }),
     addArea: async () => ({ ok: true, value: 'x' }),
   },
-  vault: { info: async () => ({ path: '/home/me/Paroh' }), choose: async () => null, onChanged: () => () => {} },
+  settings: {
+    get: async () => ({ vaultPath: '/home/me/Paroh', onboarded: true, aiFeatures, reminderTime: '21:00', version: '0.1.0', hasApiKey: false, apiKeyEncrypted: true }),
+    setAiFeature: async () => ({ ok: true, value: undefined }),
+    setReminder: async () => ({ ok: true, value: undefined }),
+    completeOnboarding: async () => {},
+  },
+  ai: {
+    setApiKey: async () => ({ ok: true, value: undefined }),
+    note: {
+      generate: async () => ({ ok: false, error: 'unused' }),
+      cancel: async () => {},
+      load: async (month) => ({ ok: true, value: { month, text: 'October began quietly.\n\nBy the second week you were writing about Sunday walks.', createdAt: '2026-10-31T20:00:00Z', model: 'claude-opus-5-5' } }),
+      save: async () => ({ ok: false, error: 'unused' }),
+      remove: async () => ({ ok: true, value: undefined }),
+    },
+    model: {
+      status: async () => ({ state: 'ready', bytes: 81_000_000 }),
+      download: async () => ({ ok: true, value: undefined }),
+      remove: async () => ({ ok: true, value: undefined }),
+      onChanged: () => () => {},
+    },
+  },
+  vault: {
+    info: async () => ({ path: '/home/me/Paroh' }),
+    choose: async () => null,
+    confirmChoice: async () => null,
+    reveal: async () => '',
+    export: async () => ({ ok: true, value: null }),
+    import: async () => ({ ok: true, value: null }),
+    onExportProgress: () => () => {},
+    onChanged: () => () => {},
+  },
 } satisfies ParohApi;
 
 const entries: EntrySummary[] = [
@@ -86,8 +128,9 @@ const entries: EntrySummary[] = [
   { date: '2026-09-29', title: '', tags: [], excerpt: '' },
 ];
 
-async function violations(ui: ReactElement) {
-  const host = document.createElement('main');
+/** `hostTag` is `div` for screens that render their own `<main>` (onboarding). */
+async function violations(ui: ReactElement, hostTag: 'main' | 'div' = 'main') {
+  const host = document.createElement(hostTag);
   document.body.appendChild(host);
   const root = createRoot(host);
   await act(async () => root.render(<RecorderProvider>{ui}</RecorderProvider>));
@@ -101,6 +144,7 @@ async function violations(ui: ReactElement) {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  aiFeatures = {};
 });
 
 describe('accessibility (axe-core)', () => {
@@ -144,6 +188,34 @@ describe('accessibility (axe-core)', () => {
     expect(await violations(<HorizonsPage today="2026-10-02" entries={entries} onOpenEntry={noop} initialView="list" />)).toEqual([]);
     const save = async () => ({ ok: true as const, value: undefined });
     expect(await violations(<LifeStoryEditor story={story} initialArea="health" areas={['career', 'health']} entries={entries} today="2026-10-02" onSave={save} onDelete={save} onClose={noop} onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('Settings and onboarding have no violations', async () => {
+    const noop = () => {};
+    expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+    expect(await violations(<OnboardingPage onDone={noop} />, 'div')).toEqual([]);
+  });
+
+  it('AI features have no violations when switched on: settings, Editor’s Note, transcripts', async () => {
+    const noop = () => {};
+    aiFeatures = { 'editors-note': true, transcription: true };
+    expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+    expect(await violations(<ChaptersPage today="2026-10-02" onOpenEntry={noop} onOpenRange={noop} />)).toEqual([]);
+    expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+  });
+
+  it('the phone layout has no violations: settings, onboarding, audio logs, sidebar', async () => {
+    const noop = () => {};
+    const api = window.paroh as { platform: string };
+    api.platform = 'mobile';
+    try {
+      expect(await violations(<SettingsPage onVaultChanged={noop} />)).toEqual([]);
+      expect(await violations(<OnboardingPage onDone={noop} />, 'div')).toEqual([]);
+      expect(await violations(<AudioLogsPage onOpenEntry={noop} />)).toEqual([]);
+      expect(await violations(<Sidebar view={{ name: 'canvas' }} today="2026-10-02" vaultPath="Documents/Paroh" onNavigate={noop} onChooseVault={noop} />)).toEqual([]);
+    } finally {
+      api.platform = 'desktop';
+    }
   });
 
   it('Editor metadata rail has no violations', async () => {

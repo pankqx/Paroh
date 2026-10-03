@@ -24,5 +24,5 @@ export function useAudioLogs() {
     [load],
   );
 
-  return { logs, error, rename };
+  return { logs, error, rename, reload: load };
 }

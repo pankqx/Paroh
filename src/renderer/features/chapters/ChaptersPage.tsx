@@ -4,6 +4,8 @@ import { markdownToPlainText } from '../../../shared/plainText';
 import { MOOD_EMOJI } from '../../components/MoodSelector';
 import { chapterSummary, describeWeek, formatMonth, hardestWeek, shiftMonth } from '../../domain/chapters';
 import { formatShortDate } from '../../domain/dates';
+import { useAiFeature } from '../../hooks/useAiStatus';
+import { EditorsNoteCard } from './EditorsNoteCard';
 import { MoodLandscape } from './MoodLandscape';
 
 interface Props {
@@ -17,6 +19,7 @@ export function ChaptersPage({ today, onOpenEntry, onOpenRange }: Props) {
   const [month, setMonth] = useState(today.slice(0, 7));
   const [loaded, setLoaded] = useState<{ month: string; entries: Entry[]; error: string | null } | null>(null);
   const [version, setVersion] = useState(0);
+  const noteEnabled = useAiFeature('editors-note') === true;
 
   useEffect(() => window.paroh.vault.onChanged(() => setVersion((v) => v + 1)), []);
 
@@ -95,6 +98,8 @@ export function ChaptersPage({ today, onOpenEntry, onOpenRange }: Props) {
               {chapter.topWords.length > 1 && <dd className="micro muted">also {chapter.topWords.slice(1).map((w) => w.word).join(', ')}</dd>}
             </div>
           </dl>
+
+          <EditorsNoteCard month={month} enabled={noteEnabled} />
 
           <section aria-labelledby="weeks-title">
             <h2 className="section-title" id="weeks-title">

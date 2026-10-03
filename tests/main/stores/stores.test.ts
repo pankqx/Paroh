@@ -77,7 +77,7 @@ describe('HabitStore', () => {
 });
 
 describe('TaskStore', () => {
-  const store = () => new TaskStore(root, () => today);
+  const store = () => new TaskStore(service.fs, () => today);
 
   it('creates, completes and reopens a task', async () => {
     const t = value(await store().create({ text: 'Call mom', dueDate: today }));
@@ -159,5 +159,37 @@ describe('AudioStore', () => {
 
   it('refuses ids that could escape the audio folder', async () => {
     expect((await store().read('../../etc/passwd')).ok).toBe(false);
+    expect((await store().setTranscript('../../etc/passwd', 'x')).ok).toBe(false);
+  });
+
+  it('keeps a transcript with the recording, makes it searchable, and removes it on request', async () => {
+    const s = store();
+    const { id } = value(await s.begin());
+    await s.append(id, new Uint8Array([1]));
+    await s.finish(id, 3);
+    const log = value(await s.setTranscript(id, '  Walked to the lighthouse with Priya.  '));
+    expect(log).toMatchObject({ transcript: 'Walked to the lighthouse with Priya.', transcribedAt: at.toISOString() });
+    expect(value(await s.list())[0].transcript).toBe('Walked to the lighthouse with Priya.');
+    expect(value(await service.load('2026-10-02'))?.body ?? '').not.toContain('lighthouse'); // the entry itself is never touched
+    const hits = value(await service.search('lighthouse'));
+    expect(hits.map((h) => h.date)).toEqual(['2026-10-02']);
+    expect(hits[0].snippet).toContain('lighthouse');
+
+    value(await s.setTranscript(id, ''));
+    expect(value(await s.list())[0].transcript).toBeUndefined();
+    expect(value(await service.search('lighthouse'))).toEqual([]);
+  });
+
+  it('re-indexes transcripts from audio.json when a vault opens', async () => {
+    const s = store();
+    const { id } = value(await s.begin());
+    await s.finish(id, 3);
+    value(await s.setTranscript(id, 'notes about the harbour'));
+    service.close();
+    await rm(join(root, '.paroh', 'index.db'), { force: true });
+    service = await EntryService.open(root);
+    expect(value(await service.search('harbour'))).toEqual([]);
+    await new AudioStore(service, () => at).syncTranscriptIndex();
+    expect(value(await service.search('harbour')).map((h) => h.date)).toEqual(['2026-10-02']);
   });
 });

@@ -1,10 +1,9 @@
-import { join } from 'node:path';
 import type { HabitInput } from '../../shared/ipc-contract';
 import { toEntryDate } from '../../shared/localDate';
 import { emptyEntry } from '../../shared/types/Entry';
 import type { Habit } from '../../shared/types/Habit';
 import { err, ok, type Result } from '../../shared/types/Result';
-import type { EntryService } from '../EntryService';
+import type { VaultService } from '../VaultService';
 import { readJsonFile, writeJsonFile } from '../vault/jsonFile';
 
 interface HabitsFile {
@@ -18,10 +17,10 @@ export class HabitStore {
   private readonly path: string;
 
   constructor(
-    private entries: EntryService,
+    private entries: VaultService,
     private today: () => string = () => toEntryDate(new Date()),
   ) {
-    this.path = join(entries.root, '.paroh', 'habits.json');
+    this.path = '.paroh/habits.json';
   }
 
   async list(): Promise<Result<Habit[]>> {
@@ -44,7 +43,7 @@ export class HabitStore {
       const file = await this.read();
       const habit: Habit = { id: uniqueId(input.name, file.habits), name: input.name.trim(), ...frequencyOf(input), createdAt: this.today(), archived: false };
       file.habits.push(habit);
-      await writeJsonFile(this.path, file);
+      await writeJsonFile(this.entries.fs, this.path, file);
       return habit;
     }));
   }
@@ -88,13 +87,13 @@ export class HabitStore {
       const i = file.habits.findIndex((h) => h.id === id);
       if (i < 0) throw new Error('That habit no longer exists');
       file.habits[i] = change(file.habits[i]);
-      await writeJsonFile(this.path, file);
+      await writeJsonFile(this.entries.fs, this.path, file);
       return file.habits[i];
     }));
   }
 
   private async read(): Promise<HabitsFile> {
-    const file = await readJsonFile<HabitsFile>(this.path, { schema_version: 1, habits: [] });
+    const file = await readJsonFile<HabitsFile>(this.entries.fs, this.path, { schema_version: 1, habits: [] });
     return { schema_version: 1, habits: Array.isArray(file.habits) ? file.habits : [] };
   }
 }

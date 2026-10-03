@@ -2,10 +2,15 @@ import { useState } from 'react';
 import { formatDuration, useRecorder } from '../../app/RecorderContext';
 import { AudioPlayer } from '../../components/AudioPlayer';
 import { formatLongDate } from '../../domain/dates';
+import { useAiFeature, useSpeechModel } from '../../hooks/useAiStatus';
 import { useAudioLogs } from '../../hooks/useAudioLogs';
+import { TranscriptBlock } from './TranscriptBlock';
 
 export function AudioLogsPage({ onOpenEntry }: { onOpenEntry: (date: string) => void }) {
-  const { logs, error, rename } = useAudioLogs();
+  const { logs, error, rename, reload } = useAudioLogs();
+  const transcriptionOn = useAiFeature('transcription') === true;
+  const model = useSpeechModel();
+  const canTranscribe = transcriptionOn && model?.state === 'ready';
   const { recording, seconds, toggle } = useRecorder();
   const [editing, setEditing] = useState<{ id: string; title: string } | null>(null);
 
@@ -14,7 +19,7 @@ export function AudioLogsPage({ onOpenEntry }: { onOpenEntry: (date: string) => 
       <div className="page-head">
         <h1 className="page-title">Audio Logs</h1>
         <div className="page-head-actions">
-          <span className="micro muted">Ctrl/Cmd+Shift+R records from anywhere</span>
+          {window.paroh.platform === 'desktop' && <span className="micro muted">Ctrl/Cmd+Shift+R records from anywhere</span>}
           <button className={`btn ${recording ? 'btn-accent' : 'btn-record'}`} onClick={toggle}>
             {recording ? `■ Stop (${formatDuration(seconds)})` : '● Record'}
           </button>
@@ -53,6 +58,7 @@ export function AudioLogsPage({ onOpenEntry }: { onOpenEntry: (date: string) => 
               </span>
             </div>
             <AudioPlayer log={log} />
+            <TranscriptBlock log={log} canTranscribe={canTranscribe} onSaved={() => void reload()} />
           </li>
         ))}
       </ul>

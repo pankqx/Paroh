@@ -12,5 +12,5 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["electron.vite.config.ts", "vitest.config.ts", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "tests/main/**/*"]
+  "include": ["electron.vite.config.ts", "vitest.config.ts", "vite.mobile.config.ts", "capacitor.config.ts", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "tests/main/**/*"]
 }

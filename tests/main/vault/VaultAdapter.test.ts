@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { atomicWrite } from '../../../src/main/vault/atomicWrite';
+import { NodeVaultFs } from '../../../src/main/vault/NodeVaultFs';
 import { VaultAdapter } from '../../../src/main/vault/VaultAdapter';
 import { emptyEntry } from '../../../src/shared/types/Entry';
 
@@ -11,7 +12,7 @@ let vault: VaultAdapter;
 
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), 'paroh-vault-'));
-  vault = new VaultAdapter(root);
+  vault = new VaultAdapter(new NodeVaultFs(root));
 });
 afterEach(() => rm(root, { recursive: true, force: true }));
 

@@ -6,4 +6,7 @@ export interface AudioLog {
   createdAt: string; // ISO timestamp
   durationSeconds?: number; // missing if recording was interrupted
   linkedEntryDate?: string;
+  /** Text from on-device transcription, only when the person asked for it. */
+  transcript?: string;
+  transcribedAt?: string;
 }

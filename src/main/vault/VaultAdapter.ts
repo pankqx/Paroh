@@ -1,19 +1,21 @@
-import { mkdir, readdir, readFile, rm, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { isNotFound, type VaultFs } from '../../shared/fs/VaultFs';
 import { isEntryDate, type DateRange, type Entry, type EntrySummary } from '../../shared/types/Entry';
 import { err, ok, type Result } from '../../shared/types/Result';
 import { markdownToPlainText } from '../../shared/plainText';
-import { atomicWrite } from './atomicWrite';
 import { parseEntry, serializeEntry } from './frontmatter';
 
 const MONTH_DIR_RE = /^\d{4}-\d{2}$/;
 
-/** The only code that touches the vault on disk (folder-structure.md). */
+/** The only code that touches entry files (folder-structure.md), on whichever filesystem `fs` is. */
 export class VaultAdapter {
-  constructor(readonly root: string) {}
+  constructor(readonly fs: VaultFs) {}
+
+  get root(): string {
+    return this.fs.root;
+  }
 
   entryPath(date: string): string {
-    return join(this.root, date.slice(0, 7), `${date}.md`);
+    return `${date.slice(0, 7)}/${date}.md`;
   }
 
   async save(entry: Entry): Promise<Result<Entry>> {
@@ -21,8 +23,8 @@ export class VaultAdapter {
     const path = this.entryPath(entry.date);
     const text = serializeEntry(entry);
     try {
-      await mkdir(join(this.root, entry.date.slice(0, 7)), { recursive: true });
-      await atomicWrite(path, text, (written) => {
+      await this.fs.mkdir(entry.date.slice(0, 7));
+      await this.fs.writeTextAtomic(path, text, (written) => {
         const reparsed = parseEntry(written, entry.date);
         if (!reparsed.ok) return reparsed.error;
         return reparsed.value.body === normalizeBody(entry.body) ? null : 'Body did not round-trip';
@@ -37,9 +39,9 @@ export class VaultAdapter {
     if (!isEntryDate(date)) return err(`Invalid entry date: ${date}`);
     let text: string;
     try {
-      text = await readFile(this.entryPath(date), 'utf8');
+      text = await this.fs.readText(this.entryPath(date));
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return ok(null);
+      if (isNotFound(e)) return ok(null);
       return err(`Could not read ${date}: ${(e as Error).message}`);
     }
     return parseEntry(text, date);
@@ -48,7 +50,7 @@ export class VaultAdapter {
   async delete(date: string): Promise<Result<void>> {
     if (!isEntryDate(date)) return err(`Invalid entry date: ${date}`);
     try {
-      await rm(this.entryPath(date), { force: true });
+      await this.fs.remove(this.entryPath(date));
       return ok(undefined);
     } catch (e) {
       return err(`Could not delete ${date}: ${(e as Error).message}`);
@@ -60,18 +62,17 @@ export class VaultAdapter {
     const files: { date: string; mtimeMs: number }[] = [];
     let months: string[];
     try {
-      months = (await readdir(this.root)).filter((m) => MONTH_DIR_RE.test(m));
+      months = (await this.fs.list('')).filter((m) => MONTH_DIR_RE.test(m));
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      if (isNotFound(e)) return [];
       throw e;
     }
     for (const month of months) {
-      const dir = join(this.root, month);
-      if (!(await stat(dir)).isDirectory()) continue;
-      for (const file of await readdir(dir)) {
+      if (!(await this.fs.stat(month)).isDirectory) continue;
+      for (const file of await this.fs.list(month)) {
         const date = file.replace(/\.md$/, '');
         if (!file.endsWith('.md') || !isEntryDate(date) || date.slice(0, 7) !== month) continue;
-        files.push({ date, mtimeMs: (await stat(join(dir, file))).mtimeMs });
+        files.push({ date, mtimeMs: (await this.fs.stat(`${month}/${file}`)).mtimeMs });
       }
     }
     return files;
@@ -82,9 +83,9 @@ export class VaultAdapter {
     if (!MONTH_DIR_RE.test(month)) return err(`Invalid month: ${month}`);
     let files: string[];
     try {
-      files = await readdir(join(this.root, month));
+      files = await this.fs.list(month);
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return ok([]);
+      if (isNotFound(e)) return ok([]);
       return err(`Could not read ${month}: ${(e as Error).message}`);
     }
     const entries: Entry[] = [];
@@ -100,9 +101,9 @@ export class VaultAdapter {
   /** Modification time of an entry's file, or null if it does not exist. */
   async mtime(date: string): Promise<number | null> {
     try {
-      return (await stat(this.entryPath(date))).mtimeMs;
+      return (await this.fs.stat(this.entryPath(date))).mtimeMs;
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return null;
+      if (isNotFound(e)) return null;
       throw e;
     }
   }
@@ -112,16 +113,15 @@ export class VaultAdapter {
     const summaries: EntrySummary[] = [];
     let months: string[];
     try {
-      months = (await readdir(this.root)).filter((m) => MONTH_DIR_RE.test(m));
+      months = (await this.fs.list('')).filter((m) => MONTH_DIR_RE.test(m));
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ENOENT') return ok([]);
+      if (isNotFound(e)) return ok([]);
       return err(`Could not read vault: ${(e as Error).message}`);
     }
     for (const month of months) {
       if (range && (month < range.from.slice(0, 7) || month > range.to.slice(0, 7))) continue;
-      const dir = join(this.root, month);
-      if (!(await stat(dir)).isDirectory()) continue;
-      for (const file of await readdir(dir)) {
+      if (!(await this.fs.stat(month)).isDirectory) continue;
+      for (const file of await this.fs.list(month)) {
         const date = file.replace(/\.md$/, '');
         if (!file.endsWith('.md') || !isEntryDate(date)) continue;
         if (range && (date < range.from || date > range.to)) continue;

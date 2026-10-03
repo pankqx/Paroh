@@ -2,8 +2,11 @@ import { useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 import { addDays } from '../../../shared/localDate';
 import { areaLabel, STORY_STATUSES, type LifeStory } from '../../../shared/types/LifeStory';
 import { assignLanes, storySpan, timelineColumns, timelineFraction, timelineYears, type Zoom } from '../../domain/horizons';
+import { PHONE_QUERY, useMediaQuery } from '../../hooks/useMediaQuery';
 
-const LABEL_W = 150;
+const LABEL_W_WIDE = 150;
+// On a phone the area labels give up width to the timeline itself.
+const LABEL_W_PHONE = 120;
 const COL_W: Record<Zoom, number> = { year: 240, quarter: 150 };
 const MIN_BAND = 150;
 const LANE_H = 52;
@@ -21,6 +24,7 @@ interface Props {
 
 /** Years run left to right, life areas top to bottom (§10). Native scrolling gives the momentum; the list view is the accessible twin. */
 export function TimelineCanvas({ areas, stories, today, zoom, onZoom, onOpen, onAdd }: Props) {
+  const LABEL_W = useMediaQuery(PHONE_QUERY) ? LABEL_W_PHONE : LABEL_W_WIDE;
   const ref = useRef<HTMLDivElement>(null);
   const years = timelineYears(stories, today);
   const cols = timelineColumns(years, zoom);
@@ -32,7 +36,7 @@ export function TimelineCanvas({ areas, stories, today, zoom, onZoom, onOpen, on
   useLayoutEffect(() => {
     const el = ref.current;
     if (el) el.scrollLeft = Math.max(0, LABEL_W + todayX - el.clientWidth / 3);
-  }, [zoom, todayX]);
+  }, [zoom, todayX, LABEL_W]);
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const el = ref.current;
@@ -68,7 +72,7 @@ export function TimelineCanvas({ areas, stories, today, zoom, onZoom, onOpen, on
           return (
             <div key={area} className="timeline-row">
               <div className="timeline-label" style={{ width: LABEL_W }}>
-                <span>{areaLabel(area)}</span>
+                <span title={areaLabel(area)}>{areaLabel(area)}</span>
                 <button className="icon-btn small" aria-label={`Add a story to ${areaLabel(area)}`} onClick={() => onAdd(area)}>
                   +
                 </button>

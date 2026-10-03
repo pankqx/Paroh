@@ -47,6 +47,7 @@ docs/
 ├── api.md                      IPC contract reference — every channel, typed
 ├── contribution.md             How to contribute — references coding-standards + quality checklist
 ├── decisions.md                Log of smaller decisions not big enough for architecture.md
+├── mobile.md                   The Android app: getting it, syncing, what is desktop-only
 └── future-ideas.md             Parked ideas — Seasons, AI Chapters narrative, encryption, multi-vault, plugin API
 ```
 
@@ -333,7 +334,7 @@ Per `architecture.md`'s Engineering Quality Standards, Domain and Application la
 ## What's Deliberately Not Here Yet
 
 - No `plugins/` folder — per `architecture.md`, plugin seams exist in code (Tiptap extensions, `AIProvider`, Prompt Packs, `VaultAdapter`) but there is no plugin loader or marketplace scaffolding until Phase 5+.
-- No `mobile/` folder — the mobile port reuses `src/renderer` and `src/shared` almost entirely; when it starts, it'll add a `src/mobile-main/` (Capacitor's equivalent of `src/main/`) rather than a parallel app.
+- No `mobile/` folder — the mobile port reuses `src/renderer` and `src/shared` almost entirely. As built in Phase 9, `src/mobile-main/` (Capacitor's equivalent of `src/main/`) installs `window.paroh` on the phone, and `android/` is the generated Capacitor Android project.
 - No `chapters/` folder in the vault — see above, intentional.
 - No `encrypted-vault/` variant — tracked in `future-ideas.md`, not designed yet.
 

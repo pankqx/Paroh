@@ -1,0 +1,6 @@
+# Keep LF everywhere, so Windows checkouts read the same bytes the tests expect.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.bat text eol=crlf
+*.jar binary

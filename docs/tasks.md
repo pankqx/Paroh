@@ -2,8 +2,8 @@
 
 > This file reflects the current repository state only. It is updated when the documentation or implementation status changes.
 
-**Active phase:** Phase 5 — Horizons & Chapters (implemented, in review)
-**Last updated:** 2026-10-02
+**Active phase:** Phase 8 — AI Features, Opt-In (implemented, in review)
+**Last updated:** 2026-10-03
 
 ---
 
@@ -53,14 +53,52 @@
 - [x] Sidebar grouped into Today and Reflect.
 - [x] Tests: word counts, chapter stats and week grouping, landscape summary, timeline spans, columns and lanes, life story file format and round-trip, the Horizons store (unique slugs, moving between areas, unknown keys kept, path escapes rejected), month loading, axe-core for Chapters, the timeline, the list and the editor.
 
-## TODO (Phase 6 — Polish & Packaging)
+## DONE (Phase 6)
 
-- [ ] Settings page (vault, export/import, reminders, privacy and crisis-resources line).
-- [ ] `.deb` / `.AppImage` builds via electron-builder, including `npm run build:ubuntu`.
-- [ ] Onboarding, and a design and accessibility pass across every screen.
+- [x] Settings page: vault folder (show, change), export and import, daily reminder, AI features section (every feature off by default, each with its own switch and a sentence on what leaves the device), the permanent privacy and crisis-resources line, About.
+- [x] Export: one `.zip` of the whole vault (entries, audio, horizons, `.paroh/*.json`), leaving out the disposable search index and temp files, with progress and specific errors (disk full, no permission). Import unpacks an export into an empty folder, checks it is a Paroh vault, and switches to it. No zip dependency: a small reader/writer in `src/main/vault/zip.ts`, with CRC checks and path-escape protection.
+- [x] Choosing a folder that already holds unrelated files asks first, everywhere (onboarding, Settings, sidebar).
+- [x] Onboarding on first launch: what Paroh is, where the journal will live, the privacy line. Shown once; anyone who already picked a folder skips it.
+- [x] Packaging: `npm run build:ubuntu` builds `.deb` and `.AppImage` with electron-builder (`electron-builder.yml`), with an app icon in `build/`. Only `yaml` ships as a runtime dependency; renderer libraries are bundled by Vite.
+- [x] A global reduced-motion rule.
+- [x] Tests: zip round-trip byte for byte, readable by Python's zipfile, unsafe paths and damaged archives rejected, folder classification, reminder timing, axe-core for Settings and onboarding.
+
+## DONE (Phase 7)
+
+- [x] `npm run build:windows` builds a per-user NSIS installer (`Paroh-Setup-<version>.exe`) with Start menu and desktop shortcuts; uninstalling never touches the vault. The `Build Windows` workflow uploads it.
+- [x] The unit suite runs on `windows-latest` as well as Ubuntu in CI.
+- [x] Windows fixes: notifications get an AppUserModelID, the file watcher understands `\` paths, the default menu bar is hidden (Alt shows it), and a second launch focuses the open window (on every platform).
+- [x] `.gitattributes` keeps LF line endings on Windows checkouts.
+- [ ] Real-machine pass with `docs/windows-qa.md` (needs a person on Windows).
+- [ ] Code signing, so SmartScreen stops warning (needs a certificate).
+
+## DONE (Phase 8)
+
+- [x] The `AIProvider` seam (`src/main/ai/AIProvider.ts`): one narrow binding per feature, so switching one on never routes another feature's data anywhere.
+- [x] Editor's Note in Chapters, through `CloudAIProvider` (Claude via the Anthropic API, the person's own key). Off by default. Sends only that month's entry text, moods and tags. The draft is shown first and only written to `<vault>/chapters/YYYY-MM.md` when the person keeps it; it can be stopped, retried, discarded or removed.
+- [x] The Anthropic key is stored encrypted with the OS keyring in the app's config folder (never the vault, never sent back to the renderer). Without a keyring it is stored obscured, owner-only, and Settings says so.
+- [x] Local transcription: a per-recording Transcribe button in Audio Logs runs Whisper base on this computer (Transformers.js on ONNX Runtime Web, in a worker). The model is downloaded once from Hugging Face by the main process into the app's config folder and served read-only over `paroh-model://`. Transcripts live in `.paroh/audio.json` and are searchable (index version 4).
+- [x] Each feature has its own switch in Settings with its sentence on what leaves the device. The main process re-reads the switch on every request, so turning one off stops the very next action.
+- [x] Tests: Claude request shape (model, fallback beta, effort, key header) and error wording against a fake API, consent gating, draft-not-written, note file round trip, unsafe months rejected, key store, model download (optional files, failed downloads clean up, path escapes refused), transcripts stored, indexed and re-indexed, axe-core with the features on.
+- [ ] A real transcription run with the downloaded model (the build sandbox cannot reach Hugging Face; everything up to the model weights was checked in the packaged app).
+
+## DONE (Phase 9)
+
+- [x] The vault code no longer depends on Node: a `VaultFs` interface (`src/shared/fs/VaultFs.ts`) with `NodeVaultFs` on the desktop and `CapacitorVaultFs` on phones, and a `SearchIndex` interface with SQLite on the desktop and an in-memory index (`MemoryIndex`) on phones. `VaultService` holds the shared logic; the desktop's `EntryService` adds the file watcher. The same `VaultAdapter`, stores and atomic-save pipeline run on both.
+- [x] A Capacitor Android app (`android/`, `capacitor.config.ts`) running the same React app. Its `window.paroh` (`src/mobile-main/mobileApi.ts`) calls the vault services directly instead of over IPC. The vault lives in `Documents/Paroh`, in the identical Markdown format, and the app catches up on files a sync app changed whenever it comes back to the foreground.
+- [x] Phone layout: below 900px the sidebar becomes a drawer behind a menu button, the top bar compacts, pages and the editor stack in one column, touch targets are at least 44px on touch screens, safe-area insets are respected, and the Horizons label column narrows on phones.
+- [x] Desktop-only for now, and labelled as such on the phone: export/import, the daily reminder, the AI features and transcription. Recording audio works on the phone.
+- [x] The `Build Android` workflow builds a debug APK on a GitHub runner (`npm run build:android` does the same locally with the Android SDK).
+- [x] Tests: one contract suite runs every `VaultFs` behaviour against both the Node and Capacitor implementations, the index suite runs against both SQLite and the in-memory index, the phone API is tested end to end on a fake Capacitor filesystem, axe-core covers the phone layout, and `tsconfig.mobile.json` type-checks the phone bundle without Node types so a Node import there fails CI.
+- [ ] A run on a real Android phone, and the waiting-room test from the roadmap with a real sync app (needs a person and a phone).
+- [ ] iOS (needs a Mac with Xcode).
+- [ ] On Android 11 and newer, files another app (such as Syncthing) creates in `Documents/Paroh` may not be readable by Paroh without broader storage access; see `docs/mobile.md`.
+
+## Later
+
 - [ ] Horizons: drag stories between periods, and rename or hide life areas.
+- [ ] Accent colour and dark mode in Settings (the spec marks these "once available").
 
 ## Known gaps
 
-- `npm run build:ubuntu` (used by the release workflow) is not defined yet; packaging lands in the Polish & Packaging phase.
 - Opener images in `assets/openers/quotes.json` are placeholders; the opener card uses a gradient until real images exist.

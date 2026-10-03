@@ -71,6 +71,35 @@ The original brainstorm's Google-Maps-style continuous zoom is a genuinely good 
 - **Horizons is not watched for outside edits** in v1; it reloads each time the page opens. Entries remain the only watched files.
 - **Dragging cards between periods is deferred.** The editor's "when" field does the same job and works by keyboard; drag can come in the polish phase.
 
+### 2026-10-03 — Phase 6 implementation choices
+- **A built-in ZIP writer and reader** instead of a dependency. The format needs only store and deflate, Node has `zlib.crc32`, and every byte of the user's safety net stays inspectable in one file. Archives are checked readable by Python's `zipfile` in the tests.
+- **Exports leave out `.paroh/index.db`**, since the index is rebuilt from the files on first open.
+- **The main process remembers the folder awaiting confirmation**, so the renderer can confirm a choice but never name an arbitrary path for Paroh to write into.
+- **electron-builder's old `@electron/get` is overridden to 5.x** (the version Electron itself uses), which removes a high-severity advisory in `http-cache-semantics` that has no patched release. It only affects the packaging tool, never the shipped app.
+- **Renderer libraries moved to devDependencies.** Vite bundles them, so shipping their `node_modules` again only made the installer bigger.
+- **Accent colour and dark mode wait.** The spec lists them "once available"; the design system has no dark tokens yet.
+
+### 2026-10-03 — Phase 7 implementation choices
+- **NSIS, per user, not one-click.** No admin prompt, and the person can see and choose where it goes. MSI was dropped from the workflow's artifact list because nothing builds one; NSIS is electron-builder's default and supports updates later.
+- **Windows runs the whole unit suite in CI** rather than a separate Windows-only test set, so any path or file-locking difference shows up as a normal red check.
+- **Single-instance lock on every platform.** Two windows on one vault would mean two watchers and two indexes racing on the same files.
+- **Unsigned for now.** Signing needs a certificate only the project owner can buy; `docs/windows-qa.md` tells testers how to get past SmartScreen.
+
+### 2026-10-03 — Phase 8 implementation choices
+- **The person's own Anthropic key, no Paroh server.** There is nothing in between to trust or pay for. The key is encrypted with Electron's `safeStorage` in the config folder, so an exported or synced vault never carries it.
+- **Claude Opus 5.5 at low effort, with server-side fallback.** A month's note is short; low effort keeps it quick and cheap. `fallbacks: "default"` lets Anthropic retry a classifier decline on its recommended model instead of failing.
+- **Notes live in `<vault>/chapters/`** as Markdown with frontmatter, so they export, sync and read like everything else. Nothing is written until the person keeps a draft.
+- **Transcription runs in the renderer on ONNX Runtime Web (WASM), not a native module.** `onnxruntime-node` downloads extra binaries at install time and would need per-platform packaging; the WASM build runs everywhere Electron does, including the planned Capacitor app. The native `onnxruntime-node` and `sharp` packages Transformers.js lists are replaced with empty stubs (`tools/stubs/`, npm `overrides`) because they are never used.
+- **The main process downloads the model**, keeping every network call in main per `security.md`; the renderer reads the files through a read-only `paroh-model://` scheme with path-escape checks. Whisper base (multilingual, 8-bit, about 80 MB) balances quality and download size.
+- **Transcripts go in `.paroh/audio.json`, not the entry body.** The person decides what enters their writing; the search index keeps transcripts findable on their own.
+
+### 2026-10-03 — Phase 9 implementation choices
+- **One React app, two hosts.** The phone runs the exact renderer bundle; only `window.paroh` differs. On the desktop it is the IPC bridge, on the phone it is `mobileApi.ts`, which calls the same vault services in the WebView. No second codebase, as `architecture.md` §Mobile Reuse Strategy planned.
+- **The swap happens at a `VaultFs` interface, not inside each store.** Every store and the `VaultAdapter` take a `VaultFs`, so the atomic save pipeline (write temp, read back, validate, replace) is the same code on both platforms. A contract test holds the two implementations to the same behaviour.
+- **An in-memory search index on phones.** `node:sqlite` does not exist in a WebView and a native SQLite plugin adds a second schema to keep in step. A personal journal is small enough to index on launch, and the index is disposable by design.
+- **Android first.** It can be built on Linux CI; iOS needs a Mac. The `Documents/Paroh` folder is where sync apps can reach it.
+- **Desktop-only features say so on the phone** instead of half-working: export/import (the phone folder is already plain files), the reminder (needs a notification plugin) and the AI features (key storage and the speech model need their own phone work).
+
 ---
 
 ## Template for New Entries
